@@ -248,7 +248,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.0</span>
+    <span class="build-date">v1.1</span>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
       <span class="zoom-label" id="zoomLabel">100%</span>
@@ -423,7 +423,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.0
+// reviewcheck v1.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -574,7 +574,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.0' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.1' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -717,11 +717,11 @@ async function fetchAllProductInfo() {
         if (!code) return;
 
         const images = (item.mediumImageUrls || []).map(o => o.imageUrl || (typeof o === 'string' ? o : null)).filter(Boolean);
-        // 1枚目, 2枚目, 4枚目 → indices 0, 1, 3
+        // 1枚目, 2枚目, 3枚目 → indices 0, 1, 2 (楽天APIは最大3枚まで返す)
         const targetImages = [
           _hiResImg(images[0] || null),
           _hiResImg(images[1] || null),
-          _hiResImg(images[3] || null),
+          _hiResImg(images[2] || null),
         ];
 
         if (!productCache[code]) {
@@ -862,8 +862,8 @@ function _renderCard(code) {
   const lastFetchedDate = p.lastFetched ? new Date(p.lastFetched).toLocaleDateString('ja-JP') : '—';
   const checkedAtDate = p.checkedAt ? new Date(p.checkedAt).toLocaleDateString('ja-JP') : '';
 
-  // 画像セル(1, 2, 4枚目)
-  const imageLabels = ['1', '2', '4'];
+  // 画像セル(1, 2, 3枚目)
+  const imageLabels = ['1', '2', '3'];
   const imagesHtml = (p.images || [null, null, null]).map((img, i) => {
     if (!img) {
       return `<div class="image-cell empty">
@@ -1264,7 +1264,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.0 initialized');
+  console.log('[reviewcheck] v1.1 initialized');
 }
 
 init();
