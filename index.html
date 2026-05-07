@@ -93,7 +93,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 4px; word-break: break-all; }
 .product-name a { color: inherit; text-decoration: none; }
 .product-name a:hover { color: var(--accent); text-decoration: underline; }
-.product-code { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.product-code { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.product-code .code-sep { color: var(--text3); opacity: 0.5; }
+.product-code .item-number { color: var(--accent); font-weight: 600; }
+.product-code .item-number-empty { color: var(--text3); font-style: italic; cursor: pointer; padding: 1px 6px; border: 1px dashed var(--border2); border-radius: 3px; transition: all 0.15s; }
+.product-code .item-number-empty:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.product-code .item-number-edit-btn { background: none; border: none; cursor: pointer; padding: 0 2px; color: var(--text3); font-size: 10px; opacity: 0; transition: opacity 0.15s; }
+.product-card:hover .product-code .item-number-edit-btn { opacity: 1; }
+.product-code .item-number-edit-btn:hover { color: var(--accent); }
+.item-number-input { font-family: 'DM Mono', monospace; font-size: 10px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 3px; outline: none; min-width: 120px; }
 .product-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
 .check-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 10px; border-radius: 14px; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
@@ -247,7 +255,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.2</span>
+    <span class="build-date">v1.3</span>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
       <span class="zoom-label" id="zoomLabel">100%</span>
@@ -257,6 +265,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
     <button class="header-btn" onclick="openSettings()">⚙ 設定</button>
     <button class="header-btn" onclick="manualFetchAll()" id="fetchBtn">🔄 商品データ取得</button>
+    <button class="header-btn" onclick="document.getElementById('csvFileInput').click()" title="楽天RMSの商品別売上CSVから商品番号をインポート">📋 商品番号CSV</button>
+    <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <button class="header-btn primary" onclick="openSettings()">+ 始める</button>
   </div>
 </header>
@@ -266,7 +276,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   <!-- Toolbar -->
   <div class="toolbar" id="toolbar" style="display:none">
     <div class="toolbar-group">
-      <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品番号で検索..." oninput="renderProducts()">
+      <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
     </div>
     <div class="toolbar-group">
       <span class="toolbar-label">表示:</span>
@@ -422,7 +432,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.2
+// reviewcheck v1.3
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -573,7 +583,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.2' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.3' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -733,6 +743,7 @@ async function fetchAllProductInfo() {
             itemUrl: item.itemUrl || '',
             lastFetched: new Date().toISOString(),
             checked: false,
+            itemNumber: null,
           };
         } else {
           updateCount++;
@@ -828,7 +839,7 @@ function renderProducts() {
     if (currentFilter === 'unchecked' && p.checked) return false;
     if (currentFilter === 'hasReviews' && (!p.reviewCount || p.reviewCount === 0)) return false;
     if (search) {
-      const hay = (code + ' ' + (p.name || '')).toLowerCase();
+      const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -880,7 +891,14 @@ function _renderCard(code) {
     <div class="product-header">
       <div class="product-info">
         <div class="product-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></div>
-        <div class="product-code">${_escape(code)}</div>
+        <div class="product-code">
+          <span>${_escape(code)}</span>
+          <span class="code-sep">/</span>
+          ${p.itemNumber 
+            ? `<span class="item-number" id="itemnum-${_escape(code)}">${_escape(p.itemNumber)}</span><button class="item-number-edit-btn" onclick="editItemNumber('${_escape(code)}')" title="商品番号を編集">✎</button>` 
+            : `<span class="item-number-empty" onclick="editItemNumber('${_escape(code)}')" title="商品番号を入力">+ 商品番号</span>`
+          }
+        </div>
       </div>
       <div class="product-actions">
         <button class="check-toggle ${p.checked ? 'on' : ''}" onclick="toggleCheck('${_escape(code)}')">
@@ -1251,6 +1269,168 @@ function adjustZoom(delta) {
   _applyZoom(z);
 }
 
+// ── CSV インポート（商品管理番号 → 商品番号） ──
+function handleCsvImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const text = e.target.result;
+      const result = _parseSalesListCsv(text);
+      if (!result.ok) {
+        alert('⚠ CSV解析エラー: ' + result.error);
+        return;
+      }
+      const { mapping } = result;
+      const total = Object.keys(mapping).length;
+      if (total === 0) {
+        alert('⚠ CSVから商品管理番号と商品番号のペアが見つかりませんでした。');
+        return;
+      }
+      // 既存の productCache とマッチング
+      let matched = 0;
+      let updated = 0;
+      let skipped = 0;
+      let notFound = 0;
+      for (const [kanri, bangou] of Object.entries(mapping)) {
+        if (productCache[kanri]) {
+          matched++;
+          if (productCache[kanri].itemNumber) {
+            // 既に商品番号あり → スキップ（安全重視）
+            skipped++;
+          } else {
+            productCache[kanri].itemNumber = bangou;
+            updated++;
+          }
+        } else {
+          notFound++;
+        }
+      }
+      if (updated === 0 && skipped === 0) {
+        alert(`⚠ CSV内の商品(${total}件)とは1件もマッチしませんでした。\n商品データを先に取得してから再度CSVインポートしてください。`);
+        return;
+      }
+      alert(`📋 CSVインポート完了！\n\n` +
+        `CSV内の商品: ${total}件\n` +
+        `→ マッチ: ${matched}件\n` +
+        `  → 商品番号を新規追加: ${updated}件\n` +
+        `  → 既に登録済み(スキップ): ${skipped}件\n` +
+        `→ 未マッチ(reviewcheckに無い商品): ${notFound}件`
+      );
+      renderProducts();
+      scheduleGitHubSave();
+    } catch(err) {
+      alert('⚠ CSV読込エラー: ' + (err.message || err));
+    } finally {
+      event.target.value = ''; // 同じファイルを再選択できるようにクリア
+    }
+  };
+  reader.onerror = () => alert('⚠ ファイル読込に失敗しました');
+  reader.readAsText(file, 'UTF-8');
+}
+
+function _parseSalesListCsv(text) {
+  // BOM除去
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const lines = text.split(/\r?\n/);
+  // ヘッダー行を探す（「商品管理番号」と「商品番号」を含む行）
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    if (lines[i].includes('商品管理番号') && lines[i].includes('商品番号')) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx < 0) {
+    return { ok: false, error: 'ヘッダー行(商品管理番号/商品番号)が見つかりません' };
+  }
+  const headerCells = _parseCsvLine(lines[headerIdx]);
+  const kanriIdx = headerCells.indexOf('商品管理番号');
+  const bangouIdx = headerCells.indexOf('商品番号');
+  if (kanriIdx < 0 || bangouIdx < 0) {
+    return { ok: false, error: '列が見つかりません' };
+  }
+  // データ行をパース
+  const mapping = {};
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const cells = _parseCsvLine(line);
+    const kanri = (cells[kanriIdx] || '').trim();
+    const bangou = (cells[bangouIdx] || '').trim();
+    if (kanri && bangou) {
+      mapping[kanri] = bangou;
+    }
+  }
+  return { ok: true, mapping };
+}
+
+// 簡易CSVパーサ（ダブルクォート対応）
+function _parseCsvLine(line) {
+  const result = [];
+  let cur = '';
+  let inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQuote) {
+      if (c === '"') {
+        if (line[i+1] === '"') { cur += '"'; i++; }
+        else { inQuote = false; }
+      } else {
+        cur += c;
+      }
+    } else {
+      if (c === '"') inQuote = true;
+      else if (c === ',') { result.push(cur); cur = ''; }
+      else cur += c;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── 商品番号 編集 ──
+function editItemNumber(code) {
+  if (!productCache[code]) return;
+  const card = document.getElementById('card-' + code);
+  if (!card) return;
+  const codeDiv = card.querySelector('.product-code');
+  if (!codeDiv) return;
+  const current = productCache[code].itemNumber || '';
+  codeDiv.innerHTML = `
+    <span>${_escape(code)}</span>
+    <span class="code-sep">/</span>
+    <input type="text" class="item-number-input" id="itemnum-input-${_escape(code)}" value="${_escape(current)}" placeholder="例: ih-22-04-set1">
+    <button class="item-number-edit-btn" style="opacity:1;color:var(--green)" onclick="saveItemNumber('${_escape(code)}')" title="保存">✓</button>
+    <button class="item-number-edit-btn" style="opacity:1" onclick="cancelEditItemNumber('${_escape(code)}')" title="キャンセル">✕</button>
+  `;
+  const input = document.getElementById('itemnum-input-' + code);
+  input.focus();
+  input.select();
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveItemNumber(code);
+    else if (e.key === 'Escape') cancelEditItemNumber(code);
+  });
+}
+
+function saveItemNumber(code) {
+  if (!productCache[code]) return;
+  const input = document.getElementById('itemnum-input-' + code);
+  if (!input) return;
+  const value = input.value.trim();
+  productCache[code].itemNumber = value || null;
+  // カードを部分更新
+  const card = document.getElementById('card-' + code);
+  if (card) card.outerHTML = _renderCard(code);
+  scheduleGitHubSave();
+}
+
+function cancelEditItemNumber(code) {
+  const card = document.getElementById('card-' + code);
+  if (card) card.outerHTML = _renderCard(code);
+}
+
 // ── 起動 ──
 async function init() {
   _applyZoom(_getZoom());
@@ -1263,7 +1443,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.2 initialized');
+  console.log('[reviewcheck] v1.3 initialized');
 }
 
 init();
