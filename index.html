@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>reviewcheck — 楽天レビュー＆商品画像チェック</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #BF0000;
+  --red-dark: #8a0000;
+  --red-light: #fef2f2;
+  --bg: #f8f7f5;
+  --surface: #ffffff;
+  --surface2: #f3f2ef;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a1a;
+  --text2: #666;
+  --text3: #999;
+  --green: #1D9E75;
+  --amber: #BA7517;
+  --danger: #A32D2D;
+  --gold: #f5a623;
+  --accent: #BF0000;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: none; text-size-adjust: none; zoom: 1; }
+body { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── Header ── */
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.logo { flex-shrink: 0; line-height: 0; width: auto; cursor: pointer; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.header-btn { font-size: 12px; padding: 6px 12px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.header-btn:hover { background: var(--surface2); border-color: var(--border2); }
+.header-btn.primary { background: var(--red); color: #fff; border-color: var(--red); }
+.header-btn.primary:hover { background: var(--red-dark); }
+.header-btn.danger-btn { color: var(--danger); border-color: rgba(163,45,45,0.3); }
+.header-btn.danger-btn:hover { background: var(--red-light); }
+.build-date { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; padding: 2px 6px; }
+
+/* API status badge */
+.api-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-family: 'DM Mono', monospace; cursor: pointer; }
+.api-status.unset { background: #fff3cd; color: #6d4c00; border: 1px solid #ffe082; }
+.api-status.ok { background: #e6f9f1; color: #1D9E75; border: 1px solid rgba(29,158,117,0.3); }
+.api-status.error { background: var(--red-light); color: var(--danger); border: 1px solid rgba(163,45,45,0.3); }
+
+/* Save status indicator */
+.save-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-family: 'Noto Sans JP', sans-serif; }
+.save-status.saved { background: #e6f9f1; color: var(--green); }
+.save-status.pending { background: #fff8e1; color: var(--amber); }
+.save-status.saving { background: #e3f2fd; color: #0288d1; }
+.save-status.error { background: var(--red-light); color: var(--danger); }
+
+/* ── Layout ── */
+.container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+/* ── Toolbar ── */
+.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.toolbar-group { display: flex; align-items: center; gap: 8px; }
+.toolbar-label { font-size: 11px; color: var(--text3); font-weight: 500; }
+.search-input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; min-width: 220px; }
+.search-input:focus { outline: none; border-color: var(--accent); }
+.toolbar-stat { font-size: 12px; color: var(--text2); }
+.toolbar-stat strong { color: var(--text); font-family: 'DM Mono', monospace; }
+.filter-pill { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border2); border-radius: 12px; background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.filter-pill:hover { background: var(--surface2); }
+.filter-pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+.sort-select { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; cursor: pointer; }
+
+/* ── Empty state ── */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.empty-icon { width: 64px; height: 64px; background: var(--red-light); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+.empty-upload-btn { font-size: 13px; padding: 10px 20px; border-radius: var(--radius-sm); border: none; background: var(--red); color: #fff; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; }
+.empty-upload-btn:hover { background: var(--red-dark); }
+
+/* ── Product grid ── */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(540px, 1fr)); gap: 16px; }
+.product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); transition: all 0.15s; position: relative; }
+.product-card:hover { border-color: var(--border2); }
+.product-card.checked { background: #fafff8; border-color: rgba(29,158,117,0.3); }
+.product-card.checked::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--green); border-radius: var(--radius) 0 0 var(--radius); }
+
+.product-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.product-info { flex: 1; min-width: 0; }
+.product-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 4px; word-break: break-all; }
+.product-name a { color: inherit; text-decoration: none; }
+.product-name a:hover { color: var(--accent); text-decoration: underline; }
+.product-code { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.product-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.check-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 10px; border-radius: 14px; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+.check-toggle:hover { background: var(--surface2); }
+.check-toggle.on { background: var(--green); color: #fff; border-color: var(--green); }
+.check-toggle.on:hover { background: #178660; }
+.check-toggle .check-icon { font-size: 13px; line-height: 1; }
+
+/* ── Review summary row ── */
+.review-summary { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface2); border-radius: var(--radius-sm); }
+.review-stars { display: inline-flex; align-items: center; gap: 2px; }
+.star { color: #ddd; font-size: 14px; line-height: 1; }
+.star.filled { color: var(--gold); }
+.star.half { background: linear-gradient(90deg, var(--gold) 50%, #ddd 50%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.review-avg { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
+.review-count { font-size: 11px; color: var(--text2); }
+.review-count strong { color: var(--text); font-family: 'DM Mono', monospace; }
+.review-link-btn { margin-left: auto; font-size: 11px; padding: 5px 10px; border: 1px solid var(--accent); border-radius: var(--radius-sm); background: var(--surface); color: var(--accent); text-decoration: none; font-weight: 600; transition: all 0.15s; white-space: nowrap; }
+.review-link-btn:hover { background: var(--accent); color: #fff; }
+.review-link-btn.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
+
+/* ── Image strip ── */
+.image-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.image-cell { position: relative; aspect-ratio: 1 / 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; }
+.image-cell img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform 0.2s; }
+.image-cell:hover img { transform: scale(1.02); }
+.image-cell.empty { display: flex; align-items: center; justify-content: center; cursor: default; }
+.image-cell.empty .empty-placeholder { font-size: 11px; color: var(--text3); text-align: center; padding: 8px; }
+.image-cell .image-label { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-family: 'DM Mono', monospace; pointer-events: none; }
+.image-cell.loading { background: linear-gradient(90deg, var(--surface2) 0%, #ebe9e6 50%, var(--surface2) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── Memo / status ── */
+.product-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; color: var(--text3); padding-top: 6px; border-top: 1px solid var(--border); }
+.product-meta .checked-info { color: var(--green); font-weight: 600; }
+
+/* ── Image lightbox ── */
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; padding: 20px; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 95vw; max-height: 90vh; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; }
+.lightbox-close:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Modal ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.modal p { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.6; }
+.modal-field { margin-bottom: 14px; }
+.modal-label { display: block; font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+.modal-input { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: inherit; }
+.modal-input:focus { outline: none; border-color: var(--accent); }
+.modal-hint { font-size: 10px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+.modal-status { font-size: 11px; padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 10px; min-height: 32px; }
+.modal-status.ok { background: #e6f9f1; color: var(--green); }
+.modal-status.error { background: var(--red-light); color: var(--danger); }
+.modal-status.info { background: #e3f2fd; color: #0288d1; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.modal-btn { font-size: 12px; padding: 7px 14px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.modal-btn:hover { background: var(--surface2); }
+.modal-btn.save { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
+.modal-btn.save:hover { background: var(--red-dark); }
+.modal-btn.danger { background: var(--surface); color: var(--danger); border-color: rgba(163,45,45,0.3); }
+.modal-btn.danger:hover { background: var(--red-light); }
+
+/* ── Shop selector ── */
+#shopSelectorWrap { position: relative; margin-left: 8px; }
+#shopSelectorBtn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border2); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+#shopSelectorBtn:hover { background: var(--surface2); }
+#shopMenu { display: none; position: fixed; margin-top: 4px; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); min-width: 240px; z-index: 99999; overflow: hidden; }
+.shop-menu-item { display: block; width: 100%; text-align: left; padding: 10px 14px; border: none; background: none; cursor: pointer; font-size: 12px; color: var(--text); font-family: inherit; transition: background 0.15s; }
+.shop-menu-item:hover { background: var(--surface2); }
+.shop-menu-item.current { background: var(--surface2); font-weight: 600; }
+
+/* ── Lock UI (for save in progress) ── */
+#lockOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+#lockOverlay.show { display: flex; }
+.lock-card { background: var(--surface); border-radius: var(--radius); padding: 24px 28px; max-width: 420px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.lock-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.lock-sub { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+.lock-progress { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+.lock-bar { height: 100%; background: var(--accent); width: 0; transition: width 0.3s; }
+.lock-bar.indeterminate { width: 30%; animation: indet 1.2s infinite ease-in-out; }
+@keyframes indet { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+.lock-pct { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 12px; }
+.lock-warn { font-size: 11px; color: var(--amber); line-height: 1.5; }
+
+/* ── Zoom buttons ── */
+.zoom-control { display: flex; align-items: center; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 4px; }
+.zoom-btn { border: none; background: none; cursor: pointer; font-weight: 700; color: var(--text2); padding: 2px 6px; border-radius: 4px; line-height: 1; }
+.zoom-btn:hover { background: var(--surface); color: var(--text); }
+.zoom-label { font-size: 11px; color: var(--text3); min-width: 36px; text-align: center; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .product-grid { grid-template-columns: 1fr; }
+  header { padding: 0 12px; }
+  .container { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Lock overlay (during GitHub save) -->
+<div id="lockOverlay">
+  <div class="lock-card">
+    <div class="lock-title">📥 データを保存中...</div>
+    <div class="lock-sub" id="lockSubMsg">GitHubにデータを記録しています。<br>完了するまでお待ちください。</div>
+    <div class="lock-progress"><div class="lock-bar indeterminate" id="lockBar"></div></div>
+    <div class="lock-pct" id="lockPct"></div>
+    <div class="lock-warn">⚠️ この画面が閉じるまでブラウザを閉じたり<br>更新ボタンを押さないでください</div>
+  </div>
+</div>
+
+<!-- Lightbox for image zoom -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="トップへ戻る">
+      <svg width="180" height="36" viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="180" height="36" rx="8" fill="#BF0000"/>
+        <!-- 星アイコン -->
+        <path d="M22 8 L24.4 13.6 L30.5 14.2 L25.9 18.3 L27.3 24.3 L22 21.1 L16.7 24.3 L18.1 18.3 L13.5 14.2 L19.6 13.6 Z" fill="white" opacity="0.95"/>
+        <!-- 縦区切り線 -->
+        <rect x="40" y="7" width="1" height="22" rx="0.5" fill="white" opacity="0.25"/>
+        <!-- review check テキスト -->
+        <text y="25" font-family="'DM Mono', 'Noto Sans JP', monospace" font-weight="700" fill="white">
+          <tspan x="48" font-size="12" opacity="0.8" letter-spacing="0.5">review</tspan><tspan font-size="15" letter-spacing="-0.3">check</tspan>
+        </text>
+      </svg>
+    </div>
+    <!-- Shop selector -->
+    <div id="shopSelectorWrap">
+      <button id="shopSelectorBtn" onclick="toggleShopMenu(event)">
+        <span style="font-size:14px">🏪</span>
+        <span id="shopSelectorLabel">—</span>
+        <span style="font-size:9px;color:var(--text3)">▼</span>
+      </button>
+      <div id="shopMenu">
+        <div id="shopMenuList"></div>
+        <div style="border-top:1px solid var(--border)"></div>
+        <button class="shop-menu-item" style="color:var(--accent);font-weight:600" onclick="event.stopPropagation();openShopAddModal();closeShopMenu()">＋ 新規ショップ追加</button>
+        <button class="shop-menu-item" style="color:var(--text2);border-top:1px solid var(--border)" onclick="event.stopPropagation();openShopManageModal();closeShopMenu()">⚙ ショップ管理</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <span class="build-date">v1.0</span>
+    <div class="zoom-control">
+      <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
+      <span class="zoom-label" id="zoomLabel">100%</span>
+      <button class="zoom-btn" style="font-size:15px" onclick="adjustZoom(+0.02)" title="文字を大きく">A+</button>
+    </div>
+    <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
+    <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
+    <button class="header-btn" onclick="openSettings()">⚙ 設定</button>
+    <button class="header-btn" onclick="manualFetchAll()" id="fetchBtn">🔄 商品データ取得</button>
+    <button class="header-btn primary" onclick="openSettings()">+ 始める</button>
+  </div>
+</header>
+
+<!-- Main container -->
+<div class="container">
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none">
+    <div class="toolbar-group">
+      <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品番号で検索..." oninput="renderProducts()">
+    </div>
+    <div class="toolbar-group">
+      <span class="toolbar-label">表示:</span>
+      <button class="filter-pill active" data-filter="all" onclick="setFilter('all')">全て</button>
+      <button class="filter-pill" data-filter="unchecked" onclick="setFilter('unchecked')">未チェック</button>
+      <button class="filter-pill" data-filter="checked" onclick="setFilter('checked')">チェック済み</button>
+      <button class="filter-pill" data-filter="hasReviews" onclick="setFilter('hasReviews')">レビューあり</button>
+    </div>
+    <div class="toolbar-group">
+      <span class="toolbar-label">並び:</span>
+      <select class="sort-select" id="sortSelect" onchange="renderProducts()">
+        <option value="default">デフォルト</option>
+        <option value="reviewCountDesc">レビュー数(多→少)</option>
+        <option value="reviewCountAsc">レビュー数(少→多)</option>
+        <option value="reviewAvgDesc">平均評価(高→低)</option>
+        <option value="reviewAvgAsc">平均評価(低→高)</option>
+        <option value="nameAsc">商品名(あ→ん)</option>
+      </select>
+    </div>
+    <div class="toolbar-group" style="margin-left:auto">
+      <span class="toolbar-stat">表示中: <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 件 ｜ チェック済: <strong id="checkedCount">0</strong></span>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="emptyState" class="empty-state">
+    <div class="empty-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2 L14.5 9 L22 9.5 L16 14 L18 21 L12 17 L6 21 L8 14 L2 9.5 L9.5 9 Z"/>
+      </svg>
+    </div>
+    <h3>レビューチェックを始めましょう</h3>
+    <p>まず ⚙ 設定 から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>商品データを取得すると、商品画像とレビュー件数・平均評価を一覧で確認できます。</p>
+    <button class="empty-upload-btn" onclick="openSettings()">⚙ 設定を開く</button>
+  </div>
+
+  <!-- Product grid -->
+  <div class="product-grid" id="productGrid" style="display:none"></div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>⚙ 設定</h3>
+    <p>楽天アプリID・アクセスキー・店舗コードを入力してください。GitHub PATを入力するとデータがGitHubに保存され、どのPCからも同じデータが閲覧できます。</p>
+    <div class="modal-field">
+      <label class="modal-label">アプリケーションID（Application ID）</label>
+      <input type="text" class="modal-input" id="appIdInput" placeholder="例：xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+      <div class="modal-hint">楽天Developers のアプリ一覧 →「アプリケーションID」欄の値です。</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">アクセスキー（Access Key）</label>
+      <input type="text" class="modal-input" id="accessKeyInput" placeholder="例：pk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="modal-hint">アプリ一覧の「アクセスキー」欄の目のアイコンをクリックすると表示されます。</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">店舗コード（shopCode）</label>
+      <input type="text" class="modal-input" id="shopCodeInput" placeholder="例：yukaiya">
+      <div class="modal-hint">楽天市場の店舗URLに含まれる英数字のコードです。<br>例：item.rakuten.co.jp/<strong>yukaiya</strong>/xxxxxxxx/</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">GitHub PAT（データ共有用・任意）</label>
+      <input type="password" class="modal-input" id="githubPatInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <div class="modal-hint">入力すると全PCでデータを共有できます。GitHubのSettings → Developer settings → Personal access tokens で発行（repo権限）。</div>
+    </div>
+    <div id="modalStatus" class="modal-status"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeSettings()">キャンセル</button>
+      <button class="modal-btn" onclick="testApi()">接続テスト</button>
+      <button class="modal-btn save" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shop add modal -->
+<div class="modal-overlay" id="shopAddModal">
+  <div class="modal" style="max-width:480px">
+    <h3>🏪 新規ショップを追加</h3>
+    <p>新しいショップのデータは <code style="background:var(--surface2);padding:2px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px">data/{ID}/</code> 以下に保存されます。</p>
+    <div class="modal-field">
+      <label class="modal-label">ショップID(英数字・ハイフンのみ)</label>
+      <input type="text" class="modal-input" id="shopAddId" placeholder="例: shop2" pattern="[a-zA-Z0-9_-]+">
+      <div class="modal-hint">後から変更不可。データ保存先のディレクトリ名になります。</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">表示名</label>
+      <input type="text" class="modal-input" id="shopAddName" placeholder="例: 第二ショップ">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">店舗コード(shopCode)</label>
+      <input type="text" class="modal-input" id="shopAddShopCode" placeholder="例: shop2">
+      <div class="modal-hint">楽天市場の店舗URL内の英数字コード。</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">アプリケーションID</label>
+      <input type="text" class="modal-input" id="shopAddAppId" placeholder="例: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">アクセスキー</label>
+      <input type="text" class="modal-input" id="shopAddAccessKey" placeholder="例: pk_xxxxxxxxxxxxxxxxxxxx">
+    </div>
+    <div id="shopAddStatus" class="modal-status"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeShopAddModal()">キャンセル</button>
+      <button class="modal-btn save" onclick="saveNewShop()">追加して切替</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shop manage modal -->
+<div class="modal-overlay" id="shopManageModal">
+  <div class="modal" style="max-width:560px">
+    <h3>⚙ ショップ管理</h3>
+    <p>登録済みショップの編集・削除ができます。</p>
+    <div id="shopManageList"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeShopManageModal()">閉じる</button>
+      <button class="modal-btn save" onclick="openShopAddModal();closeShopManageModal()">＋ 新規ショップ追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shop edit modal -->
+<div class="modal-overlay" id="shopEditModal">
+  <div class="modal" style="max-width:480px">
+    <h3>✏ ショップ編集</h3>
+    <p>表示名・API認証情報を変更できます。<br><strong>※ ショップID(<span id="shopEditIdLabel"></span>)は変更できません</strong></p>
+    <div class="modal-field">
+      <label class="modal-label">表示名</label>
+      <input type="text" class="modal-input" id="shopEditName">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">店舗コード(shopCode)</label>
+      <input type="text" class="modal-input" id="shopEditShopCode">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">アプリケーションID</label>
+      <input type="text" class="modal-input" id="shopEditAppId">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">アクセスキー</label>
+      <input type="text" class="modal-input" id="shopEditAccessKey">
+    </div>
+    <div id="shopEditStatus" class="modal-status"></div>
+    <div class="modal-actions">
+      <button class="modal-btn danger" onclick="deleteCurrentEditShop()">🗑 このショップを削除</button>
+      <button class="modal-btn" onclick="closeShopEditModal()">キャンセル</button>
+      <button class="modal-btn save" onclick="saveEditShop()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript will be added in next step -->
+<script>
+// ─────────────────────────────────────────────────────
+// reviewcheck v1.0
+// 楽天店舗向け：商品レビュー＆画像チェックツール
+// ─────────────────────────────────────────────────────
+
+// ── GitHub設定 ──
+const GH_OWNER = 'kaiyoshida0318';
+const GH_REPO = 'reviewcheck';
+
+// ── ショップ管理 ──
+const SHOPS_KEY = 'reviewcheck_shops';
+const CURRENT_SHOP_KEY = 'reviewcheck_current_shop';
+
+function _getShops() {
+  try { return JSON.parse(localStorage.getItem(SHOPS_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveShops(shops) {
+  try { localStorage.setItem(SHOPS_KEY, JSON.stringify(shops)); } catch(e) {}
+}
+function _getCurrentShopId() {
+  return localStorage.getItem(CURRENT_SHOP_KEY) || 'yukaiya';
+}
+function _setCurrentShopId(id) {
+  localStorage.setItem(CURRENT_SHOP_KEY, id);
+}
+function _getCurrentShop() {
+  const shops = _getShops();
+  const id = _getCurrentShopId();
+  return shops.find(s => s.id === id) || shops[0] || null;
+}
+
+// 初回マイグレーション：既存設定からyukaiyaショップを作成
+function _initShopsIfNeeded() {
+  const shops = _getShops();
+  if (shops.length === 0) {
+    const appId     = localStorage.getItem('rakuten_app_id')     || '';
+    const accessKey = localStorage.getItem('rakuten_access_key') || '';
+    const shopCode  = localStorage.getItem('rakuten_shop_code')  || 'yukaiya';
+    const yukaiya = {
+      id: 'yukaiya',
+      name: 'ゆかい屋',
+      appId, accessKey,
+      shopCode: shopCode || 'yukaiya',
+    };
+    _saveShops([yukaiya]);
+    _setCurrentShopId('yukaiya');
+    console.log('[reviewcheck] 初回マイグレーション: yukaiyaショップを作成');
+  }
+}
+_initShopsIfNeeded();
+
+function _shopDataDir() {
+  const id = _getCurrentShopId() || 'yukaiya';
+  return `data/${id}`;
+}
+function _ghReviewFile() { return `${_shopDataDir()}/review_data.json`; }
+
+// ── State ──
+// productCache: { [itemCode]: { name, images: [url1, url2, url4], reviewCount, reviewAvg, itemUrl, lastFetched, checked, checkedAt, memo } }
+let productCache = {};
+let currentFilter = 'all';
+let _saveTimer = null;
+let _fetchInProgress = false;
+let _saveInFlight = null;
+
+// ── localStorage cache ──
+function _cacheKey() { return 'reviewcheck_cache_' + _getCurrentShopId(); }
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(_cacheKey());
+    if (raw) productCache = JSON.parse(raw);
+    else productCache = {};
+  } catch(e) {
+    productCache = {};
+  }
+}
+function saveCache() {
+  try { localStorage.setItem(_cacheKey(), JSON.stringify(productCache)); } catch(e) {}
+}
+
+// ── Lock UI ──
+function _lockUI(msg, opts) {
+  const overlay = document.getElementById('lockOverlay');
+  if (msg) document.getElementById('lockSubMsg').innerHTML = msg;
+  const bar = document.getElementById('lockBar');
+  const pct = document.getElementById('lockPct');
+  if (opts && typeof opts.pct === 'number') {
+    bar.classList.remove('indeterminate');
+    bar.style.width = Math.min(100, Math.max(0, opts.pct)) + '%';
+    pct.textContent = Math.round(opts.pct) + '%';
+  } else {
+    bar.classList.add('indeterminate');
+    bar.style.width = '';
+    pct.textContent = '';
+  }
+  overlay.classList.add('show');
+}
+function _unlockUI() {
+  document.getElementById('lockOverlay').classList.remove('show');
+}
+
+// beforeunload guard during save
+window.addEventListener('beforeunload', (e) => {
+  if (_saveInFlight) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
+
+// ── Save status indicator ──
+function _setSaveStatus(state, msg) {
+  const el = document.getElementById('saveStatus');
+  if (!el) return;
+  if (!state) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.className = 'save-status ' + state;
+  el.textContent = msg || ({
+    saved: '💾 保存済み',
+    pending: '✏ 未保存',
+    saving: '📥 保存中...',
+    error: '⚠ 保存エラー',
+  }[state] || msg || '');
+}
+
+// ── GitHub save ──
+async function saveToGitHub(opts = {}) {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) {
+    _setSaveStatus(null);
+    return;
+  }
+  if (_saveInFlight) return _saveInFlight;
+  const showLock = opts.showLock !== false;
+  _saveInFlight = (async () => {
+    try {
+      _setSaveStatus('saving');
+      if (showLock) _lockUI('GitHubにレビューデータを記録しています。<br>完了するまでお待ちください。');
+      const headers = {
+        'Authorization': `token ${pat}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+      const file = _ghReviewFile();
+      const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
+      // 1. 現在のSHA取得
+      let sha = null;
+      try {
+        const getRes = await fetch(apiUrl, { headers });
+        if (getRes.ok) sha = (await getRes.json()).sha;
+      } catch(e) {}
+      // 2. PUT
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.0' };
+      const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
+      if (sha) body.sha = sha;
+      let putRes = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+      // 3. 409リトライ
+      let retry = 0;
+      while (putRes.status === 409 && retry < 3) {
+        retry++;
+        await new Promise(r => setTimeout(r, 500 + retry * 300));
+        const re = await fetch(apiUrl, { headers });
+        if (re.ok) body.sha = (await re.json()).sha;
+        putRes = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+      }
+      if (!putRes.ok) {
+        const e = await putRes.json().catch(() => ({}));
+        throw new Error(e.message || `HTTP ${putRes.status}`);
+      }
+      _setSaveStatus('saved');
+      console.log('[reviewcheck] GitHub保存成功');
+    } catch(e) {
+      console.error('[reviewcheck] GitHub保存エラー:', e);
+      _setSaveStatus('error', '⚠ ' + (e.message || 'エラー'));
+    } finally {
+      if (showLock) _unlockUI();
+      _saveInFlight = null;
+    }
+  })();
+  return _saveInFlight;
+}
+
+// 3秒デバウンス
+function scheduleGitHubSave() {
+  saveCache();
+  _setSaveStatus('pending');
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    saveToGitHub({ showLock: false });
+  }, 3000);
+}
+
+// ── GitHub load ──
+async function loadFromGitHub() {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) return;
+  try {
+    const file = _ghReviewFile();
+    const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
+    const res = await fetch(apiUrl, {
+      headers: { 'Authorization': `token ${pat}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) {
+      if (res.status === 404) {
+        console.log('[reviewcheck] GitHubにデータなし(初回)');
+        return;
+      }
+      console.warn('[reviewcheck] GitHub読込エラー:', res.status);
+      return;
+    }
+    const data = await res.json();
+    const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    const parsed = JSON.parse(decoded);
+    if (parsed.productCache) {
+      productCache = parsed.productCache;
+      saveCache();
+      console.log(`[reviewcheck] GitHubから ${Object.keys(productCache).length}件 読込完了`);
+    }
+  } catch(e) {
+    console.error('[reviewcheck] GitHub読込エラー:', e);
+  }
+}
+
+// ── 画像URL高解像化 ──
+function _hiResImg(url) {
+  if (!url) return null;
+  // ?_ex=128x128 → ?_ex=500x500
+  return url.replace(/\?_ex=\d+x\d+/, '?_ex=500x500');
+}
+
+// ── 楽天Ichiba Item Search APIで全商品取得 ──
+async function fetchAllProductInfo() {
+  if (_fetchInProgress) return;
+  _fetchInProgress = true;
+  document.getElementById('fetchBtn').textContent = '⏳ 取得中...';
+  document.getElementById('fetchBtn').disabled = true;
+
+  const shop = _getCurrentShop();
+  if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
+    alert('設定が未入力です。⚙ 設定 から楽天API認証情報を入力してください。');
+    _fetchInProgress = false;
+    document.getElementById('fetchBtn').textContent = '🔄 商品データ取得';
+    document.getElementById('fetchBtn').disabled = false;
+    return;
+  }
+
+  const BASE = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601';
+  const headers = { 'Origin': 'https://kaiyoshida0318.github.io' };
+  const SAFE_INTERVAL = 1200;
+  const MAX_RATE_LIMIT = 3;
+  let rateLimitHits = 0;
+
+  console.log('[reviewcheck] fetchAllProductInfo 開始 (1.2秒間隔・429×3回で中断)');
+
+  let page = 1;
+  let hasMore = true;
+  let totalFetched = 0;
+  let newCount = 0;
+  let updateCount = 0;
+
+  _lockUI('楽天APIから商品データを取得中...<br>1.2秒間隔のため時間がかかります。', { pct: 0 });
+
+  while (hasMore) {
+    try {
+      // elements指定: itemName, itemCode, mediumImageUrls, itemUrl, reviewCount, reviewAverage
+      const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&format=json&elements=itemName,itemCode,mediumImageUrls,itemUrl,reviewCount,reviewAverage`;
+      const res = await fetch(url, { headers });
+      if (res.status === 429) {
+        rateLimitHits++;
+        console.warn(`[reviewcheck] 429 rate limit (${rateLimitHits}/${MAX_RATE_LIMIT}). 5秒待機...`);
+        if (rateLimitHits >= MAX_RATE_LIMIT) {
+          console.error('[reviewcheck] 429多発で中断');
+          break;
+        }
+        document.getElementById('lockSubMsg').innerHTML = `⚠ 楽天APIレート制限。5秒待機中... (${rateLimitHits}/${MAX_RATE_LIMIT})`;
+        await new Promise(r => setTimeout(r, 5000));
+        continue;
+      }
+      if (!res.ok) {
+        console.warn('[reviewcheck] API error:', res.status);
+        break;
+      }
+      const data = await res.json();
+      const items = data.Items || [];
+      const total = data.count || 0;
+      if (items.length === 0) break;
+
+      items.forEach(({ Item: item }) => {
+        if (!item) return;
+        const fullCode = item.itemCode || '';
+        const code = fullCode.split(':')[1] || fullCode;
+        if (!code) return;
+
+        const images = (item.mediumImageUrls || []).map(o => o.imageUrl || (typeof o === 'string' ? o : null)).filter(Boolean);
+        // 1枚目, 2枚目, 4枚目 → indices 0, 1, 3
+        const targetImages = [
+          _hiResImg(images[0] || null),
+          _hiResImg(images[1] || null),
+          _hiResImg(images[3] || null),
+        ];
+
+        if (!productCache[code]) {
+          newCount++;
+          productCache[code] = {
+            name: item.itemName || '',
+            images: targetImages,
+            reviewCount: item.reviewCount || 0,
+            reviewAvg: item.reviewAverage || 0,
+            itemUrl: item.itemUrl || '',
+            lastFetched: new Date().toISOString(),
+            checked: false,
+          };
+        } else {
+          updateCount++;
+          // 既存データの保護: checked/checkedAt/memo は保持
+          productCache[code].name = item.itemName || productCache[code].name;
+          productCache[code].images = targetImages;
+          productCache[code].reviewCount = item.reviewCount || 0;
+          productCache[code].reviewAvg = item.reviewAverage || 0;
+          productCache[code].itemUrl = item.itemUrl || productCache[code].itemUrl;
+          productCache[code].lastFetched = new Date().toISOString();
+        }
+      });
+      totalFetched += items.length;
+      const pct = total ? Math.min(100, (totalFetched / total) * 100) : 0;
+      _lockUI(`楽天APIから商品データを取得中... (${totalFetched}/${total}件)`, { pct });
+      hasMore = items.length === 30 && (data.pageCount ? page < data.pageCount : true);
+      page++;
+      if (hasMore) await new Promise(r => setTimeout(r, SAFE_INTERVAL));
+    } catch(e) {
+      console.warn('[reviewcheck] fetch err:', e);
+      break;
+    }
+  }
+
+  saveCache();
+  _fetchInProgress = false;
+  document.getElementById('fetchBtn').textContent = '🔄 商品データ取得';
+  document.getElementById('fetchBtn').disabled = false;
+  console.log(`[reviewcheck] fetchAllProductInfo 完了. 新規${newCount}件 / 更新${updateCount}件 / 合計${Object.keys(productCache).length}件`);
+  _unlockUI();
+  renderProducts();
+
+  // GitHub保存
+  if (localStorage.getItem('github_pat')) {
+    await saveToGitHub({ showLock: true });
+  }
+
+  alert(`取得完了！\n新規: ${newCount}件 / 更新: ${updateCount}件\n合計: ${Object.keys(productCache).length}件`);
+}
+
+function manualFetchAll() {
+  if (_fetchInProgress) return;
+  if (!confirm('楽天APIから商品データを取得します。1.2秒間隔のため時間がかかります(100商品で約2分)。よろしいですか?')) return;
+  fetchAllProductInfo();
+}
+
+// ── レビューページURL生成 ──
+function _reviewPageUrl(itemCode) {
+  const shop = _getCurrentShop();
+  if (!shop || !itemCode) return '';
+  // 楽天レビューページ: https://review.rakuten.co.jp/item/1/{shopCode}_{itemCode}/1.1/
+  return `https://review.rakuten.co.jp/item/1/${shop.shopCode}_${itemCode}/1.1/`;
+}
+
+// ── 星表示 ──
+function _renderStars(avg) {
+  if (!avg || avg <= 0) return '<span style="color:var(--text3);font-size:11px">未評価</span>';
+  const full = Math.floor(avg);
+  const half = (avg - full) >= 0.25 && (avg - full) < 0.75;
+  const fullStars = half ? full : Math.round(avg);
+  const emptyStars = 5 - fullStars - (half ? 1 : 0);
+  let html = '<span class="review-stars">';
+  for (let i = 0; i < fullStars; i++) html += '<span class="star filled">★</span>';
+  if (half) html += '<span class="star half">★</span>';
+  for (let i = 0; i < emptyStars; i++) html += '<span class="star">★</span>';
+  html += '</span>';
+  return html;
+}
+
+// ── レンダリング ──
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  const empty = document.getElementById('emptyState');
+  const toolbar = document.getElementById('toolbar');
+  const codes = Object.keys(productCache);
+
+  if (codes.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = '';
+    toolbar.style.display = 'none';
+    return;
+  }
+  grid.style.display = '';
+  empty.style.display = 'none';
+  toolbar.style.display = '';
+
+  // フィルタ・ソート
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const sortKey = document.getElementById('sortSelect')?.value || 'default';
+  let visible = codes.filter(code => {
+    const p = productCache[code];
+    if (currentFilter === 'checked' && !p.checked) return false;
+    if (currentFilter === 'unchecked' && p.checked) return false;
+    if (currentFilter === 'hasReviews' && (!p.reviewCount || p.reviewCount === 0)) return false;
+    if (search) {
+      const hay = (code + ' ' + (p.name || '')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  visible.sort((a, b) => {
+    const pa = productCache[a], pb = productCache[b];
+    switch (sortKey) {
+      case 'reviewCountDesc': return (pb.reviewCount || 0) - (pa.reviewCount || 0);
+      case 'reviewCountAsc':  return (pa.reviewCount || 0) - (pb.reviewCount || 0);
+      case 'reviewAvgDesc':   return (pb.reviewAvg || 0) - (pa.reviewAvg || 0);
+      case 'reviewAvgAsc':    return (pa.reviewAvg || 0) - (pb.reviewAvg || 0);
+      case 'nameAsc':         return (pa.name || '').localeCompare(pb.name || '', 'ja');
+      default: return a.localeCompare(b, 'ja');
+    }
+  });
+
+  document.getElementById('totalCount').textContent = codes.length;
+  document.getElementById('visibleCount').textContent = visible.length;
+  document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
+
+  grid.innerHTML = visible.map(code => _renderCard(code)).join('');
+}
+
+function _renderCard(code) {
+  const p = productCache[code];
+  const reviewUrl = _reviewPageUrl(code);
+  const itemUrl = p.itemUrl || `https://item.rakuten.co.jp/${_getCurrentShop()?.shopCode}/${code}/`;
+  const hasReviews = (p.reviewCount || 0) > 0;
+  const lastFetchedDate = p.lastFetched ? new Date(p.lastFetched).toLocaleDateString('ja-JP') : '—';
+  const checkedAtDate = p.checkedAt ? new Date(p.checkedAt).toLocaleDateString('ja-JP') : '';
+
+  // 画像セル(1, 2, 4枚目)
+  const imageLabels = ['1', '2', '4'];
+  const imagesHtml = (p.images || [null, null, null]).map((img, i) => {
+    if (!img) {
+      return `<div class="image-cell empty">
+        <div class="image-label">${imageLabels[i]}</div>
+        <div class="empty-placeholder">${imageLabels[i]}枚目<br>なし</div>
+      </div>`;
+    }
+    return `<div class="image-cell" onclick="openLightbox('${_escape(img)}')">
+      <div class="image-label">${imageLabels[i]}</div>
+      <img src="${_escape(img)}" alt="${imageLabels[i]}枚目" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML+='<div class=&quot;empty-placeholder&quot;>読込失敗</div>'">
+    </div>`;
+  }).join('');
+
+  return `<div class="product-card ${p.checked ? 'checked' : ''}" id="card-${_escape(code)}">
+    <div class="product-header">
+      <div class="product-info">
+        <div class="product-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></div>
+        <div class="product-code">${_escape(code)}</div>
+      </div>
+      <div class="product-actions">
+        <button class="check-toggle ${p.checked ? 'on' : ''}" onclick="toggleCheck('${_escape(code)}')">
+          <span class="check-icon">${p.checked ? '✓' : '○'}</span>${p.checked ? 'チェック済' : '未チェック'}
+        </button>
+      </div>
+    </div>
+    <div class="review-summary">
+      ${_renderStars(p.reviewAvg)}
+      <span class="review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
+      <span class="review-count"><strong>${p.reviewCount || 0}</strong>件</span>
+      <a href="${_escape(reviewUrl)}" target="_blank" rel="noopener" class="review-link-btn ${hasReviews ? '' : 'no-reviews'}" title="${hasReviews ? '楽天レビューページを別タブで開く' : 'レビューがありません'}">📷 画像付きレビューを見る</a>
+    </div>
+    <div class="image-strip">${imagesHtml}</div>
+    <div class="product-meta">
+      <span>取得: ${lastFetchedDate}</span>
+      ${checkedAtDate ? `<span class="checked-info">✓ チェック済: ${checkedAtDate}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function _escape(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+// ── チェック切替 ──
+function toggleCheck(code) {
+  if (!productCache[code]) return;
+  productCache[code].checked = !productCache[code].checked;
+  productCache[code].checkedAt = productCache[code].checked ? new Date().toISOString() : null;
+  // カードを部分更新
+  const card = document.getElementById('card-' + code);
+  if (card) {
+    card.outerHTML = _renderCard(code);
+  }
+  // 件数更新
+  const codes = Object.keys(productCache);
+  document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
+  scheduleGitHubSave();
+}
+
+// ── フィルタ ──
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === f);
+  });
+  renderProducts();
+}
+
+// ── Lightbox ──
+function openLightbox(url) {
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxImg').src = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ── 設定モーダル ──
+function openSettings() {
+  loadSettings();
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function loadSettings() {
+  const shop = _getCurrentShop();
+  document.getElementById('appIdInput').value     = shop?.appId     || '';
+  document.getElementById('accessKeyInput').value = shop?.accessKey || '';
+  document.getElementById('shopCodeInput').value  = shop?.shopCode  || '';
+  document.getElementById('githubPatInput').value = localStorage.getItem('github_pat') || '';
+  document.getElementById('modalStatus').className = 'modal-status';
+  document.getElementById('modalStatus').textContent = '';
+}
+function saveSettings() {
+  const appId     = document.getElementById('appIdInput').value.trim();
+  const accessKey = document.getElementById('accessKeyInput').value.trim();
+  const shopCode  = document.getElementById('shopCodeInput').value.trim();
+  const pat       = document.getElementById('githubPatInput').value.trim();
+
+  // 現在ショップに反映
+  const shops = _getShops();
+  const id = _getCurrentShopId();
+  const idx = shops.findIndex(s => s.id === id);
+  if (idx >= 0) {
+    shops[idx].appId = appId;
+    shops[idx].accessKey = accessKey;
+    shops[idx].shopCode = shopCode;
+    _saveShops(shops);
+  }
+  // 旧キーにも反映(互換)
+  localStorage.setItem('rakuten_app_id', appId);
+  localStorage.setItem('rakuten_access_key', accessKey);
+  localStorage.setItem('rakuten_shop_code', shopCode);
+  if (pat) localStorage.setItem('github_pat', pat);
+  else localStorage.removeItem('github_pat');
+
+  updateApiStatus();
+  document.getElementById('modalStatus').className = 'modal-status ok';
+  document.getElementById('modalStatus').textContent = '✓ 保存しました';
+  setTimeout(closeSettings, 800);
+}
+async function testApi() {
+  const appId     = document.getElementById('appIdInput').value.trim();
+  const accessKey = document.getElementById('accessKeyInput').value.trim();
+  const shopCode  = document.getElementById('shopCodeInput').value.trim();
+  const status = document.getElementById('modalStatus');
+  if (!appId || !accessKey || !shopCode) {
+    status.className = 'modal-status error';
+    status.textContent = '⚠ アプリID・アクセスキー・店舗コードを入力してください';
+    return;
+  }
+  status.className = 'modal-status info';
+  status.textContent = '⏳ 接続テスト中...';
+  try {
+    const url = `https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?applicationId=${appId}&accessKey=${accessKey}&shopCode=${shopCode}&hits=1&format=json`;
+    const res = await fetch(url, { headers: { 'Origin': 'https://kaiyoshida0318.github.io' } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const total = data.count || 0;
+    status.className = 'modal-status ok';
+    status.textContent = `✓ 接続成功！店舗 "${shopCode}" の商品 ${total}件 が確認できました`;
+  } catch(e) {
+    status.className = 'modal-status error';
+    status.textContent = '✗ 接続失敗: ' + (e.message || e);
+  }
+}
+
+function updateApiStatus() {
+  const shop = _getCurrentShop();
+  const el = document.getElementById('apiStatus');
+  if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
+    el.className = 'api-status unset';
+    el.textContent = 'API未設定';
+  } else {
+    el.className = 'api-status ok';
+    el.textContent = `API設定済 (${shop.shopCode})`;
+  }
+}
+
+// ── ショップ切替UI ──
+function toggleShopMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('shopMenu');
+  if (menu.style.display === 'block') {
+    menu.style.display = 'none';
+    return;
+  }
+  renderShopMenu();
+  const btn = document.getElementById('shopSelectorBtn');
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = rect.left + 'px';
+  menu.style.display = 'block';
+}
+function closeShopMenu() {
+  document.getElementById('shopMenu').style.display = 'none';
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('shopMenu');
+  const btn = document.getElementById('shopSelectorBtn');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target) && !btn.contains(e.target)) {
+    closeShopMenu();
+  }
+});
+
+function renderShopMenu() {
+  const shops = _getShops();
+  const currentId = _getCurrentShopId();
+  const list = document.getElementById('shopMenuList');
+  list.innerHTML = shops.map(s =>
+    `<button class="shop-menu-item ${s.id === currentId ? 'current' : ''}" onclick="switchShop('${_escape(s.id)}')">${s.id === currentId ? '✓ ' : ''}${_escape(s.name)} <span style="color:var(--text3);font-size:10px">(${_escape(s.id)})</span></button>`
+  ).join('');
+}
+function updateShopSelectorLabel() {
+  const shop = _getCurrentShop();
+  document.getElementById('shopSelectorLabel').textContent = shop ? shop.name : '—';
+}
+async function switchShop(id) {
+  if (id === _getCurrentShopId()) {
+    closeShopMenu();
+    return;
+  }
+  // 未保存があれば先に保存
+  if (_saveTimer) {
+    clearTimeout(_saveTimer);
+    _saveTimer = null;
+    await saveToGitHub({ showLock: true });
+  }
+  _setCurrentShopId(id);
+  closeShopMenu();
+  updateShopSelectorLabel();
+  updateApiStatus();
+  loadCache();
+  if (localStorage.getItem('github_pat')) {
+    _lockUI('ショップ切替中: GitHubから読込中...');
+    await loadFromGitHub();
+    _unlockUI();
+  }
+  renderProducts();
+}
+
+// ── ショップ追加 ──
+function openShopAddModal() {
+  document.getElementById('shopAddId').value = '';
+  document.getElementById('shopAddName').value = '';
+  document.getElementById('shopAddShopCode').value = '';
+  document.getElementById('shopAddAppId').value = '';
+  document.getElementById('shopAddAccessKey').value = '';
+  document.getElementById('shopAddStatus').className = 'modal-status';
+  document.getElementById('shopAddStatus').textContent = '';
+  document.getElementById('shopAddModal').classList.add('open');
+}
+function closeShopAddModal() {
+  document.getElementById('shopAddModal').classList.remove('open');
+}
+async function saveNewShop() {
+  const id        = document.getElementById('shopAddId').value.trim();
+  const name      = document.getElementById('shopAddName').value.trim();
+  const shopCode  = document.getElementById('shopAddShopCode').value.trim();
+  const appId     = document.getElementById('shopAddAppId').value.trim();
+  const accessKey = document.getElementById('shopAddAccessKey').value.trim();
+  const status    = document.getElementById('shopAddStatus');
+
+  if (!id || !name || !shopCode) {
+    status.className = 'modal-status error';
+    status.textContent = '⚠ ショップID・表示名・店舗コードは必須です';
+    return;
+  }
+  if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
+    status.className = 'modal-status error';
+    status.textContent = '⚠ ショップIDは英数字・ハイフン・アンダーバーのみ';
+    return;
+  }
+  const shops = _getShops();
+  if (shops.find(s => s.id === id)) {
+    status.className = 'modal-status error';
+    status.textContent = `⚠ ショップID "${id}" は既に登録済みです`;
+    return;
+  }
+  shops.push({ id, name, appId, accessKey, shopCode });
+  _saveShops(shops);
+  _setCurrentShopId(id);
+  status.className = 'modal-status ok';
+  status.textContent = '✓ 追加して切替しました';
+  setTimeout(async () => {
+    closeShopAddModal();
+    updateShopSelectorLabel();
+    updateApiStatus();
+    loadCache();
+    if (localStorage.getItem('github_pat')) {
+      _lockUI('GitHubから読込中...');
+      await loadFromGitHub();
+      _unlockUI();
+    }
+    renderProducts();
+  }, 600);
+}
+
+// ── ショップ管理 ──
+function openShopManageModal() {
+  renderShopManageList();
+  document.getElementById('shopManageModal').classList.add('open');
+}
+function closeShopManageModal() {
+  document.getElementById('shopManageModal').classList.remove('open');
+}
+function renderShopManageList() {
+  const shops = _getShops();
+  const currentId = _getCurrentShopId();
+  document.getElementById('shopManageList').innerHTML = shops.map(s =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;background:${s.id === currentId ? 'var(--surface2)' : 'var(--surface)'}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${s.id === currentId ? '✓ ' : ''}${_escape(s.name)}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">id:${_escape(s.id)} / shopCode:${_escape(s.shopCode)}</div>
+      </div>
+      <button class="modal-btn" style="font-size:11px;padding:5px 10px" onclick="openShopEditModal('${_escape(s.id)}')">✏ 編集</button>
+    </div>`
+  ).join('');
+}
+
+// ── ショップ編集 ──
+let _editingShopId = null;
+function openShopEditModal(id) {
+  const shops = _getShops();
+  const shop = shops.find(s => s.id === id);
+  if (!shop) return;
+  _editingShopId = id;
+  document.getElementById('shopEditIdLabel').textContent = id;
+  document.getElementById('shopEditName').value = shop.name;
+  document.getElementById('shopEditShopCode').value = shop.shopCode;
+  document.getElementById('shopEditAppId').value = shop.appId;
+  document.getElementById('shopEditAccessKey').value = shop.accessKey;
+  document.getElementById('shopEditStatus').className = 'modal-status';
+  document.getElementById('shopEditStatus').textContent = '';
+  closeShopManageModal();
+  document.getElementById('shopEditModal').classList.add('open');
+}
+function closeShopEditModal() {
+  document.getElementById('shopEditModal').classList.remove('open');
+  _editingShopId = null;
+}
+function saveEditShop() {
+  if (!_editingShopId) return;
+  const shops = _getShops();
+  const idx = shops.findIndex(s => s.id === _editingShopId);
+  if (idx < 0) return;
+  shops[idx].name      = document.getElementById('shopEditName').value.trim();
+  shops[idx].shopCode  = document.getElementById('shopEditShopCode').value.trim();
+  shops[idx].appId     = document.getElementById('shopEditAppId').value.trim();
+  shops[idx].accessKey = document.getElementById('shopEditAccessKey').value.trim();
+  _saveShops(shops);
+  document.getElementById('shopEditStatus').className = 'modal-status ok';
+  document.getElementById('shopEditStatus').textContent = '✓ 保存しました';
+  setTimeout(() => {
+    closeShopEditModal();
+    updateShopSelectorLabel();
+    updateApiStatus();
+    renderProducts();
+  }, 600);
+}
+function deleteCurrentEditShop() {
+  if (!_editingShopId) return;
+  const shops = _getShops();
+  if (shops.length <= 1) {
+    alert('最後の1ショップは削除できません');
+    return;
+  }
+  if (!confirm(`ショップ "${_editingShopId}" を削除しますか?\n\n※ ローカルキャッシュは消えますが、GitHub上のデータ(data/${_editingShopId}/)は残ります。手動で削除する必要があります。`)) return;
+  const filtered = shops.filter(s => s.id !== _editingShopId);
+  _saveShops(filtered);
+  // ローカルキャッシュ削除
+  localStorage.removeItem('reviewcheck_cache_' + _editingShopId);
+  // 現在ショップだったら別のに切替
+  if (_getCurrentShopId() === _editingShopId) {
+    _setCurrentShopId(filtered[0].id);
+  }
+  closeShopEditModal();
+  updateShopSelectorLabel();
+  updateApiStatus();
+  loadCache();
+  renderProducts();
+  if (localStorage.getItem('github_pat')) {
+    loadFromGitHub().then(renderProducts);
+  }
+}
+
+// ── ズーム ──
+const ZOOM_KEY = 'reviewcheck_zoom';
+function _getZoom() { return parseFloat(localStorage.getItem(ZOOM_KEY) || '1'); }
+function _applyZoom(z) {
+  document.documentElement.style.zoom = z;
+  document.getElementById('zoomLabel').textContent = Math.round(z * 100) + '%';
+}
+function adjustZoom(delta) {
+  let z = _getZoom() + delta;
+  z = Math.max(0.6, Math.min(1.5, z));
+  z = Math.round(z * 100) / 100;
+  localStorage.setItem(ZOOM_KEY, z);
+  _applyZoom(z);
+}
+
+// ── 起動 ──
+async function init() {
+  _applyZoom(_getZoom());
+  updateShopSelectorLabel();
+  updateApiStatus();
+  loadCache();
+  if (localStorage.getItem('github_pat')) {
+    _setSaveStatus('saving', '📥 GitHubから読込中...');
+    await loadFromGitHub();
+    _setSaveStatus('saved');
+  }
+  renderProducts();
+  console.log('[reviewcheck] v1.0 initialized');
+}
+
+init();
+</script>
+</body>
+</html>
