@@ -219,16 +219,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <header>
   <div class="header-left">
     <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="トップへ戻る">
-      <svg width="180" height="36" viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="180" height="36" rx="8" fill="#BF0000"/>
-        <!-- 星アイコン -->
-        <path d="M22 8 L24.4 13.6 L30.5 14.2 L25.9 18.3 L27.3 24.3 L22 21.1 L16.7 24.3 L18.1 18.3 L13.5 14.2 L19.6 13.6 Z" fill="white" opacity="0.95"/>
-        <!-- 縦区切り線 -->
-        <rect x="40" y="7" width="1" height="22" rx="0.5" fill="white" opacity="0.25"/>
-        <!-- review check テキスト -->
-        <text y="25" font-family="'DM Mono', 'Noto Sans JP', monospace" font-weight="700" fill="white">
-          <tspan x="48" font-size="12" opacity="0.8" letter-spacing="0.5">review</tspan><tspan font-size="15" letter-spacing="-0.3">check</tspan>
-        </text>
+      <svg width="190" height="36" viewBox="0 0 190 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 赤い角丸バッジ -->
+        <rect x="0" y="2" width="32" height="32" rx="6" fill="#BF0000"/>
+        <!-- バッジ内の星(白抜き) -->
+        <path d="M16 9 L18.4 14.4 L24.5 14.9 L19.9 18.9 L21.3 24.7 L16 21.6 L10.7 24.7 L12.1 18.9 L7.5 14.9 L13.6 14.4 Z" fill="white"/>
+        <!-- メインテキスト ReviewCheck -->
+        <text x="42" y="25" font-family="-apple-system, 'Helvetica Neue', 'Noto Sans JP', sans-serif" font-weight="700" font-size="19" fill="#1a1a1a" letter-spacing="-0.3">ReviewCheck</text>
+        <!-- サブタイトル FOR RAKUTEN -->
+        <text x="42" y="34" font-family="'DM Mono', monospace" font-weight="500" font-size="8" fill="#999" letter-spacing="2">FOR RAKUTEN</text>
       </svg>
     </div>
     <!-- Shop selector -->
@@ -248,7 +247,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.1</span>
+    <span class="build-date">v1.2</span>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
       <span class="zoom-label" id="zoomLabel">100%</span>
@@ -423,7 +422,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.1
+// reviewcheck v1.2
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -574,7 +573,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.1' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.2' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1264,7 +1263,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.1 initialized');
+  console.log('[reviewcheck] v1.2 initialized');
 }
 
 init();
