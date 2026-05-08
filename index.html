@@ -491,7 +491,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.3</span>
+    <span class="build-date">v6.4</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -503,11 +503,12 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
-    <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📥 データ取得</button>
+    <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📋 商品番号・商品名取得</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
-    <button class="header-btn primary" onclick="openSetupMenuModal()">⚙ 初期設定</button>
+    <button class="header-btn" onclick="openSetupMenuModal()">⚙ 初期設定</button>
+    <button class="header-btn primary" onclick="fetchAllProductData()" id="fetchProductDataBtn" title="楽天APIから商品データを全件取得しレビュー件数を記録">📥 商品データ取得</button>
   </div>
 </header>
 
@@ -623,13 +624,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- Data menu modal -->
 <div class="modal-overlay" id="dataMenuModal">
   <div class="modal" style="max-width:520px">
-    <h3>📥 データ取得</h3>
-    <p>楽天市場の商品データをreviewcheckに取り込みます。</p>
+    <h3>📋 商品番号・商品名取得</h3>
+    <p>CSVファイルから商品番号・商品名・分類など各種データを取り込みます。</p>
     <div class="menu-modal-actions">
-      <button class="menu-action-btn" onclick="closeDataMenuModal();manualFetchAll()">
-        <div class="action-title"><span class="action-title-icon">🔄</span><span>商品データ吸い上げ</span></div>
-        <div class="action-desc">楽天市場APIと連携して、店舗の全商品データ(商品名・画像・レビュー件数・平均評価)を取得します。1.2秒間隔で順次取得するため、商品数が多いと数分かかります。チェック状態や商品番号は保持されます。</div>
-      </button>
       <button class="menu-action-btn" onclick="closeDataMenuModal();document.getElementById('csvFileInput').click()">
         <div class="action-title"><span class="action-title-icon">📋</span><span>商品番号一括入力</span></div>
         <div class="action-desc">楽天RMSの商品別売上CSVをアップロードして、商品管理番号と商品番号の対応を一括登録します。すでに商品番号が入力されている商品は上書きされません。</div>
@@ -981,7 +978,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.3
+// reviewcheck v6.4
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1160,7 +1157,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.3' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.4' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1255,15 +1252,20 @@ function _hiResImg(url) {
 async function fetchAllProductInfo() {
   if (_fetchInProgress) return;
   _fetchInProgress = true;
-  document.getElementById('fetchBtn').textContent = '⏳ 取得中...';
-  document.getElementById('fetchBtn').disabled = true;
+  const btn = document.getElementById('fetchProductDataBtn');
+  if (btn) {
+    btn.textContent = '⏳ 取得中...';
+    btn.disabled = true;
+  }
 
   const shop = _getCurrentShop();
   if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
     alert('設定が未入力です。⚙ 設定 から楽天API認証情報を入力してください。');
     _fetchInProgress = false;
-    document.getElementById('fetchBtn').textContent = '📥 データ取得';
-    document.getElementById('fetchBtn').disabled = false;
+    if (btn) {
+      btn.textContent = '📥 商品データ取得';
+      btn.disabled = false;
+    }
     return;
   }
 
@@ -1399,8 +1401,11 @@ async function fetchAllProductInfo() {
 
   saveCache();
   _fetchInProgress = false;
-  document.getElementById('fetchBtn').textContent = '📥 データ取得';
-  document.getElementById('fetchBtn').disabled = false;
+  const finishBtn = document.getElementById('fetchProductDataBtn');
+  if (finishBtn) {
+    finishBtn.textContent = '📥 商品データ取得';
+    finishBtn.disabled = false;
+  }
   console.log(`[reviewcheck] fetchAllProductInfo 完了. 新規${newCount}件 / 更新${updateCount}件 / 合計${Object.keys(productCache).length}件`);
   _unlockUI();
   renderProducts();
@@ -1565,7 +1570,7 @@ async function diagnoseFetchAll() {
     }
     if (missingInCache.length > 30) html += `<span style="color:var(--text3)">…他 ${missingInCache.length - 30} 件</span>`;
     html += `</div>`;
-    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「📥 データ取得 → 商品データ吸い上げ」で再取得してください</div>`;
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「📥 商品データ取得」で再取得してください</div>`;
   }
   if (orphanInCache.length > 0) {
     html += `<br><span style="color:var(--amber);font-weight:700">△ 古いデータ: ${orphanInCache.length}件</span>(cache にあるけど現在 API にない=出品停止？)<br>`;
@@ -1690,12 +1695,18 @@ async function clearAllData() {
   }
 
   renderProducts();
-  alert('✓ クリア完了\n\n「🔄 商品データ取得」を押して正しい番号で取り直してください。');
+  alert('✓ クリア完了\n\n「📥 商品データ取得」を押して正しい番号で取り直してください。');
 }
 
 function manualFetchAll() {
   if (_fetchInProgress) return;
   if (!confirm('楽天APIから商品データを取得します。1.2秒間隔のため時間がかかります(100商品で約2分)。よろしいですか?')) return;
+  fetchAllProductInfo();
+}
+
+// 新ヘッダーボタン用: 確認ダイアログなしで即実行(日々の取得に便利)
+function fetchAllProductData() {
+  if (_fetchInProgress) return;
   fetchAllProductInfo();
 }
 
@@ -2660,8 +2671,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v6.3 */ }
-function _loadViewMode() { /* removed in v6.3 */ }
+function setViewMode(mode) { /* removed in v6.4 */ }
+function _loadViewMode() { /* removed in v6.4 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2791,8 +2802,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v6.3 */ }
-function setFilter(f) { /* removed in v6.3 */ }
+function toggleCheck(code) { /* removed in v6.4 */ }
+function setFilter(f) { /* removed in v6.4 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3698,7 +3709,7 @@ function _renderReviewHistoryTable(code) {
   if (!table) return;
   const history = _getReviewHistory(code);
   if (history.length === 0) {
-    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">📥データ取得をするたびに記録されます</span></td></tr></tbody>`;
+    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">📥 商品データ取得を押すたびに記録されます</span></td></tr></tbody>`;
     return;
   }
   let html = `<thead><tr>
@@ -3952,7 +3963,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.3 initialized');
+  console.log('[reviewcheck] v6.4 initialized');
 }
 
 init();
