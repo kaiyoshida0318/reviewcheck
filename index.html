@@ -488,7 +488,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.0</span>
+    <span class="build-date">v6.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -962,7 +962,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.0
+// reviewcheck v6.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1141,7 +1141,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.0' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.1' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1807,6 +1807,31 @@ function renderProducts() {
         cmp = sa - sb; // 昇順比較(▲表示時に少→多)
         break;
       }
+      case 'onscreen': {
+        // 未入力(null)はソート末尾に置く
+        const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : Number.POSITIVE_INFINITY;
+        const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : Number.POSITIVE_INFINITY;
+        cmp = oa - ob;
+        break;
+      }
+      case 'diff': {
+        // 未入力はソート末尾
+        const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : null;
+        const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : null;
+        const da = oa === null ? Number.POSITIVE_INFINITY : (pa.reviewCount || 0) - oa;
+        const db = ob === null ? Number.POSITIVE_INFINITY : (pb.reviewCount || 0) - ob;
+        cmp = da - db;
+        break;
+      }
+      case 'growth': {
+        // 未入力はソート末尾。0は1基準で計算(セル表示と一致)
+        const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : null;
+        const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : null;
+        const ga = oa === null ? Number.POSITIVE_INFINITY : ((pa.reviewCount || 0) - oa) / (oa === 0 ? 1 : oa);
+        const gb = ob === null ? Number.POSITIVE_INFINITY : ((pb.reviewCount || 0) - ob) / (ob === 0 ? 1 : ob);
+        cmp = ga - gb;
+        break;
+      }
       default:           cmp = a.localeCompare(b, 'ja');
     }
     return currentSortDir === 'desc' ? -cmp : cmp;
@@ -1832,13 +1857,13 @@ function setSortKey(key) {
     currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
   } else {
     currentSortKey = key;
-    // 新しい列: レビューはデフォルトで降順、それ以外は昇順
-    currentSortDir = (key === 'review' || key === 'sales') ? 'desc' : 'asc';
+    // 数値系列: 多い順スタート(降順)
+    currentSortDir = (key === 'review' || key === 'sales' || key === 'onscreen' || key === 'diff' || key === 'growth') ? 'desc' : 'asc';
   }
   renderProducts();
 }
 function _updateSortIndicators() {
-  ['code', 'itemNumber', 'name', 'review', 'sales'].forEach(k => {
+  ['code', 'itemNumber', 'name', 'review', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
@@ -2601,8 +2626,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v6.0 */ }
-function _loadViewMode() { /* removed in v6.0 */ }
+function setViewMode(mode) { /* removed in v6.1 */ }
+function _loadViewMode() { /* removed in v6.1 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2636,22 +2661,33 @@ function _updateTableColumns() {
     const reviewTh = thead.querySelector('.col-review');
     if (reviewTh) {
       const onscreenTh = document.createElement('th');
-      onscreenTh.className = 'col-diff-onscreen';
-      onscreenTh.innerHTML = '画面上件数';
+      onscreenTh.className = 'col-diff-onscreen sortable';
+      onscreenTh.id = 'sortHeader-onscreen';
+      onscreenTh.innerHTML = '画面上件数 <span class="sort-indicator" id="sortInd-onscreen"></span>';
       onscreenTh.title = '実画面で確認した件数を入力(楽天ページ等)';
+      onscreenTh.onclick = () => setSortKey('onscreen');
+
       const diffTh = document.createElement('th');
-      diffTh.className = 'col-diff-result';
-      diffTh.innerHTML = '件数差異';
-      diffTh.title = 'API取得値 - 画面上件数';
+      diffTh.className = 'col-diff-result sortable';
+      diffTh.id = 'sortHeader-diff';
+      diffTh.innerHTML = '件数差異 <span class="sort-indicator" id="sortInd-diff"></span>';
+      diffTh.title = 'API取得値 - 画面上件数。クリックでソート';
+      diffTh.onclick = () => setSortKey('diff');
+
       const growthTh = document.createElement('th');
-      growthTh.className = 'col-diff-growth';
-      growthTh.innerHTML = '上昇率';
-      growthTh.title = '画面上件数からの上昇率(%)。0件は1件として計算';
+      growthTh.className = 'col-diff-growth sortable';
+      growthTh.id = 'sortHeader-growth';
+      growthTh.innerHTML = '上昇率 <span class="sort-indicator" id="sortInd-growth"></span>';
+      growthTh.title = '画面上件数からの上昇率(%)。0件は1件として計算。クリックでソート';
+      growthTh.onclick = () => setSortKey('growth');
+
       reviewTh.after(onscreenTh);
       onscreenTh.after(diffTh);
       diffTh.after(growthTh);
     }
   }
+  // ソートインジケーターを再描画
+  _updateSortIndicators();
 }
 
 function _renderCard(code) {
@@ -2721,8 +2757,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v6.0 */ }
-function setFilter(f) { /* removed in v6.0 */ }
+function toggleCheck(code) { /* removed in v6.1 */ }
+function setFilter(f) { /* removed in v6.1 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3722,7 +3758,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.0 initialized');
+  console.log('[reviewcheck] v6.1 initialized');
 }
 
 init();
