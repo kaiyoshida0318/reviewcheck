@@ -378,7 +378,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.1</span>
+    <span class="build-date">v3.2</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -571,7 +571,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
       <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(複数選択可)</span></label>
       <div style="display:flex;gap:8px">
         <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
-          <span style="font-size:14px">🔄</span><span>リニューアル予定</span>
+          <span style="font-size:14px">🔄</span><span>リニューアル</span>
         </button>
         <button class="tag-btn" data-tag="boost" onclick="toggleEditTag('boost')" id="tagBtnBoost">
           <span style="font-size:14px">🚀</span><span>盛り上げ制作</span>
@@ -743,7 +743,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.1
+// reviewcheck v3.2
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -899,7 +899,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.1' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.2' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1452,7 +1452,7 @@ function renderSidebar() {
     if (tags.boost) tagCounts.boost++;
   }
   const tagDefs = [
-    { key: 'renewal', label: 'リニューアル予定', color: '#2e7d32', icon: '🔄' },
+    { key: 'renewal', label: 'リニューアル', color: '#2e7d32', icon: '🔄' },
     { key: 'boost',   label: '盛り上げ制作',     color: '#e65100', icon: '🚀' },
   ];
   let tagHtml = '';
@@ -2483,7 +2483,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v3.1 initialized');
+  console.log('[reviewcheck] v3.2 initialized');
 }
 
 init();
