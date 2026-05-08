@@ -222,6 +222,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .status-btn .status-desc { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; line-height: 1.4; text-align: center; }
 .status-btn.active .status-desc { color: inherit; opacity: 0.8; }
 
+.tag-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text2); transition: all 0.15s; }
+.tag-btn:hover { background: var(--surface2); }
+.tag-btn.active[data-tag="renewal"] { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+.tag-btn.active[data-tag="boost"] { background: #fff3e0; color: #e65100; border-color: #e65100; }
+
 /* ── Mapping modal (CSV import wizard) ── */
 .mapping-modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 920px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
 .mapping-section { margin-bottom: 20px; }
@@ -373,7 +378,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.0</span>
+    <span class="build-date">v3.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -403,6 +408,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
           <span>レビュー評価</span>
         </div>
         <div class="sidebar-list" id="sidebarScoreList"></div>
+      </div>
+      <!-- 制作タグフィルタ（独立カード） -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <span>制作</span>
+        </div>
+        <div class="sidebar-list" id="sidebarTagList"></div>
       </div>
       <!-- カテゴリフィルタ（独立カード） -->
       <div class="sidebar">
@@ -551,6 +563,18 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
           <span style="font-size:14px">🙈</span><span>無視</span>
           <div class="status-desc">「無視」フィルタ以外では非表示</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(複数選択可)</span></label>
+      <div style="display:flex;gap:8px">
+        <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
+          <span style="font-size:14px">🔄</span><span>リニューアル予定</span>
+        </button>
+        <button class="tag-btn" data-tag="boost" onclick="toggleEditTag('boost')" id="tagBtnBoost">
+          <span style="font-size:14px">🚀</span><span>盛り上げ制作</span>
         </button>
       </div>
     </div>
@@ -719,7 +743,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.0
+// reviewcheck v3.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -780,7 +804,8 @@ function _ghReviewFile() { return `${_shopDataDir()}/review_data.json`; }
 let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
-let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
+let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated' | 'ignored')
+let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | null)
 let viewMode = 'card'; // 'card' | 'table'
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
@@ -874,7 +899,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.0' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.1' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1261,6 +1286,19 @@ function renderProducts() {
   const sortKey = document.getElementById('sortSelect')?.value || 'default';
   let visible = codes.filter(code => {
     const p = productCache[code];
+
+    // 制作タグフィルタが選ばれている場合: そのタグを持つ商品のみ表示(他フィルタ無視)
+    if (currentProductionTag) {
+      const tags = p.tags || {};
+      if (!tags[currentProductionTag]) return false;
+      // 検索だけは効くようにする
+      if (search) {
+        const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+      return true;
+    }
+
     // 「無視」ロジック: サイドバーで「無視」を選んだ時だけ無視商品が表示、それ以外では非表示
     const isIgnored = p.status === 'ignore';
     if (currentScoreBand === 'ignored') {
@@ -1403,15 +1441,56 @@ function renderSidebar() {
     </button>`;
   }
   document.getElementById('sidebarScoreList').innerHTML = scoreHtml;
+
+  // ── 制作タグ ──
+  const tagCounts = { renewal: 0, boost: 0 };
+  for (const code of codes) {
+    const p = productCache[code];
+    if (p.status === 'ignore') continue;
+    const tags = p.tags || {};
+    if (tags.renewal) tagCounts.renewal++;
+    if (tags.boost) tagCounts.boost++;
+  }
+  const tagDefs = [
+    { key: 'renewal', label: 'リニューアル予定', color: '#2e7d32', icon: '🔄' },
+    { key: 'boost',   label: '盛り上げ制作',     color: '#e65100', icon: '🚀' },
+  ];
+  let tagHtml = '';
+  for (const t of tagDefs) {
+    const isActive = currentProductionTag === t.key;
+    const colorStyle = `color:${t.color};font-weight:600`;
+    tagHtml += `<button class="sidebar-item ${isActive ? 'active' : ''}" onclick="setProductionTag('${t.key}')">
+      <span class="cat-name" style="${colorStyle}">${t.icon} ${_escape(t.label)}</span>
+      <span class="cat-count">${tagCounts[t.key] || 0}</span>
+    </button>`;
+  }
+  document.getElementById('sidebarTagList').innerHTML = tagHtml;
 }
 
 function setScoreBand(band) {
   currentScoreBand = band;
+  // 制作タグもリセット(レビュー評価選択時はタグフィルタ解除)
+  currentProductionTag = null;
+  renderProducts();
+}
+
+function setProductionTag(tag) {
+  // 同じタグを再クリックでオフ(トグル)
+  if (currentProductionTag === tag) {
+    currentProductionTag = null;
+  } else {
+    currentProductionTag = tag;
+    // 他のフィルタをリセット
+    currentScoreBand = 'all';
+    currentCategory = 'all';
+  }
   renderProducts();
 }
 
 function setCategory(cat) {
   currentCategory = cat;
+  // 制作タグもリセット
+  currentProductionTag = null;
   renderProducts();
 }
 
@@ -2334,6 +2413,7 @@ function cancelEditItemNumber(code) {
 // ── 商品詳細編集モーダル ──
 let _editingProductCode = null;
 let _editingTempStatus = 'watch';
+let _editingTempTags = { renewal: false, boost: false };
 
 function openProductEditModal(code) {
   if (!productCache[code]) return;
@@ -2341,11 +2421,15 @@ function openProductEditModal(code) {
   const p = productCache[code];
   // 状態は 'ignore' 以外は 'watch'(デフォルト)扱い
   _editingTempStatus = p.status === 'ignore' ? 'ignore' : 'watch';
+  // 制作タグ
+  const tags = p.tags || {};
+  _editingTempTags = { renewal: !!tags.renewal, boost: !!tags.boost };
 
   document.getElementById('productEditMeta').innerHTML =
     `商品管理番号: <strong>${_escape(code)}</strong><br>商品名: ${_escape((p.name || '').substring(0, 60))}${(p.name || '').length > 60 ? '...' : ''}`;
   document.getElementById('productEditItemNumber').value = p.itemNumber || '';
   _updateStatusBtns();
+  _updateTagBtns();
   document.getElementById('productEditModal').classList.add('open');
   setTimeout(() => document.getElementById('productEditItemNumber').focus(), 50);
 }
@@ -2361,12 +2445,25 @@ function _updateStatusBtns() {
   document.getElementById('statusBtnWatch').classList.toggle('active', _editingTempStatus === 'watch');
   document.getElementById('statusBtnIgnore').classList.toggle('active', _editingTempStatus === 'ignore');
 }
+function toggleEditTag(tag) {
+  _editingTempTags[tag] = !_editingTempTags[tag];
+  _updateTagBtns();
+}
+function _updateTagBtns() {
+  document.getElementById('tagBtnRenewal').classList.toggle('active', _editingTempTags.renewal);
+  document.getElementById('tagBtnBoost').classList.toggle('active', _editingTempTags.boost);
+}
 function saveProductEdit() {
   const code = _editingProductCode;
   if (!code || !productCache[code]) return;
   const newItemNumber = document.getElementById('productEditItemNumber').value.trim() || null;
   productCache[code].itemNumber = newItemNumber;
   productCache[code].status = _editingTempStatus; // 'watch' | 'ignore'
+  // タグ保存(true のものだけ持つ)
+  const newTags = {};
+  if (_editingTempTags.renewal) newTags.renewal = true;
+  if (_editingTempTags.boost) newTags.boost = true;
+  productCache[code].tags = newTags;
   closeProductEditModal();
   renderProducts();
   scheduleGitHubSave();
@@ -2386,7 +2483,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v3.0 initialized');
+  console.log('[reviewcheck] v3.1 initialized');
 }
 
 init();
