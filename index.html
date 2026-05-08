@@ -227,6 +227,22 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; }
 .lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
+/* ── Drop zone (sales upload) ── */
+.drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius); padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: var(--surface2); }
+.drop-zone:hover { border-color: var(--accent); background: var(--red-light); }
+.drop-zone.drag-over { border-color: var(--accent); background: var(--red-light); transform: scale(1.02); }
+.sales-month-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 12px; }
+.sales-month-row .month-label { font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; min-width: 90px; }
+.sales-month-row .month-stat { color: var(--text2); flex: 1; }
+.sales-month-row .month-delete-btn { background: none; border: 1px solid var(--border2); color: var(--text3); padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; font-family: inherit; }
+.sales-month-row .month-delete-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Sales column in table ── */
+.product-table .col-sales { width: 130px; text-align: right; }
+.product-table .col-sales-amount { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
+.product-table .col-sales-amount.zero { color: var(--text3); font-weight: 400; }
+.product-table .col-sales-sub { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
 /* ── Menu modal (large action buttons) ── */
 .menu-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
 .menu-action-btn { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; text-align: left; transition: all 0.15s; width: 100%; }
@@ -396,7 +412,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.6</span>
+    <span class="build-date">v3.7</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -411,6 +427,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📥 データ取得</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
+    <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
     <button class="header-btn primary" onclick="openSetupMenuModal()">⚙ 初期設定</button>
   </div>
 </header>
@@ -453,6 +470,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="toolbar-group">
           <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
         </div>
+        <div class="toolbar-group" id="salesMonthGroup" style="display:none">
+          <span class="toolbar-label">📊 売上月:</span>
+          <select class="sort-select" id="salesMonthSelect" onchange="setSalesMonth(this.value)"></select>
+        </div>
         <div class="toolbar-group" style="margin-left:auto">
           <span class="toolbar-stat">表示中: <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 件</span>
         </div>
@@ -482,6 +503,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-kanri sortable" onclick="setSortKey('code')" id="sortHeader-code">商品管理番号 <span class="sort-indicator" id="sortInd-code"></span></th>
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
+              <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
               <th class="col-review sortable" onclick="setSortKey('review')" id="sortHeader-review">レビュー <span class="sort-indicator" id="sortInd-review"></span></th>
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
@@ -590,6 +612,32 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeProductEditModal()">キャンセル</button>
       <button class="modal-btn save" onclick="saveProductEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sales upload modal -->
+<div class="modal-overlay" id="salesModal">
+  <div class="modal" style="max-width:560px">
+    <h3>📊 売上反映</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">楽天RMSの月別商品売上CSVをアップロードしてください。月は CSV内の表示期間から自動判定されます。</p>
+
+    <!-- ドロップゾーン -->
+    <div class="drop-zone" id="salesDropZone" onclick="document.getElementById('salesFileInput').click()">
+      <div style="font-size:32px;margin-bottom:8px">📥</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text)">クリックまたはここにドロップ</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">CSV ファイル</div>
+    </div>
+    <input type="file" id="salesFileInput" accept=".csv" style="display:none" onchange="handleSalesFileSelect(event)">
+
+    <!-- 取り込み済み月一覧 -->
+    <div id="salesMonthsList" style="margin-top:18px"></div>
+
+    <!-- 処理結果 -->
+    <div id="salesUploadResult" style="display:none;margin-top:12px"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeSalesModal()">閉じる</button>
     </div>
   </div>
 </div>
@@ -751,7 +799,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.6
+// reviewcheck v3.7
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -816,6 +864,8 @@ let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' |
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
 let viewMode = 'card'; // 'card' | 'table' (legacy, no longer used)
 let tableMode = 'basic'; // 'basic' | 'diff' - テーブル表示モード
+let monthlySales = {}; // { '2026-03': { '10001280': { sales: 1882340, qty: 1102, count: 887 }, ... } }
+let currentSalesMonth = null; // 選択中の表示月 (例: '2026-03')
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
@@ -922,7 +972,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, savedAt: new Date().toISOString(), version: 'v3.6' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.7' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -994,6 +1044,11 @@ async function loadFromGitHub() {
       productCache = cleaned;
       saveCache();
       console.log(`[reviewcheck] GitHubから ${Object.keys(productCache).length}件 読込完了`);
+    }
+    if (parsed.monthlySales) {
+      monthlySales = parsed.monthlySales;
+      saveMonthlySalesCache();
+      console.log(`[reviewcheck] 月別売上データ ${Object.keys(monthlySales).length}ヶ月分 読込完了`);
     }
   } catch(e) {
     console.error('[reviewcheck] GitHub読込エラー:', e);
@@ -1352,6 +1407,13 @@ function renderProducts() {
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'review':     cmp = (pb.reviewCount || 0) - (pa.reviewCount || 0); break; // レビューはデフォ多い順
+      case 'sales': {
+        const md = monthlySales[currentSalesMonth] || {};
+        const sa = (md[a] && md[a].sales) || 0;
+        const sb = (md[b] && md[b].sales) || 0;
+        cmp = sb - sa; // 売上はデフォ多い順
+        break;
+      }
       default:           cmp = a.localeCompare(b, 'ja');
     }
     return currentSortDir === 'desc' ? -cmp : cmp;
@@ -1376,12 +1438,12 @@ function setSortKey(key) {
   } else {
     currentSortKey = key;
     // 新しい列: レビューはデフォルトで降順、それ以外は昇順
-    currentSortDir = (key === 'review') ? 'desc' : 'asc';
+    currentSortDir = (key === 'review' || key === 'sales') ? 'desc' : 'asc';
   }
   renderProducts();
 }
 function _updateSortIndicators() {
-  ['code', 'itemNumber', 'name', 'review'].forEach(k => {
+  ['code', 'itemNumber', 'name', 'review', 'sales'].forEach(k => {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
@@ -1556,6 +1618,240 @@ function _loadSidebarSort() {
 }
 
 // ── Table row renderer ──
+// ── 売上反映 ──
+function openSalesModal() {
+  document.getElementById('salesModal').classList.add('open');
+  _renderSalesMonthsList();
+  document.getElementById('salesUploadResult').style.display = 'none';
+  // ドラッグ&ドロップ初期化
+  const zone = document.getElementById('salesDropZone');
+  zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('drag-over'); };
+  zone.ondragleave = () => zone.classList.remove('drag-over');
+  zone.ondrop = (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length > 0) {
+      _processSalesFile(e.dataTransfer.files[0]);
+    }
+  };
+}
+function closeSalesModal() {
+  document.getElementById('salesModal').classList.remove('open');
+}
+
+function handleSalesFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  _processSalesFile(file);
+  event.target.value = '';
+}
+
+async function _processSalesFile(file) {
+  try {
+    const { text } = await _readCsvSmart(file);
+    const result = _parseSalesCsv(text);
+    if (!result.ok) {
+      _showSalesResult('error', '⚠ ' + result.error);
+      return;
+    }
+    const { yearMonth, salesByCode } = result;
+    // 既存月データに上書き(同じ月をアップしたら最新で置き換え)
+    monthlySales[yearMonth] = salesByCode;
+    saveMonthlySalesCache();
+    scheduleGitHubSave();
+    // 結果表示
+    const total = Object.keys(salesByCode).length;
+    let matched = 0;
+    for (const code of Object.keys(salesByCode)) {
+      if (productCache[code]) matched++;
+    }
+    _showSalesResult('success',
+      `✓ ${yearMonth} のデータを取り込みました<br>` +
+      `<span style="font-size:11px;color:var(--text2)">商品数: ${total}件 ｜ reviewcheckにマッチ: ${matched}件</span>`);
+    _renderSalesMonthsList();
+    _refreshSalesMonthSelect();
+    // 取り込んだ月に切り替え
+    if (currentSalesMonth !== yearMonth) {
+      setSalesMonth(yearMonth);
+    } else {
+      renderProducts();
+    }
+  } catch(err) {
+    _showSalesResult('error', '⚠ ' + (err.message || err));
+  }
+}
+
+function _showSalesResult(type, html) {
+  const el = document.getElementById('salesUploadResult');
+  el.style.display = '';
+  el.className = 'mapping-result ' + (type === 'error' ? 'error' : 'success');
+  el.innerHTML = html;
+}
+
+// 売上CSVを解析。表示期間から年月を抽出 + 商品管理番号→売上のマップを返す
+function _parseSalesCsv(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const lines = text.split(/\r?\n/);
+  // 「表示期間,2026年03月から2026年03月」の行を探す
+  let yearMonth = null;
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    // 例: 表示期間,2026年03月から2026年03月
+    //     表示期間,2026年03月05日から2026年03月05日 (日次)
+    const m = lines[i].match(/(\d{4})年(\d{1,2})月/);
+    if (lines[i].includes('表示期間') && m) {
+      const y = m[1];
+      const mo = m[2].padStart(2, '0');
+      yearMonth = `${y}-${mo}`;
+      break;
+    }
+  }
+  if (!yearMonth) {
+    return { ok: false, error: '表示期間(年月)が見つかりません。楽天RMSの月別商品売上CSVをアップロードしてください。' };
+  }
+  // ヘッダー行を探す
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    if (lines[i].includes('商品管理番号') && lines[i].includes('売上')) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx < 0) {
+    return { ok: false, error: 'ヘッダー行(商品管理番号/売上)が見つかりません' };
+  }
+  const headers = _parseCsvLine(lines[headerIdx]).map(h => h.trim());
+  const kanriIdx = headers.indexOf('商品管理番号');
+  const salesIdx = headers.indexOf('売上');
+  const qtyIdx = headers.indexOf('売上個数');
+  const countIdx = headers.indexOf('売上件数');
+  if (kanriIdx < 0 || salesIdx < 0) {
+    return { ok: false, error: '必要な列(商品管理番号・売上)が見つかりません' };
+  }
+  const salesByCode = {};
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const cells = _parseCsvLine(line);
+    const kanri = (cells[kanriIdx] || '').trim();
+    if (!kanri) continue;
+    const sales = parseInt((cells[salesIdx] || '0').replace(/[,¥]/g, ''), 10) || 0;
+    const qty = qtyIdx >= 0 ? parseInt((cells[qtyIdx] || '0').replace(/,/g, ''), 10) || 0 : 0;
+    const count = countIdx >= 0 ? parseInt((cells[countIdx] || '0').replace(/,/g, ''), 10) || 0 : 0;
+    salesByCode[kanri] = { sales, qty, count };
+  }
+  return { ok: true, yearMonth, salesByCode };
+}
+
+// 取り込み済み月の一覧をモーダル内に描画
+function _renderSalesMonthsList() {
+  const months = Object.keys(monthlySales).sort().reverse(); // 新しい順
+  const container = document.getElementById('salesMonthsList');
+  if (months.length === 0) {
+    container.innerHTML = `<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">まだデータが取り込まれていません</div>`;
+    return;
+  }
+  let html = `<div class="sidebar-header" style="padding-left:0;border-bottom:1px solid var(--border)"><span>取り込み済みの月</span></div><div style="margin-top:6px">`;
+  for (const ym of months) {
+    const data = monthlySales[ym];
+    const total = Object.values(data).reduce((sum, d) => sum + (d.sales || 0), 0);
+    const items = Object.keys(data).length;
+    html += `<div class="sales-month-row">
+      <span class="month-label">${ym}</span>
+      <span class="month-stat">${items}商品 ｜ 売上計 ¥${total.toLocaleString()}</span>
+      <button class="month-delete-btn" onclick="deleteSalesMonth('${ym}')" title="この月のデータを削除">削除</button>
+    </div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function deleteSalesMonth(ym) {
+  if (!confirm(`${ym} の売上データを削除します。よろしいですか？`)) return;
+  delete monthlySales[ym];
+  if (currentSalesMonth === ym) currentSalesMonth = null;
+  saveMonthlySalesCache();
+  scheduleGitHubSave();
+  _renderSalesMonthsList();
+  _refreshSalesMonthSelect();
+  renderProducts();
+}
+
+// ツールバーの月選択ドロップダウンを更新
+function _refreshSalesMonthSelect() {
+  const months = Object.keys(monthlySales).sort().reverse();
+  const group = document.getElementById('salesMonthGroup');
+  const sel = document.getElementById('salesMonthSelect');
+  if (months.length === 0) {
+    group.style.display = 'none';
+    return;
+  }
+  group.style.display = '';
+  let html = `<option value="">(売上を表示しない)</option>`;
+  for (const ym of months) {
+    const sel = (currentSalesMonth === ym) ? 'selected' : '';
+    html += `<option value="${ym}" ${sel}>${ym}</option>`;
+  }
+  sel.innerHTML = html;
+  document.getElementById('salesMonthSelect').value = currentSalesMonth || '';
+}
+
+const SALES_MONTH_KEY = 'reviewcheck_sales_month';
+function setSalesMonth(ym) {
+  currentSalesMonth = ym || null;
+  if (currentSalesMonth) {
+    localStorage.setItem(SALES_MONTH_KEY, currentSalesMonth);
+  } else {
+    localStorage.removeItem(SALES_MONTH_KEY);
+  }
+  // 売上列の表示/非表示
+  const salesHeader = document.getElementById('sortHeader-sales');
+  if (salesHeader) salesHeader.style.display = currentSalesMonth ? '' : 'none';
+  renderProducts();
+}
+function _loadSalesMonth() {
+  const saved = localStorage.getItem(SALES_MONTH_KEY);
+  if (saved && monthlySales[saved]) {
+    currentSalesMonth = saved;
+  } else {
+    // フォールバック: 最新月を自動選択
+    const months = Object.keys(monthlySales).sort().reverse();
+    currentSalesMonth = months[0] || null;
+  }
+  const salesHeader = document.getElementById('sortHeader-sales');
+  if (salesHeader) salesHeader.style.display = currentSalesMonth ? '' : 'none';
+  _refreshSalesMonthSelect();
+}
+
+// 売上セル描画
+function _renderSalesCell(code) {
+  if (!currentSalesMonth) return ''; // 月選択なしなら列ごと出力しない
+  const monthData = monthlySales[currentSalesMonth] || {};
+  const data = monthData[code];
+  if (!data) {
+    return `<td class="col-sales"><div class="col-sales-amount zero">¥0</div></td>`;
+  }
+  return `<td class="col-sales">
+    <div class="col-sales-amount">¥${data.sales.toLocaleString()}</div>
+    <div class="col-sales-sub">${data.qty}個 / ${data.count}件</div>
+  </td>`;
+}
+
+// monthlySalesのlocalStorage保存(GitHubと別にローカルキャッシュ)
+function _monthlySalesCacheKey() {
+  return `reviewcheck_monthly_sales_${_getCurrentShopId()}`;
+}
+function saveMonthlySalesCache() {
+  try { localStorage.setItem(_monthlySalesCacheKey(), JSON.stringify(monthlySales)); } catch(e) {}
+}
+function loadMonthlySalesCache() {
+  try {
+    const raw = localStorage.getItem(_monthlySalesCacheKey());
+    monthlySales = raw ? JSON.parse(raw) : {};
+  } catch(e) {
+    monthlySales = {};
+  }
+}
+
 function _renderTableRow(code) {
   const p = productCache[code];
   const reviewUrl = _reviewPageUrl(code);
@@ -1601,6 +1897,7 @@ function _renderTableRow(code) {
     <td class="col-kanri">${_escape(code)}</td>
     <td class="col-bangou">${itemNumberCell}</td>
     <td class="col-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></td>
+    ${_renderSalesCell(code)}
     <td class="col-review">
       <div class="table-review">
         <div class="table-review-line1">
@@ -1686,8 +1983,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v3.6 */ }
-function _loadViewMode() { /* removed in v3.6 */ }
+function setViewMode(mode) { /* removed in v3.7 */ }
+function _loadViewMode() { /* removed in v3.7 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -1801,8 +2098,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v3.6 */ }
-function setFilter(f) { /* removed in v3.6 */ }
+function toggleCheck(code) { /* removed in v3.7 */ }
+function setFilter(f) { /* removed in v3.7 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -1968,11 +2265,13 @@ async function switchShop(id) {
   updateShopSelectorLabel();
   updateApiStatus();
   loadCache();
+  loadMonthlySalesCache();
   if (localStorage.getItem('github_pat')) {
     _lockUI('ショップ切替中: GitHubから読込中...');
     await loadFromGitHub();
     _unlockUI();
   }
+  _loadSalesMonth();
   renderProducts();
 }
 
@@ -2115,9 +2414,12 @@ function deleteCurrentEditShop() {
   updateShopSelectorLabel();
   updateApiStatus();
   loadCache();
+  loadMonthlySalesCache();
   renderProducts();
   if (localStorage.getItem('github_pat')) {
-    loadFromGitHub().then(renderProducts);
+    loadFromGitHub().then(() => { _loadSalesMonth(); renderProducts(); });
+  } else {
+    _loadSalesMonth();
   }
 }
 
@@ -2582,13 +2884,15 @@ async function init() {
   updateShopSelectorLabel();
   updateApiStatus();
   loadCache();
+  loadMonthlySalesCache();
   if (localStorage.getItem('github_pat')) {
     _setSaveStatus('saving', '📥 GitHubから読込中...');
     await loadFromGitHub();
     _setSaveStatus('saved');
   }
+  _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v3.6 initialized');
+  console.log('[reviewcheck] v3.7 initialized');
 }
 
 init();
