@@ -258,7 +258,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── Product edit modal: status buttons ── */
 .status-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 10px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text2); transition: all 0.15s; }
 .status-btn:hover { border-color: var(--border2); background: var(--surface2); }
-.status-btn.active[data-status="watch"] { background: #e6f0fa; color: #1976d2; border-color: #1976d2; }
+.status-btn.active[data-status="focus"] { background: #fff8e1; color: #c87800; border-color: #c87800; }
+.status-btn.active[data-status="normal"] { background: #e6f0fa; color: #1976d2; border-color: #1976d2; }
 .status-btn.active[data-status="ignore"] { background: #f5f5f5; color: var(--text3); border-color: var(--text3); }
 .status-btn .status-desc { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; line-height: 1.4; text-align: center; }
 .status-btn.active .status-desc { color: inherit; opacity: 0.8; }
@@ -449,7 +450,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.7</span>
+    <span class="build-date">v4.8</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -701,8 +702,12 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="modal-field">
           <label class="modal-label">状態</label>
           <div style="display:flex;gap:8px">
-            <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
-              <span style="font-size:14px">👁</span><span>注視</span>
+            <button class="status-btn" data-status="focus" onclick="setEditStatus('focus')" id="statusBtnFocus">
+              <span style="font-size:14px">⭐</span><span>注目</span>
+              <div class="status-desc">「注目」フィルタで強調表示</div>
+            </button>
+            <button class="status-btn" data-status="normal" onclick="setEditStatus('normal')" id="statusBtnNormal">
+              <span style="font-size:14px">👁</span><span>通常</span>
               <div class="status-desc">通常表示・各種フィルタの対象</div>
             </button>
             <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
@@ -904,7 +909,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.7
+// reviewcheck v4.8
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -966,7 +971,7 @@ let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
 let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
-let currentStatusFilter = 'watch'; // 状態フィルタ ('watch'=注視[デフォルト, 無視を除外] | 'ignore'=無視のみ表示)
+let currentStatusFilter = 'normal'; // 状態フィルタ ('focus'=注目 | 'normal'=通常[デフォルト] | 'ignore'=無視)
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
 let viewMode = 'card'; // 'card' | 'table' (legacy, no longer used)
 let tableMode = 'basic'; // 'basic' | 'diff' - テーブル表示モード
@@ -987,6 +992,8 @@ function loadCache() {
       const cleaned = {};
       for (const [k, v] of Object.entries(parsed)) {
         const { checked, checkedAt, ...rest } = v;
+        // マイグレーション: 旧 'watch' → 'normal' に統一
+        if (rest.status === 'watch') rest.status = 'normal';
         cleaned[k] = rest;
       }
       productCache = cleaned;
@@ -1076,9 +1083,10 @@ async function saveToGitHub(opts = {}) {
       const cleanCache = {};
       for (const [k, v] of Object.entries(productCache)) {
         const { checked, checkedAt, ...rest } = v;
+        if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.7' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.8' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1141,10 +1149,11 @@ async function loadFromGitHub() {
     const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
     const parsed = JSON.parse(decoded);
     if (parsed.productCache) {
-      // 旧フィールド(checked/checkedAt)を除去してロード
+      // 旧フィールド(checked/checkedAt)を除去 + watch→normalマイグレーション
       const cleaned = {};
       for (const [k, v] of Object.entries(parsed.productCache)) {
         const { checked, checkedAt, ...rest } = v;
+        if (rest.status === 'watch') rest.status = 'normal';
         cleaned[k] = rest;
       }
       productCache = cleaned;
@@ -1692,12 +1701,17 @@ function renderProducts() {
       return true;
     }
 
-    // 状態フィルタ(注視/無視)
-    const isIgnored = p.status === 'ignore';
+    // 状態フィルタ(注目/通常/無視)
+    const status = p.status || 'normal'; // 未指定はnormal扱い
+    const isIgnored = status === 'ignore';
+    const isFocus = status === 'focus';
     if (currentStatusFilter === 'ignore') {
-      if (!isIgnored) return false; // 「無視」モード: 無視商品のみ表示
+      if (!isIgnored) return false; // 「無視」モード: 無視のみ表示
+    } else if (currentStatusFilter === 'focus') {
+      if (!isFocus) return false; // 「注目」モード: 注目のみ表示
     } else {
-      if (isIgnored) return false; // 「注視」モード(デフォルト): 無視商品は除外
+      // 'normal' モード(デフォルト): 通常(=注目でも無視でもない)のみ表示
+      if (isIgnored || isFocus) return false;
     }
     // カテゴリフィルタ
     if (currentCategory !== 'all') {
@@ -1865,10 +1879,17 @@ function renderSidebar() {
   }
   document.getElementById('sidebarScoreList').innerHTML = scoreHtml;
 
-  // ── 状態フィルタ(注視/無視) ──
-  const watchCount = bandCounts.all; // 注視=無視じゃない商品の総数
+  // ── 状態フィルタ(注目/通常/無視) ──
+  let focusCount = 0, normalCount = 0;
+  for (const code of codes) {
+    const p = productCache[code];
+    if (p.status === 'ignore') continue; // 無視は ignoredCount でカウント済み
+    if (p.status === 'focus') focusCount++;
+    else normalCount++; // 'normal' or undefined はすべて通常扱い
+  }
   const statusDefs = [
-    { key: 'watch',  label: '注視', icon: '👁', count: watchCount },
+    { key: 'focus',  label: '注目', icon: '⭐', count: focusCount },
+    { key: 'normal', label: '通常', icon: '👁', count: normalCount },
     { key: 'ignore', label: '無視', icon: '🙈', count: ignoredCount },
   ];
   let statusHtml = '';
@@ -2329,8 +2350,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.7 */ }
-function _loadViewMode() { /* removed in v4.7 */ }
+function setViewMode(mode) { /* removed in v4.8 */ }
+function _loadViewMode() { /* removed in v4.8 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2444,8 +2465,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.7 */ }
-function setFilter(f) { /* removed in v4.7 */ }
+function toggleCheck(code) { /* removed in v4.8 */ }
+function setFilter(f) { /* removed in v4.8 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3158,15 +3179,17 @@ function cancelEditItemNumber(code) {
 
 // ── 商品詳細編集モーダル ──
 let _editingProductCode = null;
-let _editingTempStatus = 'watch';
+let _editingTempStatus = 'normal';
 let _editingTempTags = { renewal: false, boost: false, boostPlan: false };
 
 function openProductEditModal(code) {
   if (!productCache[code]) return;
   _editingProductCode = code;
   const p = productCache[code];
-  // 状態は 'ignore' 以外は 'watch'(デフォルト)扱い
-  _editingTempStatus = p.status === 'ignore' ? 'ignore' : 'watch';
+  // 状態は productCache の値をそのまま読む。未設定なら 'normal'
+  if (p.status === 'ignore') _editingTempStatus = 'ignore';
+  else if (p.status === 'focus') _editingTempStatus = 'focus';
+  else _editingTempStatus = 'normal';
   // 制作タグ
   const tags = p.tags || {};
   _editingTempTags = { renewal: !!tags.renewal, boost: !!tags.boost, boostPlan: !!tags.boostPlan };
@@ -3385,7 +3408,8 @@ function setEditStatus(status) {
   _updateStatusBtns();
 }
 function _updateStatusBtns() {
-  document.getElementById('statusBtnWatch').classList.toggle('active', _editingTempStatus === 'watch');
+  document.getElementById('statusBtnFocus').classList.toggle('active', _editingTempStatus === 'focus');
+  document.getElementById('statusBtnNormal').classList.toggle('active', _editingTempStatus === 'normal');
   document.getElementById('statusBtnIgnore').classList.toggle('active', _editingTempStatus === 'ignore');
 }
 function toggleEditTag(tag) {
@@ -3405,7 +3429,7 @@ function saveProductEdit() {
   productCache[code].itemNumber = newItemNumber;
   // 商品名は空なら既存値を保持(誤クリアによるデータ損失防止)
   if (newName) productCache[code].name = newName;
-  productCache[code].status = _editingTempStatus; // 'watch' | 'ignore'
+  productCache[code].status = _editingTempStatus; // 'focus' | 'normal' | 'ignore'
   // タグ保存(true のものだけ持つ)
   const newTags = {};
   if (_editingTempTags.renewal) newTags.renewal = true;
@@ -3434,7 +3458,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.7 initialized');
+  console.log('[reviewcheck] v4.8 initialized');
 }
 
 init();
