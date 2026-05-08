@@ -182,19 +182,26 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-image { width: 100px; }
 .product-table .col-action { width: 130px; text-align: center; }
 .product-table .col-status { width: 110px; }
-.product-table .col-tags { width: 180px; }
+.product-table .col-tags { width: 130px; }
 
-/* ── ステータスバッジ ── */
-.status-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
-.status-badge.focus  { background: #fff8e1; color: #c87800; border: 1px solid #f5d68a; }
-.status-badge.normal { background: #e6f0fa; color: #1976d2; border: 1px solid #c4dcf4; }
-.status-badge.ignore { background: #f5f5f5; color: var(--text3); border: 1px solid var(--border2); }
+/* ── インライン編集ボタン群(状態・制作タグ) ── */
+.inline-btn-group { display: flex; gap: 3px; padding: 3px; border-radius: var(--radius-sm); transition: background 0.15s; }
+.inline-btn-group.pending { background: #fff7d6; box-shadow: inset 0 0 0 1px #f5d68a; }
+.inline-status-btn, .inline-tag-btn { width: 30px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border2); background: var(--surface); cursor: pointer; border-radius: 4px; font-size: 13px; padding: 0; font-family: inherit; transition: all 0.12s; opacity: 0.5; filter: grayscale(0.6); }
+.inline-status-btn:hover, .inline-tag-btn:hover { opacity: 0.85; filter: grayscale(0.2); border-color: var(--text3); }
+.inline-status-btn.active { opacity: 1; filter: none; border-width: 1.5px; font-weight: 700; }
+.inline-status-btn.active[data-status="focus"]  { background: #fff8e1; border-color: #c87800; box-shadow: 0 0 0 1px #c87800; }
+.inline-status-btn.active[data-status="normal"] { background: #e6f0fa; border-color: #1976d2; box-shadow: 0 0 0 1px #1976d2; }
+.inline-status-btn.active[data-status="ignore"] { background: #f5f5f5; border-color: var(--text3); box-shadow: 0 0 0 1px var(--text3); }
+.inline-tag-btn.active { opacity: 1; filter: none; border-width: 1.5px; }
+.inline-tag-btn.active[data-tag="renewal"]   { background: #e8f5e9; border-color: #2e7d32; box-shadow: 0 0 0 1px #2e7d32; }
+.inline-tag-btn.active[data-tag="boost"]     { background: #fff3e0; border-color: #e65100; box-shadow: 0 0 0 1px #e65100; }
+.inline-tag-btn.active[data-tag="boostPlan"] { background: #f3e5f5; border-color: #7b1fa2; box-shadow: 0 0 0 1px #7b1fa2; }
 
-/* ── 制作タグバッジ ── */
-.tag-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 10px; white-space: nowrap; margin: 1px 2px 1px 0; }
-.tag-badge.renewal    { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-.tag-badge.boost      { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-.tag-badge.boost-plan { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
+/* ── ペンディング保存バー ── */
+.pending-edits-group { background: #fff7d6; border: 1px solid #f5d68a; border-radius: var(--radius-sm); padding: 4px 10px; gap: 8px; }
+.pending-count { font-size: 12px; color: #8a6914; font-weight: 600; }
+.pending-count strong { font-size: 14px; color: #c87800; }
 
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: 110px; }
@@ -468,7 +475,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.2</span>
+    <span class="build-date">v5.3</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -545,6 +552,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="toolbar-group" id="salesMonthGroup" style="display:none">
           <span class="toolbar-label">📊 売上月:</span>
           <select class="sort-select" id="salesMonthSelect" onchange="setSalesMonth(this.value)"></select>
+        </div>
+        <div class="toolbar-group pending-edits-group" id="pendingEditsGroup" style="display:none">
+          <span class="pending-count">⚠ <strong id="pendingCount">0</strong>件 未保存</span>
+          <button class="modal-btn save" onclick="commitPendingEdits()">💾 保存</button>
+          <button class="modal-btn" onclick="cancelPendingEdits()">取消</button>
         </div>
         <div class="toolbar-group" style="margin-left:auto">
           <span class="toolbar-stat">表示中: <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 件</span>
@@ -933,7 +945,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.2
+// reviewcheck v5.3
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -996,6 +1008,8 @@ let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
 let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
 let currentStatusFilter = 'normal'; // 状態フィルタ ('focus'=注目 | 'normal'=通常[デフォルト] | 'ignore'=無視)
+// インライン編集の保留変更 { code: { status?: 'focus'|'normal'|'ignore', tags?: { renewal, boost, boostPlan } } }
+let pendingEdits = {};
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
 let viewMode = 'card'; // 'card' | 'table' (legacy, no longer used)
 let tableMode = 'basic'; // 'basic' | 'diff' - テーブル表示モード
@@ -1110,7 +1124,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.2' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.3' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2317,30 +2331,141 @@ function _renderTableRow(code) {
     </td>
     ${diffCells}
     ${imageCells}
-    <td class="col-status">${_renderStatusBadge(p.status)}</td>
-    <td class="col-tags">${_renderTagsBadges(p.tags)}</td>
+    <td class="col-status" id="statusCell-${_escape(code)}">${_renderStatusButtons(code, p.status)}</td>
+    <td class="col-tags" id="tagsCell-${_escape(code)}">${_renderTagsButtons(code, p.tags)}</td>
     <td class="col-action">
       <button class="modal-btn" style="font-size:11px;padding:6px 14px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 詳細</button>
     </td>
   </tr>`;
 }
 
-// 状態バッジ(注目/通常/無視)
-function _renderStatusBadge(status) {
-  const s = status || 'normal';
-  if (s === 'focus')  return `<span class="status-badge focus">⭐ 注目</span>`;
-  if (s === 'ignore') return `<span class="status-badge ignore">🙈 無視</span>`;
-  return `<span class="status-badge normal">👁 通常</span>`;
+// 状態ボタン群(注目/通常/無視)
+function _renderStatusButtons(code, savedStatus) {
+  const saved = savedStatus || 'normal';
+  // pendingEdits を反映した「現在の選択」
+  const current = (pendingEdits[code] && pendingEdits[code].status !== undefined) ? pendingEdits[code].status : saved;
+  // 変更されてるか
+  const isPending = (pendingEdits[code] && pendingEdits[code].status !== undefined && pendingEdits[code].status !== saved);
+  const opts = [
+    { key: 'focus',  label: '注目', icon: '⭐' },
+    { key: 'normal', label: '通常', icon: '👁' },
+    { key: 'ignore', label: '無視', icon: '🙈' },
+  ];
+  let html = `<div class="inline-btn-group ${isPending ? 'pending' : ''}">`;
+  for (const o of opts) {
+    const active = current === o.key ? 'active' : '';
+    html += `<button class="inline-status-btn ${active}" data-status="${o.key}" onclick="setInlineStatus('${_escape(code)}', '${o.key}')" title="${_escape(o.label)}">${o.icon}</button>`;
+  }
+  html += `</div>`;
+  return html;
 }
 
-// 制作タグバッジ(設定されてるものだけ表示)
-function _renderTagsBadges(tags) {
-  if (!tags || typeof tags !== 'object') return '';
-  const badges = [];
-  if (tags.renewal)   badges.push(`<span class="tag-badge renewal">🔄 リニューアル</span>`);
-  if (tags.boost)     badges.push(`<span class="tag-badge boost">🚀 盛り上げ制作</span>`);
-  if (tags.boostPlan) badges.push(`<span class="tag-badge boost-plan">📅 盛り上げ予定</span>`);
-  return badges.join('');
+// 制作タグボタン群(リニューアル/盛り上げ制作/盛り上げ予定)
+function _renderTagsButtons(code, savedTags) {
+  savedTags = savedTags || {};
+  const pending = (pendingEdits[code] && pendingEdits[code].tags) || null;
+  const current = pending !== null ? pending : { renewal: !!savedTags.renewal, boost: !!savedTags.boost, boostPlan: !!savedTags.boostPlan };
+  // 変更されているかは、各値とsaved値の比較で判定
+  const isPending = pending !== null && (
+    !!current.renewal !== !!savedTags.renewal ||
+    !!current.boost !== !!savedTags.boost ||
+    !!current.boostPlan !== !!savedTags.boostPlan
+  );
+  const opts = [
+    { key: 'renewal',   label: 'リニューアル', icon: '🔄' },
+    { key: 'boost',     label: '盛り上げ制作', icon: '🚀' },
+    { key: 'boostPlan', label: '盛り上げ予定', icon: '📅' },
+  ];
+  let html = `<div class="inline-btn-group ${isPending ? 'pending' : ''}">`;
+  for (const o of opts) {
+    const active = current[o.key] ? 'active' : '';
+    html += `<button class="inline-tag-btn ${active}" data-tag="${o.key}" onclick="toggleInlineTag('${_escape(code)}', '${o.key}')" title="${_escape(o.label)}">${o.icon}</button>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// 状態をインラインで変更(保留)
+function setInlineStatus(code, status) {
+  const saved = (productCache[code] || {}).status || 'normal';
+  if (!pendingEdits[code]) pendingEdits[code] = {};
+  if (status === saved) {
+    // 元に戻された場合は pending から削除
+    delete pendingEdits[code].status;
+    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
+  } else {
+    pendingEdits[code].status = status;
+  }
+  // 該当セルだけ再描画
+  const cell = document.getElementById('statusCell-' + code);
+  if (cell) cell.innerHTML = _renderStatusButtons(code, saved);
+  _refreshPendingEditsBar();
+}
+
+// 制作タグをインラインでトグル(保留)
+function toggleInlineTag(code, tagKey) {
+  const savedTags = (productCache[code] || {}).tags || {};
+  if (!pendingEdits[code]) pendingEdits[code] = {};
+  if (!pendingEdits[code].tags) {
+    // 既存のsavedTagsから初期化
+    pendingEdits[code].tags = { renewal: !!savedTags.renewal, boost: !!savedTags.boost, boostPlan: !!savedTags.boostPlan };
+  }
+  pendingEdits[code].tags[tagKey] = !pendingEdits[code].tags[tagKey];
+  // saved と一致したらpending削除
+  const t = pendingEdits[code].tags;
+  if (!!t.renewal === !!savedTags.renewal &&
+      !!t.boost === !!savedTags.boost &&
+      !!t.boostPlan === !!savedTags.boostPlan) {
+    delete pendingEdits[code].tags;
+    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
+  }
+  // 該当セルだけ再描画
+  const cell = document.getElementById('tagsCell-' + code);
+  if (cell) cell.innerHTML = _renderTagsButtons(code, savedTags);
+  _refreshPendingEditsBar();
+}
+
+// 保存バー更新
+function _refreshPendingEditsBar() {
+  const count = Object.keys(pendingEdits).length;
+  const group = document.getElementById('pendingEditsGroup');
+  if (!group) return;
+  if (count === 0) {
+    group.style.display = 'none';
+  } else {
+    group.style.display = '';
+    document.getElementById('pendingCount').textContent = count;
+  }
+}
+
+// 保留中の変更をすべて保存
+function commitPendingEdits() {
+  const count = Object.keys(pendingEdits).length;
+  if (count === 0) return;
+  for (const [code, change] of Object.entries(pendingEdits)) {
+    if (!productCache[code]) continue;
+    if (change.status !== undefined) {
+      productCache[code].status = change.status;
+    }
+    if (change.tags) {
+      // true のキーだけ持つよう正規化
+      const newTags = {};
+      if (change.tags.renewal) newTags.renewal = true;
+      if (change.tags.boost) newTags.boost = true;
+      if (change.tags.boostPlan) newTags.boostPlan = true;
+      productCache[code].tags = newTags;
+    }
+  }
+  pendingEdits = {};
+  saveCache();
+  scheduleGitHubSave();
+  renderProducts();
+}
+
+// 保留中の変更を破棄
+function cancelPendingEdits() {
+  pendingEdits = {};
+  renderProducts();
 }
 
 // 画面上件数の入力ハンドラ(行全体を再描画せず、差異セルだけ部分更新してフォーカスを失わせない)
@@ -2409,8 +2534,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.2 */ }
-function _loadViewMode() { /* removed in v5.2 */ }
+function setViewMode(mode) { /* removed in v5.3 */ }
+function _loadViewMode() { /* removed in v5.3 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2524,8 +2649,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.2 */ }
-function setFilter(f) { /* removed in v5.2 */ }
+function toggleCheck(code) { /* removed in v5.3 */ }
+function setFilter(f) { /* removed in v5.3 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3517,7 +3642,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.2 initialized');
+  console.log('[reviewcheck] v5.3 initialized');
 }
 
 init();
