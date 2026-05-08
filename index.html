@@ -306,6 +306,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .modal.product-edit-modal { max-width: 1080px; }
 .product-edit-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .product-edit-left, .product-edit-right { min-width: 0; }
+.edit-top-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+.edit-image-cell { width: 150px; height: 150px; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; display: flex; align-items: center; justify-content: center; }
+.edit-image-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.edit-image-cell.empty { font-size: 11px; color: var(--text3); cursor: default; }
+.edit-text-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .edit-section-title { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
 .sales-chart-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; position: relative; }
 .sales-chart-wrap canvas { width: 100% !important; height: 220px !important; display: block; }
@@ -439,7 +444,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.4</span>
+    <span class="build-date">v4.5</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -651,14 +656,19 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
       <!-- 右カラム: 編集フォーム -->
       <div class="product-edit-right">
-        <div class="modal-field">
-          <label class="modal-label">商品番号</label>
-          <input type="text" class="modal-input" id="productEditItemNumber" placeholder="例: ih-22-04-set1">
-        </div>
+        <div class="edit-top-row">
+          <div class="edit-image-cell" id="productEditImage1Cell"></div>
+          <div class="edit-text-fields">
+            <div class="modal-field">
+              <label class="modal-label">商品番号</label>
+              <input type="text" class="modal-input" id="productEditItemNumber" placeholder="例: ih-22-04-set1">
+            </div>
 
-        <div class="modal-field">
-          <label class="modal-label">商品名</label>
-          <textarea class="modal-input" id="productEditName" rows="2" style="resize:vertical;font-family:inherit;line-height:1.5" placeholder="商品名を入力"></textarea>
+            <div class="modal-field" style="margin-bottom:0">
+              <label class="modal-label">商品名</label>
+              <textarea class="modal-input" id="productEditName" rows="2" style="resize:vertical;font-family:inherit;line-height:1.5" placeholder="商品名を入力"></textarea>
+            </div>
+          </div>
         </div>
 
         <div class="modal-field">
@@ -882,7 +892,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.4
+// reviewcheck v4.5
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1055,7 +1065,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.4' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.5' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2281,8 +2291,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.4 */ }
-function _loadViewMode() { /* removed in v4.4 */ }
+function setViewMode(mode) { /* removed in v4.5 */ }
+function _loadViewMode() { /* removed in v4.5 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2396,8 +2406,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.4 */ }
-function setFilter(f) { /* removed in v4.4 */ }
+function toggleCheck(code) { /* removed in v4.5 */ }
+function setFilter(f) { /* removed in v4.5 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3127,6 +3137,18 @@ function openProductEditModal(code) {
     `商品管理番号: <strong>${_escape(code)}</strong>`;
   document.getElementById('productEditItemNumber').value = p.itemNumber || '';
   document.getElementById('productEditName').value = p.name || '';
+
+  // 画像1を埋め込む
+  const img1 = (p.images || [])[0];
+  const imgCell = document.getElementById('productEditImage1Cell');
+  if (img1) {
+    imgCell.classList.remove('empty');
+    imgCell.innerHTML = `<img src="${_escape(img1)}" alt="画像1" onclick="openLightbox('${_escape(img1)}')">`;
+  } else {
+    imgCell.classList.add('empty');
+    imgCell.innerHTML = '画像なし';
+  }
+
   _updateStatusBtns();
   _updateTagBtns();
   document.getElementById('productEditModal').classList.add('open');
@@ -3374,7 +3396,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.4 initialized');
+  console.log('[reviewcheck] v4.5 initialized');
 }
 
 init();
