@@ -203,6 +203,18 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; }
 .lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
+/* ── Menu modal (large action buttons) ── */
+.menu-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.menu-action-btn { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; text-align: left; transition: all 0.15s; width: 100%; }
+.menu-action-btn:hover { border-color: var(--accent); background: var(--red-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.menu-action-btn:active { transform: translateY(0); }
+.menu-action-btn .action-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--text); }
+.menu-action-btn .action-title-icon { font-size: 18px; }
+.menu-action-btn .action-desc { font-size: 11px; color: var(--text2); line-height: 1.6; padding-left: 28px; }
+.menu-action-btn.danger { border-color: rgba(163, 45, 45, 0.2); }
+.menu-action-btn.danger:hover { border-color: var(--danger); background: var(--red-light); }
+.menu-action-btn.danger .action-title { color: var(--danger); }
+
 /* ── Modal ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
@@ -317,7 +329,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.8</span>
+    <span class="build-date">v1.9</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -329,12 +341,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
-    <button class="header-btn" onclick="openSettings()">⚙ 設定</button>
-    <button class="header-btn" onclick="manualFetchAll()" id="fetchBtn">🔄 商品データ取得</button>
-    <button class="header-btn" onclick="document.getElementById('csvFileInput').click()" title="楽天RMSの商品別売上CSVから商品番号をインポート">📋 商品番号CSV</button>
+    <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📥 データ取得</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
-    <button class="header-btn danger-btn" onclick="clearAllData()" title="現在の店舗の全データを削除します">🗑 全クリア</button>
-    <button class="header-btn primary" onclick="openSettings()">+ 始める</button>
+    <button class="header-btn primary" onclick="openSetupMenuModal()">⚙ 初期設定</button>
   </div>
 </header>
 
@@ -390,8 +399,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
           </svg>
         </div>
         <h3>レビューチェックを始めましょう</h3>
-        <p>まず ⚙ 設定 から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>商品データを取得すると、商品画像とレビュー件数・平均評価を一覧で確認できます。</p>
-        <button class="empty-upload-btn" onclick="openSettings()">⚙ 設定を開く</button>
+        <p>まず <strong>⚙ 初期設定 → 楽天データ入力</strong> から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>商品データを取得すると、商品画像とレビュー件数・平均評価を一覧で確認できます。</p>
+        <button class="empty-upload-btn" onclick="openSetupMenuModal()">⚙ 初期設定を開く</button>
       </div>
 
       <!-- Product grid (card view) -->
@@ -416,6 +425,48 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
           <tbody id="productTableBody"></tbody>
         </table>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data menu modal -->
+<div class="modal-overlay" id="dataMenuModal">
+  <div class="modal" style="max-width:520px">
+    <h3>📥 データ取得</h3>
+    <p>楽天市場の商品データをreviewcheckに取り込みます。</p>
+    <div class="menu-modal-actions">
+      <button class="menu-action-btn" onclick="closeDataMenuModal();manualFetchAll()">
+        <div class="action-title"><span class="action-title-icon">🔄</span><span>商品データ吸い上げ</span></div>
+        <div class="action-desc">楽天市場APIと連携して、店舗の全商品データ(商品名・画像・レビュー件数・平均評価)を取得します。1.2秒間隔で順次取得するため、商品数が多いと数分かかります。チェック状態や商品番号は保持されます。</div>
+      </button>
+      <button class="menu-action-btn" onclick="closeDataMenuModal();document.getElementById('csvFileInput').click()">
+        <div class="action-title"><span class="action-title-icon">📋</span><span>商品番号一括入力</span></div>
+        <div class="action-desc">楽天RMSの商品別売上CSVをアップロードして、商品管理番号と商品番号の対応を一括登録します。すでに商品番号が入力されている商品は上書きされません。</div>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeDataMenuModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Setup menu modal -->
+<div class="modal-overlay" id="setupMenuModal">
+  <div class="modal" style="max-width:520px">
+    <h3>⚙ 初期設定</h3>
+    <p>初回利用時の設定や、データのリセットを行います。</p>
+    <div class="menu-modal-actions">
+      <button class="menu-action-btn" onclick="closeSetupMenuModal();openSettings()">
+        <div class="action-title"><span class="action-title-icon">🔑</span><span>楽天データ入力</span></div>
+        <div class="action-desc">楽天アプリID・アクセスキー・店舗コード(shopCode)を入力します。GitHub PATを設定すると、複数PCでデータを共有できます。初回起動時は必ず設定してください。</div>
+      </button>
+      <button class="menu-action-btn danger" onclick="closeSetupMenuModal();clearAllData()">
+        <div class="action-title"><span class="action-title-icon">🗑</span><span>全クリア</span></div>
+        <div class="action-desc">現在の店舗の全データ(商品データ・チェック状態・商品番号)を完全に削除します。GitHub上のデータも削除されます。この操作は取り消せません。データが破損している場合や、最初からやり直す場合に使ってください。</div>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeSetupMenuModal()">閉じる</button>
     </div>
   </div>
 </div>
@@ -535,7 +586,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.8
+// reviewcheck v1.9
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -689,7 +740,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.8' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.9' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -779,7 +830,7 @@ async function fetchAllProductInfo() {
   if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
     alert('設定が未入力です。⚙ 設定 から楽天API認証情報を入力してください。');
     _fetchInProgress = false;
-    document.getElementById('fetchBtn').textContent = '🔄 商品データ取得';
+    document.getElementById('fetchBtn').textContent = '📥 データ取得';
     document.getElementById('fetchBtn').disabled = false;
     return;
   }
@@ -905,7 +956,7 @@ async function fetchAllProductInfo() {
 
   saveCache();
   _fetchInProgress = false;
-  document.getElementById('fetchBtn').textContent = '🔄 商品データ取得';
+  document.getElementById('fetchBtn').textContent = '📥 データ取得';
   document.getElementById('fetchBtn').disabled = false;
   console.log(`[reviewcheck] fetchAllProductInfo 完了. 新規${newCount}件 / 更新${updateCount}件 / 合計${Object.keys(productCache).length}件`);
   _unlockUI();
@@ -1375,6 +1426,20 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ── 設定モーダル ──
+// ── メニューモーダル ──
+function openDataMenuModal() {
+  document.getElementById('dataMenuModal').classList.add('open');
+}
+function closeDataMenuModal() {
+  document.getElementById('dataMenuModal').classList.remove('open');
+}
+function openSetupMenuModal() {
+  document.getElementById('setupMenuModal').classList.add('open');
+}
+function closeSetupMenuModal() {
+  document.getElementById('setupMenuModal').classList.remove('open');
+}
+
 function openSettings() {
   loadSettings();
   document.getElementById('settingsModal').classList.add('open');
@@ -1855,7 +1920,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.8 initialized');
+  console.log('[reviewcheck] v1.9 initialized');
 }
 
 init();
