@@ -138,6 +138,45 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .review-link-btn:hover { background: var(--accent); color: #fff; }
 .review-link-btn.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
 
+/* ── Table view ── */
+.product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow); }
+.product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
+.product-table thead th { background: var(--surface2); padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 1px solid var(--border2); white-space: nowrap; position: sticky; top: 52px; z-index: 10; }
+.product-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.product-table tbody tr { transition: background 0.1s; }
+.product-table tbody tr:hover { background: var(--surface2); }
+.product-table tbody tr.checked { background: #fafff8; }
+.product-table tbody tr.checked:hover { background: #f0f8ec; }
+.product-table .col-check { width: 90px; }
+.product-table .col-kanri { width: 110px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
+.product-table .col-bangou { width: 130px; font-family: 'DM Mono', monospace; font-size: 11px; }
+.product-table .col-name { min-width: 220px; max-width: 320px; font-weight: 500; }
+.product-table .col-name a { color: var(--text); text-decoration: none; }
+.product-table .col-name a:hover { color: var(--accent); text-decoration: underline; }
+.product-table .col-review { width: 130px; }
+.product-table .col-image { width: 110px; }
+.product-table .col-action { width: 90px; }
+.product-table .table-img-cell { width: 90px; height: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; position: relative; }
+.product-table .table-img-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.product-table .table-img-cell.empty { display: flex; align-items: center; justify-content: center; cursor: default; font-size: 9px; color: var(--text3); }
+.product-table .table-review { display: flex; flex-direction: column; gap: 2px; }
+.product-table .table-review-line1 { display: flex; align-items: center; gap: 4px; }
+.product-table .table-review-avg { font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+.product-table .table-review-count { color: var(--text2); font-size: 10px; }
+.product-table .table-review-link { font-size: 10px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); text-decoration: none; display: inline-block; white-space: nowrap; }
+.product-table .table-review-link:hover { background: var(--accent); color: #fff; }
+.product-table .table-review-link.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
+.product-table .table-item-number { color: var(--accent); font-weight: 600; }
+.product-table .table-item-number-empty { color: var(--text3); font-style: italic; cursor: pointer; padding: 1px 6px; border: 1px dashed var(--border2); border-radius: 3px; font-size: 10px; }
+.product-table .table-item-number-empty:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.table-item-number-input { font-family: 'DM Mono', monospace; font-size: 11px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; outline: none; width: 100%; max-width: 120px; }
+
+/* ── View toggle ── */
+.view-toggle { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
+.view-toggle-btn { border: none; background: none; cursor: pointer; padding: 4px 10px; font-size: 11px; color: var(--text2); border-radius: 4px; font-family: inherit; display: flex; align-items: center; gap: 4px; transition: all 0.12s; }
+.view-toggle-btn:hover { color: var(--text); }
+.view-toggle-btn.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
 /* ── Image strip ── */
 .image-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .image-cell { position: relative; aspect-ratio: 1 / 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; }
@@ -274,7 +313,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.4</span>
+    <span class="build-date">v1.5</span>
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
+      <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
+    </div>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
       <span class="zoom-label" id="zoomLabel">100%</span>
@@ -340,8 +383,28 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <button class="empty-upload-btn" onclick="openSettings()">⚙ 設定を開く</button>
       </div>
 
-      <!-- Product grid -->
+      <!-- Product grid (card view) -->
       <div class="product-grid" id="productGrid" style="display:none"></div>
+
+      <!-- Product table (table view) -->
+      <div class="product-table-wrap" id="productTableWrap" style="display:none">
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th class="col-check">チェック</th>
+              <th class="col-kanri">商品管理番号</th>
+              <th class="col-bangou">商品番号</th>
+              <th class="col-name">商品名</th>
+              <th class="col-review">レビュー</th>
+              <th class="col-image">画像1</th>
+              <th class="col-image">画像2</th>
+              <th class="col-image">画像3</th>
+              <th class="col-action">アクション</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -461,7 +524,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.4
+// reviewcheck v1.5
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -522,6 +585,7 @@ function _ghReviewFile() { return `${_shopDataDir()}/review_data.json`; }
 let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
+let viewMode = 'card'; // 'card' | 'table'
 let _saveTimer = null;
 let _fetchInProgress = false;
 let _saveInFlight = null;
@@ -613,7 +677,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.4' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.5' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -846,6 +910,7 @@ function _renderStars(avg) {
 // ── レンダリング ──
 function renderProducts() {
   const grid = document.getElementById('productGrid');
+  const tableWrap = document.getElementById('productTableWrap');
   const empty = document.getElementById('emptyState');
   const toolbar = document.getElementById('toolbar');
   const sidebar = document.getElementById('sidebar');
@@ -853,15 +918,24 @@ function renderProducts() {
 
   if (codes.length === 0) {
     grid.style.display = 'none';
+    tableWrap.style.display = 'none';
     empty.style.display = '';
     toolbar.style.display = 'none';
     sidebar.style.display = 'none';
     return;
   }
-  grid.style.display = '';
   empty.style.display = 'none';
   toolbar.style.display = '';
   sidebar.style.display = '';
+
+  // View mode に応じて切り替え
+  if (viewMode === 'table') {
+    grid.style.display = 'none';
+    tableWrap.style.display = '';
+  } else {
+    grid.style.display = '';
+    tableWrap.style.display = 'none';
+  }
 
   // サイドバー(カテゴリ一覧)更新
   renderSidebar();
@@ -906,7 +980,11 @@ function renderProducts() {
   document.getElementById('visibleCount').textContent = visible.length;
   document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
 
-  grid.innerHTML = visible.map(code => _renderCard(code)).join('');
+  if (viewMode === 'table') {
+    document.getElementById('productTableBody').innerHTML = visible.map(code => _renderTableRow(code)).join('');
+  } else {
+    grid.innerHTML = visible.map(code => _renderCard(code)).join('');
+  }
 }
 
 // ── カテゴリ抽出 ──
@@ -959,6 +1037,109 @@ function renderSidebar() {
 function setCategory(cat) {
   currentCategory = cat;
   renderProducts();
+}
+
+// ── Table row renderer ──
+function _renderTableRow(code) {
+  const p = productCache[code];
+  const reviewUrl = _reviewPageUrl(code);
+  const itemUrl = p.itemUrl || `https://item.rakuten.co.jp/${_getCurrentShop()?.shopCode}/${code}/`;
+  const hasReviews = (p.reviewCount || 0) > 0;
+
+  const imageCells = (p.images || [null, null, null]).map((img, i) => {
+    if (!img) {
+      return `<td class="col-image"><div class="table-img-cell empty">なし</div></td>`;
+    }
+    return `<td class="col-image">
+      <div class="table-img-cell" onclick="openLightbox('${_escape(img)}')">
+        <img src="${_escape(img)}" alt="画像${i+1}" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML='なし'">
+      </div>
+    </td>`;
+  }).join('');
+
+  const itemNumberCell = p.itemNumber
+    ? `<span class="table-item-number" id="trnum-${_escape(code)}">${_escape(p.itemNumber)}</span>`
+    : `<span class="table-item-number-empty" onclick="editItemNumberInTable('${_escape(code)}')">+ 入力</span>`;
+
+  return `<tr class="${p.checked ? 'checked' : ''}" id="row-${_escape(code)}">
+    <td class="col-check">
+      <button class="check-toggle ${p.checked ? 'on' : ''}" onclick="toggleCheck('${_escape(code)}')">
+        <span class="check-icon">${p.checked ? '✓' : '○'}</span>${p.checked ? '済' : '未'}
+      </button>
+    </td>
+    <td class="col-kanri">${_escape(code)}</td>
+    <td class="col-bangou">${itemNumberCell}</td>
+    <td class="col-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></td>
+    <td class="col-review">
+      <div class="table-review">
+        <div class="table-review-line1">
+          ${_renderStars(p.reviewAvg)}
+          <span class="table-review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
+          <span class="table-review-count">(${p.reviewCount || 0})</span>
+        </div>
+        <a href="${_escape(reviewUrl)}" target="_blank" rel="noopener" class="table-review-link ${hasReviews ? '' : 'no-reviews'}">📷 楽天で見る</a>
+      </div>
+    </td>
+    ${imageCells}
+    <td class="col-action">
+      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="editItemNumberInTable('${_escape(code)}')" title="商品番号を編集">✎ 編集</button>
+    </td>
+  </tr>`;
+}
+
+// テーブル内インライン編集
+function editItemNumberInTable(code) {
+  if (!productCache[code]) return;
+  const row = document.getElementById('row-' + code);
+  if (!row) return;
+  const cell = row.querySelector('.col-bangou');
+  if (!cell) return;
+  const current = productCache[code].itemNumber || '';
+  cell.innerHTML = `<input type="text" class="table-item-number-input" id="trnum-input-${_escape(code)}" value="${_escape(current)}" placeholder="例: ih-22-04-set1">`;
+  const input = document.getElementById('trnum-input-' + code);
+  input.focus();
+  input.select();
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveItemNumberInTable(code);
+    else if (e.key === 'Escape') {
+      // キャンセル → 行を再描画
+      const row = document.getElementById('row-' + code);
+      if (row) row.outerHTML = _renderTableRow(code);
+    }
+  });
+  input.addEventListener('blur', () => saveItemNumberInTable(code));
+}
+
+function saveItemNumberInTable(code) {
+  if (!productCache[code]) return;
+  const input = document.getElementById('trnum-input-' + code);
+  if (!input) return;
+  const value = input.value.trim();
+  productCache[code].itemNumber = value || null;
+  // 行を再描画
+  const row = document.getElementById('row-' + code);
+  if (row) row.outerHTML = _renderTableRow(code);
+  // サイドバーも更新
+  renderSidebar();
+  scheduleGitHubSave();
+}
+
+// ── View mode toggle ──
+const VIEW_MODE_KEY = 'reviewcheck_view_mode';
+function setViewMode(mode) {
+  viewMode = mode;
+  localStorage.setItem(VIEW_MODE_KEY, mode);
+  document.getElementById('viewToggleCard').classList.toggle('active', mode === 'card');
+  document.getElementById('viewToggleTable').classList.toggle('active', mode === 'table');
+  renderProducts();
+}
+function _loadViewMode() {
+  const saved = localStorage.getItem(VIEW_MODE_KEY);
+  if (saved === 'table' || saved === 'card') {
+    viewMode = saved;
+    document.getElementById('viewToggleCard').classList.toggle('active', viewMode === 'card');
+    document.getElementById('viewToggleTable').classList.toggle('active', viewMode === 'table');
+  }
 }
 
 function _renderCard(code) {
@@ -1028,11 +1209,11 @@ function toggleCheck(code) {
   if (!productCache[code]) return;
   productCache[code].checked = !productCache[code].checked;
   productCache[code].checkedAt = productCache[code].checked ? new Date().toISOString() : null;
-  // カードを部分更新
+  // カード or テーブル行を部分更新
   const card = document.getElementById('card-' + code);
-  if (card) {
-    card.outerHTML = _renderCard(code);
-  }
+  if (card) card.outerHTML = _renderCard(code);
+  const row = document.getElementById('row-' + code);
+  if (row) row.outerHTML = _renderTableRow(code);
   // 件数更新
   const codes = Object.keys(productCache);
   document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
@@ -1531,6 +1712,7 @@ function cancelEditItemNumber(code) {
 // ── 起動 ──
 async function init() {
   _applyZoom(_getZoom());
+  _loadViewMode();
   updateShopSelectorLabel();
   updateApiStatus();
   loadCache();
@@ -1540,7 +1722,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.4 initialized');
+  console.log('[reviewcheck] v1.5 initialized');
 }
 
 init();
