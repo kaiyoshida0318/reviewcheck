@@ -491,7 +491,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.4</span>
+    <span class="build-date">v6.5</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -978,7 +978,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.4
+// reviewcheck v6.5
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1157,7 +1157,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.4' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.5' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1376,7 +1376,8 @@ async function fetchAllProductInfo() {
         } else {
           updateCount++;
           // 既存データの保護: checked/checkedAt/memo は保持
-          productCache[code].name = item.itemName || productCache[code].name;
+          // v6.5: 既存商品の商品名は上書きしない（手動編集や旧名を保護）
+          // productCache[code].name = item.itemName || productCache[code].name;
           productCache[code].images = targetImages;
           productCache[code].reviewCount = newReviewCount;
           productCache[code].reviewAvg = item.reviewAverage || 0;
@@ -3963,7 +3964,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.4 initialized');
+  console.log('[reviewcheck] v6.5 initialized');
 }
 
 init();
