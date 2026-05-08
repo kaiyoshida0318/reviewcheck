@@ -206,6 +206,33 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── Menu modal (large action buttons) ── */
 .menu-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
 .menu-action-btn { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; text-align: left; transition: all 0.15s; width: 100%; }
+
+/* ── Mapping modal (CSV import wizard) ── */
+.mapping-modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 920px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.mapping-section { margin-bottom: 20px; }
+.mapping-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.mapping-info { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 14px; background: var(--surface2); border-radius: var(--radius-sm); font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+.mapping-info strong { color: var(--text); font-family: 'DM Mono', monospace; }
+.mapping-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.mapping-row:last-child { border-bottom: none; }
+.mapping-csv-col { flex-shrink: 0; min-width: 180px; font-size: 12px; font-weight: 600; color: var(--text); display: flex; flex-direction: column; gap: 2px; }
+.mapping-csv-col-name { font-family: 'DM Mono', monospace; }
+.mapping-csv-col-sample { font-size: 10px; color: var(--text3); font-weight: 400; }
+.mapping-arrow { color: var(--text3); font-size: 14px; flex-shrink: 0; }
+.mapping-target-select { flex: 1; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; font-size: 12px; cursor: pointer; }
+.mapping-target-select:focus { outline: none; border-color: var(--accent); }
+.mapping-match-row { background: var(--red-light); padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 12px; }
+.mapping-match-row .mapping-match-label { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.mapping-preview-table-wrap { max-height: 280px; overflow: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.mapping-preview-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.mapping-preview-table thead th { background: var(--surface2); padding: 6px 10px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border2); position: sticky; top: 0; white-space: nowrap; text-align: left; }
+.mapping-preview-table tbody td { padding: 5px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.mapping-preview-table tbody tr:hover { background: var(--surface2); }
+.mapping-result { padding: 12px 16px; background: var(--surface2); border-radius: var(--radius-sm); font-size: 12px; line-height: 1.7; margin-top: 12px; }
+.mapping-result strong { color: var(--text); }
+.mapping-result.success { background: #e6f9f1; color: var(--green); }
+.mapping-result.error { background: var(--red-light); color: var(--danger); }
+
 .menu-action-btn:hover { border-color: var(--accent); background: var(--red-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 .menu-action-btn:active { transform: translateY(0); }
 .menu-action-btn .action-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--text); }
@@ -329,7 +356,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.9</span>
+    <span class="build-date">v2.0</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -343,6 +370,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
     <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📥 データ取得</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
+    <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn primary" onclick="openSetupMenuModal()">⚙ 初期設定</button>
   </div>
 </header>
@@ -443,6 +471,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="action-title"><span class="action-title-icon">📋</span><span>商品番号一括入力</span></div>
         <div class="action-desc">楽天RMSの商品別売上CSVをアップロードして、商品管理番号と商品番号の対応を一括登録します。すでに商品番号が入力されている商品は上書きされません。</div>
       </button>
+      <button class="menu-action-btn" onclick="closeDataMenuModal();document.getElementById('mappingFileInput').click()">
+        <div class="action-title"><span class="action-title-icon">📊</span><span>選択データ一括更新</span></div>
+        <div class="action-desc">任意のCSVファイルをアップロードしてプレビューを確認し、どのカラムをreviewcheckのどのフィールドに反映させるかを選択してから一括更新します。データ分析シート等から柔軟にデータを取り込めます。</div>
+      </button>
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeDataMenuModal()">閉じる</button>
@@ -467,6 +499,48 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeSetupMenuModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mapping modal (selective CSV update wizard) -->
+<div class="modal-overlay" id="mappingModal">
+  <div class="mapping-modal">
+    <h3 style="margin-bottom:8px">📊 選択データ一括更新</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">CSVのカラムをreviewcheckのフィールドにマッピングして、一括更新します。</p>
+
+    <!-- ファイル情報 -->
+    <div class="mapping-info" id="mappingInfo"></div>
+
+    <!-- マッチング基準カラム -->
+    <div class="mapping-section">
+      <div class="mapping-section-title">① マッチング基準カラムを選択</div>
+      <div class="mapping-match-row">
+        <div class="mapping-match-label">この列の値で reviewcheck の商品を特定します(現在は商品管理番号でマッチング)</div>
+        <select class="mapping-target-select" id="mappingMatchSelect" style="margin-top:4px"></select>
+      </div>
+    </div>
+
+    <!-- フィールドマッピング -->
+    <div class="mapping-section">
+      <div class="mapping-section-title">② 各カラムをどこに反映させるか選択</div>
+      <div id="mappingRowsContainer"></div>
+    </div>
+
+    <!-- データプレビュー -->
+    <div class="mapping-section">
+      <div class="mapping-section-title">③ データプレビュー(先頭10行)</div>
+      <div class="mapping-preview-table-wrap">
+        <table class="mapping-preview-table" id="mappingPreviewTable"></table>
+      </div>
+    </div>
+
+    <!-- 結果 -->
+    <div id="mappingResult" style="display:none"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeMappingModal()">キャンセル</button>
+      <button class="modal-btn save" onclick="executeMapping()" id="mappingExecuteBtn">この内容で更新</button>
     </div>
   </div>
 </div>
@@ -586,7 +660,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.9
+// reviewcheck v2.0
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -740,7 +814,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.9' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.0' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1745,6 +1819,214 @@ function adjustZoom(delta) {
 }
 
 // ── CSV インポート（商品管理番号 → 商品番号） ──
+// ── 選択データ一括更新（汎用CSVマッピング） ──
+// マッピング可能なフィールド定義（将来的に追加可能）
+const MAPPING_TARGETS = [
+  { value: '__skip__', label: '(使わない)' },
+  { value: '__match_kanri__', label: '🔑 マッチング: 商品管理番号' },
+  { value: 'itemNumber', label: '✏ 商品番号 (itemNumber)' },
+  // 将来の追加例:
+  // { value: 'memo', label: 'メモ' },
+  // { value: 'status', label: 'ステータス' },
+];
+
+let _mappingState = null; // { fileName, headers, rows, autoSuggest }
+
+function handleMappingFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  // CP932(Shift-JIS)とUTF-8の両方を試す
+  _readCsvSmart(file).then(({ text, encoding }) => {
+    const parsed = _parseGenericCsv(text);
+    if (!parsed.ok) {
+      alert('⚠ CSV解析エラー: ' + parsed.error);
+      return;
+    }
+    _mappingState = {
+      fileName: file.name,
+      encoding,
+      headers: parsed.headers,
+      rows: parsed.rows,
+    };
+    openMappingModal();
+  }).catch(err => {
+    alert('⚠ ファイル読込エラー: ' + (err.message || err));
+  }).finally(() => {
+    event.target.value = '';
+  });
+}
+
+// 文字コードを自動判定して読み込む(UTF-8 → CP932の順で試す)
+async function _readCsvSmart(file) {
+  const buf = await file.arrayBuffer();
+  // まずUTF-8で試す
+  try {
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    const text = decoder.decode(buf);
+    // BOM除去
+    return { text: text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text, encoding: 'UTF-8' };
+  } catch(e) {
+    // UTF-8で失敗 → CP932(Shift-JIS)で試す
+    try {
+      const decoder = new TextDecoder('shift-jis');
+      const text = decoder.decode(buf);
+      return { text, encoding: 'Shift-JIS (CP932)' };
+    } catch(e2) {
+      throw new Error('文字コード判定失敗: UTF-8でもShift-JISでもありません');
+    }
+  }
+}
+
+// ヘッダー行を含む汎用CSVをパース
+function _parseGenericCsv(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const lines = text.split(/\r?\n/).filter(l => l.length > 0);
+  if (lines.length === 0) return { ok: false, error: '空ファイル' };
+  // ヘッダー行を探す: 「商品管理番号」を含む行があればそれを優先、なければ1行目
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    if (lines[i].includes('商品管理番号')) {
+      headerIdx = i;
+      break;
+    }
+  }
+  const headers = _parseCsvLine(lines[headerIdx]).map(h => h.trim());
+  const rows = [];
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const cells = _parseCsvLine(lines[i]);
+    if (cells.length === 0 || cells.every(c => !c.trim())) continue;
+    const row = {};
+    headers.forEach((h, idx) => row[h] = (cells[idx] || '').trim());
+    rows.push(row);
+  }
+  if (rows.length === 0) return { ok: false, error: 'データ行がありません' };
+  return { ok: true, headers, rows };
+}
+
+function openMappingModal() {
+  const state = _mappingState;
+  if (!state) return;
+  // ファイル情報
+  document.getElementById('mappingInfo').innerHTML =
+    `📄 <strong>${_escape(state.fileName)}</strong> ｜ 文字コード: <strong>${state.encoding}</strong> ｜ 行数: <strong>${state.rows.length}</strong> 件 ｜ 列数: <strong>${state.headers.length}</strong>`;
+
+  // マッチングカラム選択肢
+  const matchSel = document.getElementById('mappingMatchSelect');
+  matchSel.innerHTML = state.headers.map(h => {
+    // 「商品管理番号」を自動選択
+    const isAutoPick = h === '商品管理番号';
+    return `<option value="${_escape(h)}" ${isAutoPick ? 'selected' : ''}>${_escape(h)}${isAutoPick ? ' (自動選択)' : ''}</option>`;
+  }).join('');
+
+  // マッピング行を生成
+  const rowsHtml = state.headers.map(h => {
+    const sample = state.rows.slice(0, 3).map(r => r[h]).filter(Boolean).join(' / ');
+    // 自動推測: 「商品番号」→ itemNumber、その他は (使わない)
+    let autoTarget = '__skip__';
+    if (h === '商品番号') autoTarget = 'itemNumber';
+    else if (h === '商品管理番号') autoTarget = '__match_kanri__';
+
+    const optsHtml = MAPPING_TARGETS.map(t =>
+      `<option value="${t.value}" ${t.value === autoTarget ? 'selected' : ''}>${_escape(t.label)}</option>`
+    ).join('');
+    return `<div class="mapping-row">
+      <div class="mapping-csv-col">
+        <span class="mapping-csv-col-name">${_escape(h)}</span>
+        <span class="mapping-csv-col-sample">${_escape(sample.substring(0, 60))}${sample.length > 60 ? '...' : ''}</span>
+      </div>
+      <span class="mapping-arrow">→</span>
+      <select class="mapping-target-select" data-csv-col="${_escape(h)}">${optsHtml}</select>
+    </div>`;
+  }).join('');
+  document.getElementById('mappingRowsContainer').innerHTML = rowsHtml;
+
+  // プレビューテーブル
+  const previewRows = state.rows.slice(0, 10);
+  const tableHtml = `<thead><tr>${state.headers.map(h => `<th>${_escape(h)}</th>`).join('')}</tr></thead>
+    <tbody>${previewRows.map(r => `<tr>${state.headers.map(h => `<td title="${_escape(r[h] || '')}">${_escape(r[h] || '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('mappingPreviewTable').innerHTML = tableHtml;
+
+  // 結果欄リセット
+  document.getElementById('mappingResult').style.display = 'none';
+  document.getElementById('mappingResult').innerHTML = '';
+  document.getElementById('mappingExecuteBtn').disabled = false;
+
+  document.getElementById('mappingModal').classList.add('open');
+}
+
+function closeMappingModal() {
+  document.getElementById('mappingModal').classList.remove('open');
+  _mappingState = null;
+}
+
+function executeMapping() {
+  const state = _mappingState;
+  if (!state) return;
+  const matchCol = document.getElementById('mappingMatchSelect').value;
+  if (!matchCol) {
+    alert('⚠ マッチング基準カラムを選択してください');
+    return;
+  }
+  // フィールドマッピングを収集
+  const fieldMap = {}; // { csvCol: targetField }
+  document.querySelectorAll('#mappingRowsContainer select').forEach(sel => {
+    const csvCol = sel.dataset.csvCol;
+    const target = sel.value;
+    if (target && target !== '__skip__' && target !== '__match_kanri__') {
+      fieldMap[csvCol] = target;
+    }
+  });
+  if (Object.keys(fieldMap).length === 0) {
+    alert('⚠ 反映するフィールドが選択されていません\n\n少なくとも1つのカラムを「商品番号 (itemNumber)」など実フィールドにマッピングしてください。');
+    return;
+  }
+
+  // 実行
+  let matched = 0, updated = 0, notFound = 0;
+  const notFoundCodes = [];
+  for (const row of state.rows) {
+    const kanri = (row[matchCol] || '').trim();
+    if (!kanri) continue;
+    if (productCache[kanri]) {
+      matched++;
+      let changed = false;
+      for (const [csvCol, targetField] of Object.entries(fieldMap)) {
+        const newVal = (row[csvCol] || '').trim() || null;
+        const oldVal = productCache[kanri][targetField];
+        if (newVal !== oldVal) {
+          productCache[kanri][targetField] = newVal;
+          changed = true;
+        }
+      }
+      if (changed) updated++;
+    } else {
+      notFound++;
+      if (notFoundCodes.length < 10) notFoundCodes.push(kanri);
+    }
+  }
+
+  // 結果表示
+  const resultEl = document.getElementById('mappingResult');
+  resultEl.style.display = '';
+  resultEl.className = 'mapping-result success';
+  let resultHtml = `<strong>✓ 一括更新完了</strong><br>` +
+    `CSV行数: ${state.rows.length}件<br>` +
+    `→ マッチした商品: <strong>${matched}</strong>件<br>` +
+    `　 → 値が変わって更新: <strong>${updated}</strong>件<br>` +
+    `→ reviewcheckに無い商品(未マッチ): <strong>${notFound}</strong>件`;
+  if (notFoundCodes.length > 0) {
+    resultHtml += `<br><span style="font-size:10px;color:var(--text3)">未マッチ例: ${notFoundCodes.slice(0, 5).map(_escape).join(', ')}${notFound > 5 ? '...' : ''}</span>`;
+  }
+  resultHtml += `<br><br>反映先: ${Object.entries(fieldMap).map(([k, v]) => _escape(k) + ' → ' + _escape(v)).join(', ')}`;
+  resultEl.innerHTML = resultHtml;
+
+  document.getElementById('mappingExecuteBtn').disabled = true;
+
+  // 反映&保存
+  renderProducts();
+  scheduleGitHubSave();
+}
+
 function handleCsvImport(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1920,7 +2202,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.9 initialized');
+  console.log('[reviewcheck] v2.0 initialized');
 }
 
 init();
