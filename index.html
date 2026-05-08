@@ -206,6 +206,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .pending-count { font-size: 12px; color: #8a6914; font-weight: 600; }
 .pending-count strong { font-size: 14px; color: #c87800; }
 
+/* ── トースト通知 ── */
+.rc-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 20px; background: var(--text); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all 0.25s; z-index: 9999; white-space: nowrap; }
+.rc-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.rc-toast.success { background: #1d9e75; }
+.rc-toast.info { background: var(--text2); }
+.rc-toast.error { background: var(--danger); }
+
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: 110px; }
 .product-table .col-diff-result { width: 90px; text-align: center; }
@@ -478,7 +485,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.6</span>
+    <span class="build-date">v5.7</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -948,7 +955,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.6
+// reviewcheck v5.7
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1127,7 +1134,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.6' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.7' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1802,6 +1809,8 @@ function renderProducts() {
 
   // ソートインジケーター更新
   _updateSortIndicators();
+  // ペンディング保存バーも常に同期
+  _refreshPendingEditsBar();
 }
 
 // ── 列ヘッダーソート ──
@@ -2442,6 +2451,21 @@ function _refreshPendingEditsBar() {
   }
 }
 
+// トースト通知(画面下部に一時的に出る)
+function _showToast(msg, type) {
+  let toast = document.getElementById('reviewcheckToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'reviewcheckToast';
+    toast.className = 'rc-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = 'rc-toast show ' + (type || '');
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => { toast.className = 'rc-toast'; }, 2000);
+}
+
 // 保留中の変更をすべて保存
 function commitPendingEdits() {
   const count = Object.keys(pendingEdits).length;
@@ -2463,13 +2487,19 @@ function commitPendingEdits() {
   pendingEdits = {};
   saveCache();
   scheduleGitHubSave();
+  _refreshPendingEditsBar(); // バーを必ず非表示に
   renderProducts();
+  _showToast(`✓ ${count}件の変更を保存しました`, 'success');
 }
 
 // 保留中の変更を破棄
 function cancelPendingEdits() {
+  const count = Object.keys(pendingEdits).length;
+  if (count === 0) return;
   pendingEdits = {};
+  _refreshPendingEditsBar(); // バーを必ず非表示に
   renderProducts();
+  _showToast(`↩ ${count}件の変更を取り消しました`, 'info');
 }
 
 // 画面上件数の入力ハンドラ(行全体を再描画せず、差異セルだけ部分更新してフォーカスを失わせない)
@@ -2538,8 +2568,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.6 */ }
-function _loadViewMode() { /* removed in v5.6 */ }
+function setViewMode(mode) { /* removed in v5.7 */ }
+function _loadViewMode() { /* removed in v5.7 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2653,8 +2683,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.6 */ }
-function setFilter(f) { /* removed in v5.6 */ }
+function toggleCheck(code) { /* removed in v5.7 */ }
+function setFilter(f) { /* removed in v5.7 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3652,7 +3682,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.6 initialized');
+  console.log('[reviewcheck] v5.7 initialized');
 }
 
 init();
