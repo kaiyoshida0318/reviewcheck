@@ -181,6 +181,20 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-review { width: 120px; }
 .product-table .col-image { width: 100px; }
 .product-table .col-action { width: 130px; text-align: center; }
+.product-table .col-status { width: 110px; }
+.product-table .col-tags { width: 180px; }
+
+/* ── ステータスバッジ ── */
+.status-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
+.status-badge.focus  { background: #fff8e1; color: #c87800; border: 1px solid #f5d68a; }
+.status-badge.normal { background: #e6f0fa; color: #1976d2; border: 1px solid #c4dcf4; }
+.status-badge.ignore { background: #f5f5f5; color: var(--text3); border: 1px solid var(--border2); }
+
+/* ── 制作タグバッジ ── */
+.tag-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 10px; white-space: nowrap; margin: 1px 2px 1px 0; }
+.tag-badge.renewal    { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.tag-badge.boost      { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+.tag-badge.boost-plan { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
 
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: 110px; }
@@ -454,7 +468,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.1</span>
+    <span class="build-date">v5.2</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -566,7 +580,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
-              <th class="col-action">アクション</th>
+              <th class="col-status">状態</th>
+              <th class="col-tags">制作タグ</th>
+              <th class="col-action">確認</th>
             </tr>
           </thead>
           <tbody id="productTableBody"></tbody>
@@ -917,7 +933,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.1
+// reviewcheck v5.2
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1094,7 +1110,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.2' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2301,10 +2317,30 @@ function _renderTableRow(code) {
     </td>
     ${diffCells}
     ${imageCells}
+    <td class="col-status">${_renderStatusBadge(p.status)}</td>
+    <td class="col-tags">${_renderTagsBadges(p.tags)}</td>
     <td class="col-action">
-      <button class="modal-btn" style="font-size:11px;padding:6px 14px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 編集/詳細</button>
+      <button class="modal-btn" style="font-size:11px;padding:6px 14px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 詳細</button>
     </td>
   </tr>`;
+}
+
+// 状態バッジ(注目/通常/無視)
+function _renderStatusBadge(status) {
+  const s = status || 'normal';
+  if (s === 'focus')  return `<span class="status-badge focus">⭐ 注目</span>`;
+  if (s === 'ignore') return `<span class="status-badge ignore">🙈 無視</span>`;
+  return `<span class="status-badge normal">👁 通常</span>`;
+}
+
+// 制作タグバッジ(設定されてるものだけ表示)
+function _renderTagsBadges(tags) {
+  if (!tags || typeof tags !== 'object') return '';
+  const badges = [];
+  if (tags.renewal)   badges.push(`<span class="tag-badge renewal">🔄 リニューアル</span>`);
+  if (tags.boost)     badges.push(`<span class="tag-badge boost">🚀 盛り上げ制作</span>`);
+  if (tags.boostPlan) badges.push(`<span class="tag-badge boost-plan">📅 盛り上げ予定</span>`);
+  return badges.join('');
 }
 
 // 画面上件数の入力ハンドラ(行全体を再描画せず、差異セルだけ部分更新してフォーカスを失わせない)
@@ -2373,8 +2409,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.1 */ }
-function _loadViewMode() { /* removed in v5.1 */ }
+function setViewMode(mode) { /* removed in v5.2 */ }
+function _loadViewMode() { /* removed in v5.2 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2488,8 +2524,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.1 */ }
-function setFilter(f) { /* removed in v5.1 */ }
+function toggleCheck(code) { /* removed in v5.2 */ }
+function setFilter(f) { /* removed in v5.2 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3481,7 +3517,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.1 initialized');
+  console.log('[reviewcheck] v5.2 initialized');
 }
 
 init();
