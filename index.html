@@ -171,12 +171,12 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-check { width: 90px; }
 .product-table .col-kanri { width: 110px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
 .product-table .col-bangou { width: 130px; font-family: 'DM Mono', monospace; font-size: 11px; }
-.product-table .col-name { min-width: 220px; max-width: 320px; font-weight: 500; }
+.product-table .col-name { min-width: 180px; max-width: 220px; width: 220px; font-weight: 500; }
 .product-table .col-name a { color: var(--text); text-decoration: none; }
 .product-table .col-name a:hover { color: var(--accent); text-decoration: underline; }
-.product-table .col-review { width: 130px; }
-.product-table .col-image { width: 110px; }
-.product-table .col-action { width: 90px; }
+.product-table .col-review { width: 120px; }
+.product-table .col-image { width: 100px; }
+.product-table .col-action { width: 130px; text-align: center; }
 
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: 110px; }
@@ -246,7 +246,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .sales-month-row .month-delete-btn:hover { border-color: var(--danger); color: var(--danger); }
 
 /* ── Sales column in table ── */
-.product-table .col-sales { width: 130px; text-align: right; }
+.product-table .col-sales { width: 120px; text-align: right; }
 .product-table .col-sales-amount { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
 .product-table .col-sales-amount.zero { color: var(--text3); font-weight: 400; }
 .product-table .col-sales-sub { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
@@ -450,7 +450,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.8</span>
+    <span class="build-date">v4.9</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -909,7 +909,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.8
+// reviewcheck v4.9
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1086,7 +1086,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.8' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.9' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2279,7 +2279,7 @@ function _renderTableRow(code) {
     ${diffCells}
     ${imageCells}
     <td class="col-action">
-      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 編集/詳細</button>
+      <button class="modal-btn" style="font-size:11px;padding:6px 14px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 編集/詳細</button>
     </td>
   </tr>`;
 }
@@ -2350,8 +2350,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.8 */ }
-function _loadViewMode() { /* removed in v4.8 */ }
+function setViewMode(mode) { /* removed in v4.9 */ }
+function _loadViewMode() { /* removed in v4.9 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2465,8 +2465,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.8 */ }
-function setFilter(f) { /* removed in v4.8 */ }
+function toggleCheck(code) { /* removed in v4.9 */ }
+function setFilter(f) { /* removed in v4.9 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3458,7 +3458,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.8 initialized');
+  console.log('[reviewcheck] v4.9 initialized');
 }
 
 init();
