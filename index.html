@@ -82,6 +82,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .sidebar-sort-btn:hover { color: var(--text); }
 .sidebar-sort-btn.active { background: var(--surface); color: var(--text); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
 .sidebar-list { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-divider { height: 1px; background: var(--border2); margin: 6px 4px; }
 .sidebar-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 7px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; color: var(--text2); border: none; background: none; font-family: inherit; text-align: left; transition: all 0.12s; }
 .sidebar-item:hover { background: var(--surface2); color: var(--text); }
 .sidebar-item.active { background: var(--red-light); color: var(--accent); font-weight: 600; }
@@ -453,7 +454,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.0</span>
+    <span class="build-date">v5.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -916,7 +917,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.0
+// reviewcheck v5.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1093,7 +1094,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.0' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.1' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1897,12 +1898,15 @@ function renderSidebar() {
   const statusDefs = [
     { key: 'focus',  label: '注目', icon: '⭐', count: focusCount },
     { key: 'normal', label: '通常', icon: '👁', count: normalCount },
-    { key: 'ignore', label: '無視', icon: '🙈', count: ignoredCount },
+    { key: 'ignore', label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
   ];
   let statusHtml = '';
   for (const s of statusDefs) {
     const isActive = currentStatusFilter === s.key;
     const isIgnoreItem = s.key === 'ignore';
+    if (s.divider) {
+      statusHtml += `<div class="sidebar-divider"></div>`;
+    }
     statusHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isIgnoreItem && !isActive ? 'ignored-item' : ''}" onclick="setStatusFilter('${s.key}')">
       <span class="cat-name">${s.icon} ${_escape(s.label)}</span>
       <span class="cat-count">${s.count}</span>
@@ -2369,8 +2373,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.0 */ }
-function _loadViewMode() { /* removed in v5.0 */ }
+function setViewMode(mode) { /* removed in v5.1 */ }
+function _loadViewMode() { /* removed in v5.1 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2484,8 +2488,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.0 */ }
-function setFilter(f) { /* removed in v5.0 */ }
+function toggleCheck(code) { /* removed in v5.1 */ }
+function setFilter(f) { /* removed in v5.1 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3477,7 +3481,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.0 initialized');
+  console.log('[reviewcheck] v5.1 initialized');
 }
 
 init();
