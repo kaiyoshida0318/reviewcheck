@@ -150,6 +150,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
 .product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 52px; z-index: 50; box-shadow: 0 1px 0 var(--border2); }
+.product-table thead th.sortable { cursor: pointer; user-select: none; }
+.product-table thead th.sortable:hover { background: #ebe9e3; color: var(--text); }
+.product-table thead th .sort-indicator { display: inline-block; margin-left: 4px; color: var(--text3); font-size: 10px; min-width: 10px; }
+.product-table thead th.sort-active { color: var(--text); }
+.product-table thead th.sort-active .sort-indicator { color: var(--accent); font-weight: 700; }
 .product-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .product-table tbody tr { transition: background 0.1s; }
 .product-table tbody tr:hover { background: var(--surface2); }
@@ -378,10 +383,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.3</span>
-    <div class="view-toggle">
-      <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
-      <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
+    <span class="build-date">v3.4</span>
+    <div class="view-toggle" style="display:none">
+      <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦</button>
+      <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰</button>
     </div>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
@@ -435,26 +440,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="toolbar-group">
           <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
         </div>
-        <div class="toolbar-group">
-          <span class="toolbar-label">表示:</span>
-          <button class="filter-pill active" data-filter="all" onclick="setFilter('all')">全て</button>
-          <button class="filter-pill" data-filter="unchecked" onclick="setFilter('unchecked')">未チェック</button>
-          <button class="filter-pill" data-filter="checked" onclick="setFilter('checked')">チェック済み</button>
-          <button class="filter-pill" data-filter="hasReviews" onclick="setFilter('hasReviews')">レビューあり</button>
-        </div>
-        <div class="toolbar-group">
-          <span class="toolbar-label">並び:</span>
-          <select class="sort-select" id="sortSelect" onchange="renderProducts()">
-            <option value="default">デフォルト</option>
-            <option value="reviewCountDesc">レビュー数(多→少)</option>
-            <option value="reviewCountAsc">レビュー数(少→多)</option>
-            <option value="reviewAvgDesc">平均評価(高→低)</option>
-            <option value="reviewAvgAsc">平均評価(低→高)</option>
-            <option value="nameAsc">商品名(あ→ん)</option>
-          </select>
-        </div>
         <div class="toolbar-group" style="margin-left:auto">
-          <span class="toolbar-stat">表示中: <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 件 ｜ チェック済: <strong id="checkedCount">0</strong></span>
+          <span class="toolbar-stat">表示中: <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 件</span>
         </div>
       </div>
 
@@ -471,6 +458,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
       </div>
 
       <!-- Product grid (card view) -->
+      <!-- Product grid (legacy, hidden) -->
       <div class="product-grid" id="productGrid" style="display:none"></div>
 
       <!-- Product table (table view) -->
@@ -478,11 +466,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <table class="product-table">
           <thead>
             <tr>
-              <th class="col-check">チェック</th>
-              <th class="col-kanri">商品管理番号</th>
-              <th class="col-bangou">商品番号</th>
-              <th class="col-name">商品名</th>
-              <th class="col-review">レビュー</th>
+              <th class="col-kanri sortable" onclick="setSortKey('code')" id="sortHeader-code">商品管理番号 <span class="sort-indicator" id="sortInd-code"></span></th>
+              <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
+              <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
+              <th class="col-review sortable" onclick="setSortKey('review')" id="sortHeader-review">レビュー <span class="sort-indicator" id="sortInd-review"></span></th>
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
@@ -748,7 +735,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.3
+// reviewcheck v3.4
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -822,8 +809,17 @@ function _cacheKey() { return 'reviewcheck_cache_' + _getCurrentShopId(); }
 function loadCache() {
   try {
     const raw = localStorage.getItem(_cacheKey());
-    if (raw) productCache = JSON.parse(raw);
-    else productCache = {};
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const cleaned = {};
+      for (const [k, v] of Object.entries(parsed)) {
+        const { checked, checkedAt, ...rest } = v;
+        cleaned[k] = rest;
+      }
+      productCache = cleaned;
+    } else {
+      productCache = {};
+    }
   } catch(e) {
     productCache = {};
   }
@@ -903,8 +899,13 @@ async function saveToGitHub(opts = {}) {
         const getRes = await fetch(apiUrl, { headers });
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
-      // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.3' };
+      // 2. PUT (チェック関連の旧フィールドを除外して保存)
+      const cleanCache = {};
+      for (const [k, v] of Object.entries(productCache)) {
+        const { checked, checkedAt, ...rest } = v;
+        cleanCache[k] = rest;
+      }
+      const payload = { productCache: cleanCache, savedAt: new Date().toISOString(), version: 'v3.4' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -967,7 +968,13 @@ async function loadFromGitHub() {
     const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
     const parsed = JSON.parse(decoded);
     if (parsed.productCache) {
-      productCache = parsed.productCache;
+      // 旧フィールド(checked/checkedAt)を除去してロード
+      const cleaned = {};
+      for (const [k, v] of Object.entries(parsed.productCache)) {
+        const { checked, checkedAt, ...rest } = v;
+        cleaned[k] = rest;
+      }
+      productCache = cleaned;
       saveCache();
       console.log(`[reviewcheck] GitHubから ${Object.keys(productCache).length}件 読込完了`);
     }
@@ -1092,7 +1099,6 @@ async function fetchAllProductInfo() {
             reviewAvg: item.reviewAverage || 0,
             itemUrl: directItemUrl,
             lastFetched: new Date().toISOString(),
-            checked: false,
             itemNumber: null,
           };
         } else {
@@ -1255,7 +1261,6 @@ function _renderStars(avg) {
 
 // ── レンダリング ──
 function renderProducts() {
-  const grid = document.getElementById('productGrid');
   const tableWrap = document.getElementById('productTableWrap');
   const empty = document.getElementById('emptyState');
   const toolbar = document.getElementById('toolbar');
@@ -1263,7 +1268,6 @@ function renderProducts() {
   const codes = Object.keys(productCache);
 
   if (codes.length === 0) {
-    grid.style.display = 'none';
     tableWrap.style.display = 'none';
     empty.style.display = '';
     toolbar.style.display = 'none';
@@ -1273,22 +1277,13 @@ function renderProducts() {
   empty.style.display = 'none';
   toolbar.style.display = '';
   sidebar.style.display = '';
-
-  // View mode に応じて切り替え
-  if (viewMode === 'table') {
-    grid.style.display = 'none';
-    tableWrap.style.display = '';
-  } else {
-    grid.style.display = '';
-    tableWrap.style.display = 'none';
-  }
+  tableWrap.style.display = '';
 
   // サイドバー(カテゴリ一覧)更新
   renderSidebar();
 
-  // フィルタ・ソート
+  // フィルタ
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-  const sortKey = document.getElementById('sortSelect')?.value || 'default';
   let visible = codes.filter(code => {
     const p = productCache[code];
 
@@ -1307,15 +1302,10 @@ function renderProducts() {
     // 「無視」ロジック: サイドバーで「無視」を選んだ時だけ無視商品が表示、それ以外では非表示
     const isIgnored = p.status === 'ignore';
     if (currentScoreBand === 'ignored') {
-      // 「無視」フィルタ選択時 → 無視商品だけ表示
       if (!isIgnored) return false;
     } else {
-      // それ以外のフィルタ選択時 → 無視商品は除外
       if (isIgnored) return false;
     }
-    if (currentFilter === 'checked' && !p.checked) return false;
-    if (currentFilter === 'unchecked' && p.checked) return false;
-    if (currentFilter === 'hasReviews' && (!p.reviewCount || p.reviewCount === 0)) return false;
     // カテゴリフィルタ
     if (currentCategory !== 'all') {
       const cat = _categoryOf(p.itemNumber);
@@ -1336,27 +1326,56 @@ function renderProducts() {
     return true;
   });
 
+  // 列ヘッダーソート
   visible.sort((a, b) => {
     const pa = productCache[a], pb = productCache[b];
-    switch (sortKey) {
-      case 'reviewCountDesc': return (pb.reviewCount || 0) - (pa.reviewCount || 0);
-      case 'reviewCountAsc':  return (pa.reviewCount || 0) - (pb.reviewCount || 0);
-      case 'reviewAvgDesc':   return (pb.reviewAvg || 0) - (pa.reviewAvg || 0);
-      case 'reviewAvgAsc':    return (pa.reviewAvg || 0) - (pb.reviewAvg || 0);
-      case 'nameAsc':         return (pa.name || '').localeCompare(pb.name || '', 'ja');
-      default: return a.localeCompare(b, 'ja');
+    let cmp = 0;
+    switch (currentSortKey) {
+      case 'code':       cmp = a.localeCompare(b, 'ja'); break;
+      case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
+      case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
+      case 'review':     cmp = (pb.reviewCount || 0) - (pa.reviewCount || 0); break; // レビューはデフォ多い順
+      default:           cmp = a.localeCompare(b, 'ja');
     }
+    return currentSortDir === 'desc' ? -cmp : cmp;
   });
 
   document.getElementById('totalCount').textContent = codes.length;
   document.getElementById('visibleCount').textContent = visible.length;
-  document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
 
-  if (viewMode === 'table') {
-    document.getElementById('productTableBody').innerHTML = visible.map(code => _renderTableRow(code)).join('');
+  document.getElementById('productTableBody').innerHTML = visible.map(code => _renderTableRow(code)).join('');
+
+  // ソートインジケーター更新
+  _updateSortIndicators();
+}
+
+// ── 列ヘッダーソート ──
+let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'review'
+let currentSortDir = 'asc';     // 'asc' | 'desc'
+function setSortKey(key) {
+  if (currentSortKey === key) {
+    // 同じ列を再クリック → 方向反転
+    currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
   } else {
-    grid.innerHTML = visible.map(code => _renderCard(code)).join('');
+    currentSortKey = key;
+    // 新しい列: レビューはデフォルトで降順、それ以外は昇順
+    currentSortDir = (key === 'review') ? 'desc' : 'asc';
   }
+  renderProducts();
+}
+function _updateSortIndicators() {
+  ['code', 'itemNumber', 'name', 'review'].forEach(k => {
+    const th = document.getElementById('sortHeader-' + k);
+    const ind = document.getElementById('sortInd-' + k);
+    if (!th || !ind) return;
+    if (k === currentSortKey) {
+      th.classList.add('sort-active');
+      ind.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+    } else {
+      th.classList.remove('sort-active');
+      ind.textContent = '';
+    }
+  });
 }
 
 // ── カテゴリ抽出 ──
@@ -1539,12 +1558,7 @@ function _renderTableRow(code) {
     ? `<span class="table-item-number" id="trnum-${_escape(code)}">${_escape(p.itemNumber)}</span>`
     : `<span class="table-item-number-empty" onclick="editItemNumberInTable('${_escape(code)}')">+ 入力</span>`;
 
-  return `<tr class="${p.checked ? 'checked' : ''}" id="row-${_escape(code)}">
-    <td class="col-check">
-      <button class="check-toggle ${p.checked ? 'on' : ''}" onclick="toggleCheck('${_escape(code)}')">
-        <span class="check-icon">${p.checked ? '✓' : '○'}</span>${p.checked ? '済' : '未'}
-      </button>
-    </td>
+  return `<tr id="row-${_escape(code)}">
     <td class="col-kanri">${_escape(code)}</td>
     <td class="col-bangou">${itemNumberCell}</td>
     <td class="col-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></td>
@@ -1687,29 +1701,9 @@ function _escape(s) {
 }
 
 // ── チェック切替 ──
-function toggleCheck(code) {
-  if (!productCache[code]) return;
-  productCache[code].checked = !productCache[code].checked;
-  productCache[code].checkedAt = productCache[code].checked ? new Date().toISOString() : null;
-  // カード or テーブル行を部分更新
-  const card = document.getElementById('card-' + code);
-  if (card) card.outerHTML = _renderCard(code);
-  const row = document.getElementById('row-' + code);
-  if (row) row.outerHTML = _renderTableRow(code);
-  // 件数更新
-  const codes = Object.keys(productCache);
-  document.getElementById('checkedCount').textContent = codes.filter(c => productCache[c].checked).length;
-  scheduleGitHubSave();
-}
-
-// ── フィルタ ──
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-pill').forEach(b => {
-    b.classList.toggle('active', b.dataset.filter === f);
-  });
-  renderProducts();
-}
+// ── レガシー: チェック機能は廃止、関数はno-op ──
+function toggleCheck(code) { /* removed in v3.4 */ }
+function setFilter(f) { /* removed in v3.4 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -2492,7 +2486,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v3.3 initialized');
+  console.log('[reviewcheck] v3.4 initialized');
 }
 
 init();
