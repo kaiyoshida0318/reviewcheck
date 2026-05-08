@@ -58,11 +58,17 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .save-status.error { background: var(--red-light); color: var(--danger); }
 
 /* ── Layout ── */
-.container { max-width: none; margin: 0; padding: 20px 16px; }
+.container { max-width: none; margin: 0; padding: 0 16px 20px; }
+.main-layout { padding-top: 16px; }
+.main-content { flex: 1; min-width: 0; }
+/* ツールバーがstickyになった時、ヘッダー(52px)との間に main-layout padding-top(16px) 分の隙間ができる
+   その隙間を、ツールバー自身の前(::before)で背景色で覆う */
+.toolbar { position: sticky; top: 52px; }
+.toolbar::before { content: ''; position: absolute; left: -1px; right: -1px; top: -17px; height: 17px; background: var(--bg); pointer-events: none; }
 
 /* ── Layout with sidebar ── */
 .main-layout { display: flex; gap: 20px; align-items: flex-start; }
-.sidebar-stack { flex-shrink: 0; display: flex; flex-direction: row; gap: 12px; position: sticky; top: 60px; height: calc(100vh - 80px); z-index: 20; align-items: flex-start; overscroll-behavior: contain; }
+.sidebar-stack { flex-shrink: 0; display: flex; flex-direction: row; gap: 12px; position: sticky; top: 52px; height: calc(100vh - 72px); z-index: 20; align-items: flex-start; overscroll-behavior: contain; }
 .sidebar-col-left { display: flex; flex-direction: column; gap: 12px; width: 200px; flex-shrink: 0; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
 .sidebar-col-right { width: 200px; flex-shrink: 0; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
 .sidebar-col-right .sidebar { max-height: none; }
@@ -84,10 +90,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .sidebar-item.ignored-item { color: var(--text3); opacity: 0.7; }
 .sidebar-item.ignored-item:hover { opacity: 1; }
 .sidebar-item.active.ignored-item, .sidebar-item.ignored-item.active { background: #f5f5f5; color: var(--text); opacity: 1; }
-.main-content { flex: 1; min-width: 0; }
 
 /* ── Toolbar ── */
-.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 60px; z-index: 30; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 52px; z-index: 30; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
 .toolbar-group { display: flex; align-items: center; gap: 8px; }
 .toolbar-label { font-size: 11px; color: var(--text3); font-weight: 500; }
 .search-input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; min-width: 220px; }
@@ -152,7 +157,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── Table view ── */
 .product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
-.product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 124px; z-index: 25; box-shadow: 0 1px 0 var(--border2); }
+.product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 110px; z-index: 25; box-shadow: 0 1px 0 var(--border2); }
 .product-table thead th.sortable { cursor: pointer; user-select: none; }
 .product-table thead th.sortable:hover { background: #ebe9e3; color: var(--text); }
 .product-table thead th .sort-indicator { display: inline-block; margin-left: 4px; color: var(--text3); font-size: 10px; min-width: 10px; }
@@ -307,7 +312,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-edit-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .product-edit-left, .product-edit-right { min-width: 0; }
 .edit-top-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
-.edit-image-cell { width: 150px; height: 150px; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; display: flex; align-items: center; justify-content: center; }
+.edit-image-cell { width: 150px; height: 150px; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .edit-image-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .edit-image-cell.empty { font-size: 11px; color: var(--text3); cursor: default; }
 .edit-text-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
@@ -444,7 +449,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.5</span>
+    <span class="build-date">v4.7</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -477,6 +482,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
             <span>レビュー評価</span>
           </div>
           <div class="sidebar-list" id="sidebarScoreList"></div>
+        </div>
+        <!-- 状態フィルタ(注視/無視) -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <span>状態</span>
+          </div>
+          <div class="sidebar-list" id="sidebarStatusList"></div>
         </div>
         <!-- 制作タグフィルタ -->
         <div class="sidebar">
@@ -892,7 +904,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.5
+// reviewcheck v4.7
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -953,7 +965,8 @@ function _ghReviewFile() { return `${_shopDataDir()}/review_data.json`; }
 let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
-let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated' | 'ignored')
+let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
+let currentStatusFilter = 'watch'; // 状態フィルタ ('watch'=注視[デフォルト, 無視を除外] | 'ignore'=無視のみ表示)
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
 let viewMode = 'card'; // 'card' | 'table' (legacy, no longer used)
 let tableMode = 'basic'; // 'basic' | 'diff' - テーブル表示モード
@@ -1065,7 +1078,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.5' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.7' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1679,12 +1692,12 @@ function renderProducts() {
       return true;
     }
 
-    // 「無視」ロジック: サイドバーで「無視」を選んだ時だけ無視商品が表示、それ以外では非表示
+    // 状態フィルタ(注視/無視)
     const isIgnored = p.status === 'ignore';
-    if (currentScoreBand === 'ignored') {
-      if (!isIgnored) return false;
+    if (currentStatusFilter === 'ignore') {
+      if (!isIgnored) return false; // 「無視」モード: 無視商品のみ表示
     } else {
-      if (isIgnored) return false;
+      if (isIgnored) return false; // 「注視」モード(デフォルト): 無視商品は除外
     }
     // カテゴリフィルタ
     if (currentCategory !== 'all') {
@@ -1695,8 +1708,8 @@ function renderProducts() {
         if (cat !== currentCategory) return false;
       }
     }
-    // スコアバンドフィルタ ('ignored' 以外で適用)
-    if (currentScoreBand !== 'all' && currentScoreBand !== 'ignored') {
+    // スコアバンドフィルタ
+    if (currentScoreBand !== 'all') {
       if (_scoreBandOf(p.reviewCount, p.reviewAvg) !== currentScoreBand) return false;
     }
     if (search) {
@@ -1820,12 +1833,13 @@ function renderSidebar() {
   list.innerHTML = html;
 
   // ── レビュー評価帯 ──
-  // 「無視」商品は通常の点数集計から除外。ignoredとして別カウント
-  const bandCounts = { all: 0, high: 0, mid: 0, low: 0, poor: 0, unrated: 0, ignored: 0 };
+  // 「無視」商品は集計から完全除外(状態フィルタが「無視」の時に別カウント表示される)
+  const bandCounts = { all: 0, high: 0, mid: 0, low: 0, poor: 0, unrated: 0 };
+  let ignoredCount = 0;
   for (const code of codes) {
     const p = productCache[code];
     if (p.status === 'ignore') {
-      bandCounts.ignored++;
+      ignoredCount++;
     } else {
       bandCounts.all++;
       const band = _scoreBandOf(p.reviewCount, p.reviewAvg);
@@ -1839,19 +1853,34 @@ function renderSidebar() {
     { key: 'low',     label: '4.0 〜 4.2', color: '#ed8936', icon: '★ ' },
     { key: 'poor',    label: '〜 4.0',     color: '#a32d2d', icon: '★ ' },
     { key: 'unrated', label: '未評価',     color: null,      icon: '★ ' },
-    { key: 'ignored', label: '無視',       color: null,      icon: '🙈 ' },
   ];
   let scoreHtml = '';
   for (const b of bandDefs) {
     const isActive = currentScoreBand === b.key;
     const colorStyle = b.color ? `color:${b.color};font-weight:600` : '';
-    const isIgnoredItem = b.key === 'ignored';
-    scoreHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isIgnoredItem && !isActive ? 'ignored-item' : ''}" onclick="setScoreBand('${b.key}')">
+    scoreHtml += `<button class="sidebar-item ${isActive ? 'active' : ''}" onclick="setScoreBand('${b.key}')">
       <span class="cat-name" style="${colorStyle}">${b.icon}${_escape(b.label)}</span>
       <span class="cat-count">${bandCounts[b.key] || 0}</span>
     </button>`;
   }
   document.getElementById('sidebarScoreList').innerHTML = scoreHtml;
+
+  // ── 状態フィルタ(注視/無視) ──
+  const watchCount = bandCounts.all; // 注視=無視じゃない商品の総数
+  const statusDefs = [
+    { key: 'watch',  label: '注視', icon: '👁', count: watchCount },
+    { key: 'ignore', label: '無視', icon: '🙈', count: ignoredCount },
+  ];
+  let statusHtml = '';
+  for (const s of statusDefs) {
+    const isActive = currentStatusFilter === s.key;
+    const isIgnoreItem = s.key === 'ignore';
+    statusHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isIgnoreItem && !isActive ? 'ignored-item' : ''}" onclick="setStatusFilter('${s.key}')">
+      <span class="cat-name">${s.icon} ${_escape(s.label)}</span>
+      <span class="cat-count">${s.count}</span>
+    </button>`;
+  }
+  document.getElementById('sidebarStatusList').innerHTML = statusHtml;
 
   // ── 制作タグ ──
   const tagCounts = { renewal: 0, boost: 0, boostPlan: 0 };
@@ -1884,6 +1913,15 @@ function setScoreBand(band) {
   currentScoreBand = band;
   // 制作タグもリセット(レビュー評価選択時はタグフィルタ解除)
   currentProductionTag = null;
+  renderProducts();
+}
+
+function setStatusFilter(status) {
+  currentStatusFilter = status;
+  // 状態切替時は他フィルタをリセット
+  currentScoreBand = 'all';
+  currentProductionTag = null;
+  currentCategory = 'all';
   renderProducts();
 }
 
@@ -2291,8 +2329,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.5 */ }
-function _loadViewMode() { /* removed in v4.5 */ }
+function setViewMode(mode) { /* removed in v4.7 */ }
+function _loadViewMode() { /* removed in v4.7 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2406,8 +2444,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.5 */ }
-function setFilter(f) { /* removed in v4.5 */ }
+function toggleCheck(code) { /* removed in v4.7 */ }
+function setFilter(f) { /* removed in v4.7 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3143,7 +3181,7 @@ function openProductEditModal(code) {
   const imgCell = document.getElementById('productEditImage1Cell');
   if (img1) {
     imgCell.classList.remove('empty');
-    imgCell.innerHTML = `<img src="${_escape(img1)}" alt="画像1" onclick="openLightbox('${_escape(img1)}')">`;
+    imgCell.innerHTML = `<img src="${_escape(img1)}" alt="画像1">`;
   } else {
     imgCell.classList.add('empty');
     imgCell.innerHTML = '画像なし';
@@ -3396,7 +3434,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.5 initialized');
+  console.log('[reviewcheck] v4.7 initialized');
 }
 
 init();
