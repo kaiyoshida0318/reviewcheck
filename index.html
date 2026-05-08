@@ -114,7 +114,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-name a:hover { color: var(--accent); text-decoration: underline; }
 .product-code { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .product-code .code-sep { color: var(--text3); opacity: 0.5; }
-.product-code .item-number { color: var(--accent); font-weight: 600; }
+.product-code .item-number { color: var(--text); font-weight: 600; }
 .product-code .item-number-empty { color: var(--text3); font-style: italic; cursor: pointer; padding: 1px 6px; border: 1px dashed var(--border2); border-radius: 3px; transition: all 0.15s; }
 .product-code .item-number-empty:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
 .product-code .item-number-edit-btn { background: none; border: none; cursor: pointer; padding: 0 2px; color: var(--text3); font-size: 10px; opacity: 0; transition: opacity 0.15s; }
@@ -173,7 +173,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .table-review-link { font-size: 10px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); text-decoration: none; display: inline-block; white-space: nowrap; }
 .product-table .table-review-link:hover { background: var(--accent); color: #fff; }
 .product-table .table-review-link.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
-.product-table .table-item-number { color: var(--accent); font-weight: 600; }
+.product-table .table-item-number { color: var(--text); font-weight: 600; }
 .product-table .table-item-number-empty { color: var(--text3); font-style: italic; cursor: pointer; padding: 1px 6px; border: 1px dashed var(--border2); border-radius: 3px; font-size: 10px; }
 .product-table .table-item-number-empty:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
 .table-item-number-input { font-family: 'DM Mono', monospace; font-size: 11px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; outline: none; width: 100%; max-width: 120px; }
@@ -359,7 +359,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v2.6</span>
+    <span class="build-date">v2.7</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -663,7 +663,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v2.6
+// reviewcheck v2.7
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -817,7 +817,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.6' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.7' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2220,7 +2220,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v2.6 initialized');
+  console.log('[reviewcheck] v2.7 initialized');
 }
 
 init();
