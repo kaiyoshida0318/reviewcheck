@@ -62,7 +62,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
 /* ── Layout with sidebar ── */
 .main-layout { display: flex; gap: 20px; align-items: flex-start; }
-.sidebar { flex-shrink: 0; width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; }
+.sidebar { flex-shrink: 0; width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; z-index: 20; }
 .sidebar-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text3); padding: 4px 8px 8px; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
 .sidebar-sort-toggle { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px; }
 .sidebar-sort-btn { border: none; background: none; cursor: pointer; padding: 2px 6px; font-size: 9px; color: var(--text3); border-radius: 3px; font-family: inherit; letter-spacing: 0; font-weight: 500; transition: all 0.12s; }
@@ -136,16 +136,16 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .star.filled { color: var(--gold); }
 .star.half { background: linear-gradient(90deg, var(--gold) 50%, #ddd 50%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .review-avg { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
-.review-count { font-size: 11px; color: var(--text2); }
-.review-count strong { color: var(--text); font-family: 'DM Mono', monospace; }
+.review-count { font-size: 13px; color: var(--text2); margin-left: auto; }
+.review-count strong { color: var(--text); font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; margin-right: 2px; }
 .review-link-btn { margin-left: auto; font-size: 11px; padding: 5px 10px; border: 1px solid var(--accent); border-radius: var(--radius-sm); background: var(--surface); color: var(--accent); text-decoration: none; font-weight: 600; transition: all 0.15s; white-space: nowrap; }
 .review-link-btn:hover { background: var(--accent); color: #fff; }
 .review-link-btn.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
 
 /* ── Table view ── */
-.product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow); }
+.product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
-.product-table thead th { background: var(--surface2); padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 1px solid var(--border2); white-space: nowrap; position: sticky; top: 52px; z-index: 10; }
+.product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 52px; z-index: 50; box-shadow: 0 1px 0 var(--border2); }
 .product-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .product-table tbody tr { transition: background 0.1s; }
 .product-table tbody tr:hover { background: var(--surface2); }
@@ -167,6 +167,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .table-review-line1 { display: flex; align-items: center; gap: 4px; }
 .product-table .table-review-avg { font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
 .product-table .table-review-count { color: var(--text2); font-size: 10px; }
+.product-table .table-review-count-big { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.product-table .table-review-count-big strong { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); margin-right: 2px; }
 .product-table .table-review-link { font-size: 10px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); text-decoration: none; display: inline-block; white-space: nowrap; }
 .product-table .table-review-link:hover { background: var(--accent); color: #fff; }
 .product-table .table-review-link.no-reviews { border-color: var(--border2); color: var(--text3); pointer-events: none; opacity: 0.5; }
@@ -356,7 +358,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v2.1</span>
+    <span class="build-date">v2.3</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -660,7 +662,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v2.1
+// reviewcheck v2.3
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -814,7 +816,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.1' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.3' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1332,9 +1334,8 @@ function _renderTableRow(code) {
         <div class="table-review-line1">
           ${_renderStars(p.reviewAvg)}
           <span class="table-review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
-          <span class="table-review-count">(${p.reviewCount || 0})</span>
         </div>
-        <a href="${_escape(reviewUrl)}" target="_blank" rel="noopener" class="table-review-link ${hasReviews ? '' : 'no-reviews'}">📷 楽天で見る</a>
+        <div class="table-review-count-big"><strong>${p.reviewCount || 0}</strong>件</div>
       </div>
     </td>
     ${imageCells}
@@ -1445,7 +1446,6 @@ function _renderCard(code) {
       ${_renderStars(p.reviewAvg)}
       <span class="review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
       <span class="review-count"><strong>${p.reviewCount || 0}</strong>件</span>
-      <a href="${_escape(reviewUrl)}" target="_blank" rel="noopener" class="review-link-btn ${hasReviews ? '' : 'no-reviews'}" title="${hasReviews ? '楽天レビューページを別タブで開く' : 'レビューがありません'}">📷 画像付きレビューを見る</a>
     </div>
     <div class="image-strip">${imagesHtml}</div>
     <div class="product-meta">
@@ -2204,7 +2204,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v2.1 initialized');
+  console.log('[reviewcheck] v2.3 initialized');
 }
 
 init();
