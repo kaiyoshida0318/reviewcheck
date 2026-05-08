@@ -300,6 +300,25 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
 .modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal.product-edit-modal { max-width: 1080px; }
+.product-edit-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.product-edit-left, .product-edit-right { min-width: 0; }
+.edit-section-title { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.sales-chart-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; position: relative; }
+.sales-chart-wrap canvas { width: 100% !important; height: 220px !important; display: block; }
+.sales-chart-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 12px; }
+.sales-history-table-wrap { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.sales-history-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.sales-history-table thead th { background: var(--surface2); padding: 6px 10px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border2); position: sticky; top: 0; text-align: right; font-family: 'DM Mono', monospace; }
+.sales-history-table thead th:first-child { text-align: left; }
+.sales-history-table tbody td { padding: 5px 10px; border-bottom: 1px solid var(--border); text-align: right; font-family: 'DM Mono', monospace; }
+.sales-history-table tbody td:first-child { text-align: left; font-weight: 600; }
+.sales-history-table tbody tr:hover { background: var(--surface2); }
+.sales-history-table .no-data { color: var(--text3); }
+@media (max-width: 900px) {
+  .product-edit-body { grid-template-columns: 1fr; }
+  .modal.product-edit-modal { max-width: 96vw; }
+}
 .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
 .modal p { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.6; }
 .modal-field { margin-bottom: 14px; }
@@ -412,7 +431,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.7</span>
+    <span class="build-date">v3.8</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -566,46 +585,64 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
 <!-- Product detail edit modal -->
 <div class="modal-overlay" id="productEditModal">
-  <div class="modal" style="max-width:480px">
-    <h3>✎ 商品詳細編集</h3>
+  <div class="modal product-edit-modal">
+    <h3>✎ 商品詳細</h3>
     <div style="font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace" id="productEditMeta"></div>
 
-    <div class="modal-field">
-      <label class="modal-label">商品番号</label>
-      <input type="text" class="modal-input" id="productEditItemNumber" placeholder="例: ih-22-04-set1">
-    </div>
-
-    <div class="modal-field">
-      <label class="modal-label">商品名</label>
-      <textarea class="modal-input" id="productEditName" rows="2" style="resize:vertical;font-family:inherit;line-height:1.5" placeholder="商品名を入力"></textarea>
-    </div>
-
-    <div class="modal-field">
-      <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(複数選択可)</span></label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
-          <span style="font-size:14px">🔄</span><span>リニューアル</span>
-        </button>
-        <button class="tag-btn" data-tag="boost" onclick="toggleEditTag('boost')" id="tagBtnBoost">
-          <span style="font-size:14px">🚀</span><span>盛り上げ制作</span>
-        </button>
-        <button class="tag-btn" data-tag="boostPlan" onclick="toggleEditTag('boostPlan')" id="tagBtnBoostPlan">
-          <span style="font-size:14px">📅</span><span>盛り上げ予定</span>
-        </button>
+    <div class="product-edit-body">
+      <!-- 左カラム: 売上グラフ + テーブル -->
+      <div class="product-edit-left">
+        <div class="edit-section-title">📈 売上推移(直近12ヶ月)</div>
+        <div class="sales-chart-wrap">
+          <canvas id="salesChart" width="500" height="220"></canvas>
+          <div class="sales-chart-empty" id="salesChartEmpty" style="display:none">売上データがありません</div>
+        </div>
+        <div class="edit-section-title" style="margin-top:14px">💴 月別売上</div>
+        <div class="sales-history-table-wrap">
+          <table class="sales-history-table" id="salesHistoryTable"></table>
+        </div>
       </div>
-    </div>
 
-    <div class="modal-field">
-      <label class="modal-label">状態</label>
-      <div style="display:flex;gap:8px">
-        <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
-          <span style="font-size:14px">👁</span><span>注視</span>
-          <div class="status-desc">通常表示・各種フィルタの対象</div>
-        </button>
-        <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
-          <span style="font-size:14px">🙈</span><span>無視</span>
-          <div class="status-desc">「無視」フィルタ以外では非表示</div>
-        </button>
+      <!-- 右カラム: 編集フォーム -->
+      <div class="product-edit-right">
+        <div class="modal-field">
+          <label class="modal-label">商品番号</label>
+          <input type="text" class="modal-input" id="productEditItemNumber" placeholder="例: ih-22-04-set1">
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-label">商品名</label>
+          <textarea class="modal-input" id="productEditName" rows="2" style="resize:vertical;font-family:inherit;line-height:1.5" placeholder="商品名を入力"></textarea>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(複数選択可)</span></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
+              <span style="font-size:14px">🔄</span><span>リニューアル</span>
+            </button>
+            <button class="tag-btn" data-tag="boost" onclick="toggleEditTag('boost')" id="tagBtnBoost">
+              <span style="font-size:14px">🚀</span><span>盛り上げ制作</span>
+            </button>
+            <button class="tag-btn" data-tag="boostPlan" onclick="toggleEditTag('boostPlan')" id="tagBtnBoostPlan">
+              <span style="font-size:14px">📅</span><span>盛り上げ予定</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-label">状態</label>
+          <div style="display:flex;gap:8px">
+            <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
+              <span style="font-size:14px">👁</span><span>注視</span>
+              <div class="status-desc">通常表示・各種フィルタの対象</div>
+            </button>
+            <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
+              <span style="font-size:14px">🙈</span><span>無視</span>
+              <div class="status-desc">「無視」フィルタ以外では非表示</div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -799,7 +836,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.7
+// reviewcheck v3.8
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -972,7 +1009,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.7' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.8' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1912,7 +1949,7 @@ function _renderTableRow(code) {
     ${diffCells}
     ${imageCells}
     <td class="col-action">
-      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="openProductEditModal('${_escape(code)}')" title="詳細を編集">✎ 編集</button>
+      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 編集/詳細</button>
     </td>
   </tr>`;
 }
@@ -1983,8 +2020,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v3.7 */ }
-function _loadViewMode() { /* removed in v3.7 */ }
+function setViewMode(mode) { /* removed in v3.8 */ }
+function _loadViewMode() { /* removed in v3.8 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2098,8 +2135,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v3.7 */ }
-function setFilter(f) { /* removed in v3.7 */ }
+function toggleCheck(code) { /* removed in v3.8 */ }
+function setFilter(f) { /* removed in v3.8 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -2832,11 +2869,195 @@ function openProductEditModal(code) {
   _updateStatusBtns();
   _updateTagBtns();
   document.getElementById('productEditModal').classList.add('open');
-  setTimeout(() => document.getElementById('productEditItemNumber').focus(), 50);
+  // 売上グラフ・テーブル描画(モーダル表示後にcanvasサイズ確定してから)
+  setTimeout(() => {
+    _renderSalesChart(code);
+    _renderSalesHistoryTable(code);
+    document.getElementById('productEditItemNumber').focus();
+  }, 50);
 }
 function closeProductEditModal() {
   document.getElementById('productEditModal').classList.remove('open');
   _editingProductCode = null;
+}
+
+// ── 売上履歴の取得(直近12ヶ月、データのある月のみ) ──
+function _getSalesHistory(code) {
+  const allMonths = Object.keys(monthlySales).sort(); // 古い順
+  // 直近12ヶ月に限定
+  const last12 = allMonths.slice(-12);
+  return last12.map(ym => {
+    const data = (monthlySales[ym] || {})[code];
+    return {
+      month: ym,
+      sales: (data && data.sales) || 0,
+      qty: (data && data.qty) || 0,
+      count: (data && data.count) || 0,
+    };
+  });
+}
+
+// ── 売上推移の折れ線グラフ(canvasで描画) ──
+function _renderSalesChart(code) {
+  const canvas = document.getElementById('salesChart');
+  const emptyEl = document.getElementById('salesChartEmpty');
+  if (!canvas) return;
+  const history = _getSalesHistory(code);
+  // データがない or 全ゼロの場合は空表示
+  const hasData = history.length > 0 && history.some(h => h.sales > 0);
+  if (!hasData) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = '';
+    return;
+  }
+  canvas.style.display = '';
+  emptyEl.style.display = 'none';
+
+  const ctx = canvas.getContext('2d');
+  // canvasのDPR対応
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // パディング
+  const padL = 56, padR = 16, padT = 14, padB = 28;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  // Y軸最大値(きりよく)
+  const maxSales = Math.max(...history.map(h => h.sales), 0);
+  const yMax = _niceMax(maxSales);
+  const yMin = 0;
+
+  // X軸座標
+  const xStep = history.length > 1 ? plotW / (history.length - 1) : 0;
+  const xAt = (i) => padL + i * xStep;
+  const yAt = (val) => padT + plotH - ((val - yMin) / (yMax - yMin || 1)) * plotH;
+
+  // グリッド + Y軸ラベル(0, max/4, max/2, max*3/4, max)
+  ctx.strokeStyle = '#e8e6e0';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#999';
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++) {
+    const v = yMin + (yMax - yMin) * (i / 4);
+    const y = yAt(v);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(W - padR, y);
+    ctx.stroke();
+    ctx.fillText('¥' + _abbrevAmount(v), padL - 6, y);
+  }
+
+  // X軸ラベル
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#666';
+  history.forEach((h, i) => {
+    const x = xAt(i);
+    // 月だけ表示(YYYY-MM → MM月)
+    const label = h.month.slice(5) + '月';
+    ctx.fillText(label, x, H - padB + 4);
+  });
+
+  // 折れ線
+  ctx.strokeStyle = '#BF0000';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  history.forEach((h, i) => {
+    const x = xAt(i);
+    const y = yAt(h.sales);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // 塗り(下半分を薄く)
+  ctx.fillStyle = 'rgba(191, 0, 0, 0.08)';
+  ctx.beginPath();
+  history.forEach((h, i) => {
+    const x = xAt(i);
+    const y = yAt(h.sales);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(xAt(history.length - 1), padT + plotH);
+  ctx.lineTo(xAt(0), padT + plotH);
+  ctx.closePath();
+  ctx.fill();
+
+  // データ点 + 値ラベル
+  history.forEach((h, i) => {
+    const x = xAt(i);
+    const y = yAt(h.sales);
+    ctx.fillStyle = '#BF0000';
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+    if (h.sales > 0) {
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = 'bold 9px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('¥' + _abbrevAmount(h.sales), x, y - 5);
+    }
+  });
+}
+
+// 軸の最大値をきりよく丸める(例: 1882340 → 2000000)
+function _niceMax(value) {
+  if (value <= 0) return 1000;
+  const exp = Math.pow(10, Math.floor(Math.log10(value)));
+  const top = value / exp;
+  let nice;
+  if (top <= 1) nice = 1;
+  else if (top <= 2) nice = 2;
+  else if (top <= 5) nice = 5;
+  else nice = 10;
+  return nice * exp;
+}
+
+// 数値を短縮表記(1882340 → 1.88M, 12345 → 12.3K)
+function _abbrevAmount(v) {
+  v = v || 0;
+  if (v >= 1000000) return (v / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'M';
+  if (v >= 1000) return (v / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(Math.round(v));
+}
+
+// ── 月別売上テーブル ──
+function _renderSalesHistoryTable(code) {
+  const table = document.getElementById('salesHistoryTable');
+  if (!table) return;
+  const history = _getSalesHistory(code);
+  if (history.length === 0) {
+    table.innerHTML = `<tbody><tr><td colspan="4" class="no-data" style="text-align:center;padding:16px">月別売上データがありません</td></tr></tbody>`;
+    return;
+  }
+  let html = `<thead><tr>
+    <th>月</th>
+    <th>売上</th>
+    <th>個数</th>
+    <th>件数</th>
+  </tr></thead><tbody>`;
+  // 新しい順に表示(直感的)
+  for (const h of [...history].reverse()) {
+    const isZero = h.sales === 0;
+    html += `<tr>
+      <td>${h.month}</td>
+      <td class="${isZero ? 'no-data' : ''}">¥${h.sales.toLocaleString()}</td>
+      <td class="${isZero ? 'no-data' : ''}">${h.qty.toLocaleString()}</td>
+      <td class="${isZero ? 'no-data' : ''}">${h.count.toLocaleString()}</td>
+    </tr>`;
+  }
+  html += '</tbody>';
+  table.innerHTML = html;
 }
 function setEditStatus(status) {
   _editingTempStatus = status;
@@ -2892,7 +3113,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v3.7 initialized');
+  console.log('[reviewcheck] v3.8 initialized');
 }
 
 init();
