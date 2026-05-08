@@ -439,7 +439,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.1</span>
+    <span class="build-date">v4.2</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -585,6 +585,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="action-title"><span class="action-title-icon">🔑</span><span>楽天データ入力</span></div>
         <div class="action-desc">楽天アプリID・アクセスキー・店舗コード(shopCode)を入力します。GitHub PATを設定すると、複数PCでデータを共有できます。初回起動時は必ず設定してください。</div>
       </button>
+      <button class="menu-action-btn" onclick="closeSetupMenuModal();diagnoseFetch()">
+        <div class="action-title"><span class="action-title-icon">🔍</span><span>取得状況の診断</span></div>
+        <div class="action-desc">楽天APIの取得結果と現在のproductCacheを比較して、取りこぼしがないか診断します。特定商品(例: 10001252)の存在チェックや、件数の不一致をチェックできます。</div>
+      </button>
       <button class="menu-action-btn danger" onclick="closeSetupMenuModal();clearAllData()">
         <div class="action-title"><span class="action-title-icon">🗑</span><span>全クリア</span></div>
         <div class="action-desc">現在の店舗の全データ(商品データ・チェック状態・商品番号)を完全に削除します。GitHub上のデータも削除されます。この操作は取り消せません。データが破損している場合や、最初からやり直す場合に使ってください。</div>
@@ -592,6 +596,35 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeSetupMenuModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic modal -->
+<div class="modal-overlay" id="diagnoseModal">
+  <div class="modal" style="max-width:680px">
+    <h3>🔍 取得状況の診断</h3>
+    <p style="font-size:12px;color:var(--text2)">楽天APIから商品を再取得して、取りこぼしがないか調べます。productCacheには影響しません(読み取り専用診断)。</p>
+
+    <div class="modal-field">
+      <label class="modal-label">商品管理番号で個別チェック(任意)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="modal-input" id="diagnoseCheckCode" placeholder="例: 10001252" style="flex:1">
+        <button class="modal-btn" onclick="diagnoseCheckSingleCode()">検索</button>
+      </div>
+      <div id="diagnoseSingleResult" style="font-size:12px;margin-top:8px;font-family:'DM Mono',monospace"></div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">全件診断(楽天APIから再取得して比較)</label>
+      <button class="modal-btn save" onclick="diagnoseFetchAll()" id="diagnoseFetchAllBtn">🔄 全件診断を実行</button>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">※ 数分かかる場合があります(現在の商品データには影響しません)</div>
+    </div>
+
+    <div id="diagnoseResult" style="display:none;margin-top:12px"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeDiagnoseModal()">閉じる</button>
     </div>
   </div>
 </div>
@@ -849,7 +882,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.1
+// reviewcheck v4.2
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1022,7 +1055,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.2' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1263,6 +1296,200 @@ async function fetchAllProductInfo() {
 }
 
 // ── 全データクリア（現在の店舗のみ） ──
+// ── 取得状況の診断 ──
+function diagnoseFetch() {
+  document.getElementById('diagnoseModal').classList.add('open');
+  document.getElementById('diagnoseSingleResult').innerHTML = '';
+  document.getElementById('diagnoseResult').style.display = 'none';
+  document.getElementById('diagnoseCheckCode').value = '';
+}
+function closeDiagnoseModal() {
+  document.getElementById('diagnoseModal').classList.remove('open');
+}
+
+// 個別商品管理番号のチェック
+function diagnoseCheckSingleCode() {
+  const code = document.getElementById('diagnoseCheckCode').value.trim();
+  const resultEl = document.getElementById('diagnoseSingleResult');
+  if (!code) {
+    resultEl.innerHTML = '<span style="color:var(--text3)">商品管理番号を入力してください</span>';
+    return;
+  }
+  const p = productCache[code];
+  if (p) {
+    const status = p.status === 'ignore' ? '<span style="color:var(--text3)">🙈 無視中(サイドバーで「無視」を選択しないと表示されない)</span>' : '✓ 表示中';
+    resultEl.innerHTML = `<div style="background:#e6f9f1;color:#1d9e75;padding:10px;border-radius:6px">
+      <strong>✓ productCache に存在</strong><br>
+      <span style="color:var(--text2);font-size:11px">商品名: ${_escape((p.name || '').substring(0, 60))}</span><br>
+      <span style="color:var(--text2);font-size:11px">商品番号: ${_escape(p.itemNumber || '(未設定)')}</span><br>
+      <span style="color:var(--text2);font-size:11px">レビュー: ${p.reviewCount || 0}件 / 平均${(p.reviewAvg || 0).toFixed(2)}</span><br>
+      <span style="color:var(--text2);font-size:11px">状態: ${status}</span>
+    </div>`;
+  } else {
+    resultEl.innerHTML = `<div style="background:var(--red-light);color:var(--danger);padding:10px;border-radius:6px">
+      <strong>✗ productCache に存在しません</strong><br>
+      <span style="color:var(--text2);font-size:11px">楽天APIから取得できていない可能性があります。「全件診断」を実行してみてください。</span>
+    </div>`;
+  }
+}
+
+// 全件診断: APIから再取得して、productCacheと比較
+async function diagnoseFetchAll() {
+  const shop = _getCurrentShop();
+  if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
+    alert('⚠ 楽天API設定が不足しています');
+    return;
+  }
+  const btn = document.getElementById('diagnoseFetchAllBtn');
+  const resultEl = document.getElementById('diagnoseResult');
+  btn.disabled = true;
+  btn.textContent = '⏳ 診断中...';
+  resultEl.style.display = '';
+  resultEl.innerHTML = '<div style="font-size:12px;color:var(--text2)">楽天APIから全商品を取得中...(1.2秒間隔で順次取得)</div>';
+
+  // APIから再取得(productCacheとは別の一時的なset)
+  const apiCodesSet = new Set();
+  const apiDetails = []; // { code, name, urlSample, source }
+  const errors = [];
+  const BASE = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601';
+  const SAFE_INTERVAL = 1200;
+  let page = 1;
+  let totalFetched = 0;
+  let hasMore = true;
+  let pageCount = 0;
+
+  while (hasMore) {
+    const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&format=json&elements=itemName,itemCode,itemUrl,reviewCount,reviewAverage`;
+    try {
+      const res = await fetch(url, { headers: { 'Origin': 'https://kaiyoshida0318.github.io' } });
+      if (!res.ok) {
+        if (res.status === 429) {
+          errors.push(`Page ${page}: レート制限(429)`);
+          break;
+        }
+        errors.push(`Page ${page}: HTTP ${res.status}`);
+        break;
+      }
+      const data = await res.json();
+      const items = data.Items || [];
+      pageCount = data.pageCount || pageCount;
+      if (items.length === 0) break;
+      for (const { Item: item } of items) {
+        if (!item) continue;
+        const rawUrl = item.itemUrl || '';
+        let code = '';
+        let source = 'unknown';
+        if (rawUrl) {
+          let directUrl = rawUrl;
+          const pcMatch = rawUrl.match(/[?&]pc=([^&]+)/);
+          if (pcMatch) {
+            try { directUrl = decodeURIComponent(pcMatch[1]); source = 'affiliate'; } catch(e) {}
+          } else {
+            source = 'direct';
+          }
+          directUrl = directUrl.split('?')[0].split('#')[0];
+          const m = directUrl.match(/item\.rakuten\.co\.jp\/[^\/]+\/([^\/]+)\/?$/);
+          if (m) code = m[1];
+        }
+        if (!code) {
+          const fullCode = item.itemCode || '';
+          code = fullCode.split(':')[1] || fullCode;
+          source = 'itemCode_fallback';
+        }
+        if (!code || code.includes('?') || code.includes('=') || code.includes('%')) {
+          errors.push(`不正な商品管理番号: code="${code}" itemCode="${item.itemCode}" itemUrl="${rawUrl.substring(0, 80)}"`);
+          continue;
+        }
+        apiCodesSet.add(code);
+        apiDetails.push({ code, name: item.itemName || '', urlSample: rawUrl.substring(0, 60), source });
+      }
+      totalFetched += items.length;
+      resultEl.innerHTML = `<div style="font-size:12px;color:var(--text2)">取得中... ${totalFetched}件 (page ${page})</div>`;
+      hasMore = items.length === 30 && (pageCount ? page < pageCount : true);
+      page++;
+      if (hasMore) await new Promise(r => setTimeout(r, SAFE_INTERVAL));
+    } catch(e) {
+      errors.push(`Page ${page}: ${e.message || e}`);
+      break;
+    }
+  }
+
+  // 比較
+  const cacheKeys = Object.keys(productCache);
+  const cacheSet = new Set(cacheKeys);
+  const apiArr = [...apiCodesSet];
+
+  // APIにあって productCache にない (取り漏れ)
+  const missingInCache = apiArr.filter(c => !cacheSet.has(c));
+  // productCache にあって API にない (古いデータ)
+  const orphanInCache = cacheKeys.filter(c => !apiCodesSet.has(c));
+
+  // ソースの内訳
+  const sourceCounts = { affiliate: 0, direct: 0, itemCode_fallback: 0, unknown: 0 };
+  for (const d of apiDetails) {
+    sourceCounts[d.source] = (sourceCounts[d.source] || 0) + 1;
+  }
+
+  // 結果表示
+  let html = `<div style="background:var(--surface2);padding:14px;border-radius:6px;font-size:12px;line-height:1.7">`;
+  html += `<strong>診断結果</strong><br>`;
+  html += `API取得: <strong>${apiArr.length}</strong>件 ｜ productCache: <strong>${cacheKeys.length}</strong>件<br>`;
+  html += `<br><strong>URL種別の内訳:</strong><br>`;
+  html += `&nbsp;&nbsp;直URL(itemUrl): ${sourceCounts.direct}件<br>`;
+  html += `&nbsp;&nbsp;アフィリエイト中継URL: ${sourceCounts.affiliate}件<br>`;
+  html += `&nbsp;&nbsp;itemCode フォールバック: ${sourceCounts.itemCode_fallback}件<br>`;
+  if (missingInCache.length > 0) {
+    html += `<br><span style="color:var(--danger);font-weight:700">⚠ 取り漏れ: ${missingInCache.length}件</span>(API にあるけど cache にない)<br>`;
+    html += `<div style="max-height:140px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:4px;padding:8px;margin-top:6px;font-family:'DM Mono',monospace;font-size:11px">`;
+    for (const c of missingInCache.slice(0, 30)) {
+      const d = apiDetails.find(x => x.code === c);
+      html += `${_escape(c)} - ${_escape((d?.name || '').substring(0, 40))}<br>`;
+    }
+    if (missingInCache.length > 30) html += `<span style="color:var(--text3)">…他 ${missingInCache.length - 30} 件</span>`;
+    html += `</div>`;
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「📥 データ取得 → 商品データ吸い上げ」で再取得してください</div>`;
+  }
+  if (orphanInCache.length > 0) {
+    html += `<br><span style="color:var(--amber);font-weight:700">△ 古いデータ: ${orphanInCache.length}件</span>(cache にあるけど現在 API にない=出品停止？)<br>`;
+    html += `<div style="max-height:80px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:4px;padding:8px;margin-top:6px;font-family:'DM Mono',monospace;font-size:11px">`;
+    for (const c of orphanInCache.slice(0, 20)) {
+      html += `${_escape(c)}<br>`;
+    }
+    if (orphanInCache.length > 20) html += `<span style="color:var(--text3)">…他 ${orphanInCache.length - 20} 件</span>`;
+    html += `</div>`;
+  }
+  if (missingInCache.length === 0 && orphanInCache.length === 0) {
+    html += `<br><span style="color:#1d9e75;font-weight:700">✓ APIとproductCacheが完全一致</span>`;
+  }
+  if (errors.length > 0) {
+    html += `<br><br><span style="color:var(--amber);font-weight:700">⚠ エラー ${errors.length}件:</span><br>`;
+    for (const e of errors.slice(0, 10)) {
+      html += `<span style="font-size:10px;color:var(--text2)">${_escape(e)}</span><br>`;
+    }
+  }
+
+  // 特定の商品(10001252等)が出てるかチェック
+  const checkCode = document.getElementById('diagnoseCheckCode').value.trim();
+  if (checkCode) {
+    const inApi = apiCodesSet.has(checkCode);
+    const inCache = cacheSet.has(checkCode);
+    html += `<br><br><strong>「${_escape(checkCode)}」の存在チェック:</strong><br>`;
+    html += `&nbsp;&nbsp;楽天API取得結果: ${inApi ? '<span style="color:#1d9e75;font-weight:700">✓ あり</span>' : '<span style="color:var(--danger);font-weight:700">✗ なし</span>'}<br>`;
+    html += `&nbsp;&nbsp;productCache: ${inCache ? '<span style="color:#1d9e75;font-weight:700">✓ あり</span>' : '<span style="color:var(--danger);font-weight:700">✗ なし</span>'}<br>`;
+    if (inApi) {
+      const detail = apiDetails.find(d => d.code === checkCode);
+      if (detail) {
+        html += `&nbsp;&nbsp;商品名: ${_escape(detail.name.substring(0, 60))}<br>`;
+        html += `&nbsp;&nbsp;URL種別: ${detail.source}<br>`;
+      }
+    }
+  }
+  html += `</div>`;
+  resultEl.innerHTML = html;
+  btn.disabled = false;
+  btn.textContent = '🔄 全件診断を再実行';
+}
+
 async function clearAllData() {
   const shop = _getCurrentShop();
   const shopName = shop ? shop.name : '現在の店舗';
@@ -2033,8 +2260,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.1 */ }
-function _loadViewMode() { /* removed in v4.1 */ }
+function setViewMode(mode) { /* removed in v4.2 */ }
+function _loadViewMode() { /* removed in v4.2 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2148,8 +2375,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.1 */ }
-function setFilter(f) { /* removed in v4.1 */ }
+function toggleCheck(code) { /* removed in v4.2 */ }
+function setFilter(f) { /* removed in v4.2 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3126,7 +3353,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.1 initialized');
+  console.log('[reviewcheck] v4.2 initialized');
 }
 
 init();
