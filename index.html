@@ -63,7 +63,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── Layout with sidebar ── */
 .main-layout { display: flex; gap: 20px; align-items: flex-start; }
 .sidebar { flex-shrink: 0; width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; }
-.sidebar-header { font-size: 11px; font-weight: 700; color: var(--text3); padding: 4px 8px 8px; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.sidebar-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text3); padding: 4px 8px 8px; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.sidebar-sort-toggle { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px; }
+.sidebar-sort-btn { border: none; background: none; cursor: pointer; padding: 2px 6px; font-size: 9px; color: var(--text3); border-radius: 3px; font-family: inherit; letter-spacing: 0; font-weight: 500; transition: all 0.12s; }
+.sidebar-sort-btn:hover { color: var(--text); }
+.sidebar-sort-btn.active { background: var(--surface); color: var(--text); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
 .sidebar-list { display: flex; flex-direction: column; gap: 2px; }
 .sidebar-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 7px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; color: var(--text2); border: none; background: none; font-family: inherit; text-align: left; transition: all 0.12s; }
 .sidebar-item:hover { background: var(--surface2); color: var(--text); }
@@ -313,7 +317,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.5</span>
+    <span class="build-date">v1.7</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -329,6 +333,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <button class="header-btn" onclick="manualFetchAll()" id="fetchBtn">🔄 商品データ取得</button>
     <button class="header-btn" onclick="document.getElementById('csvFileInput').click()" title="楽天RMSの商品別売上CSVから商品番号をインポート">📋 商品番号CSV</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
+    <button class="header-btn danger-btn" onclick="clearAllData()" title="現在の店舗の全データを削除します">🗑 全クリア</button>
     <button class="header-btn primary" onclick="openSettings()">+ 始める</button>
   </div>
 </header>
@@ -338,7 +343,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   <div class="main-layout">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar" style="display:none">
-      <div class="sidebar-header">カテゴリ</div>
+      <div class="sidebar-header">
+        <span>カテゴリ</span>
+        <div class="sidebar-sort-toggle">
+          <button class="sidebar-sort-btn active" id="sidebarSortAlpha" onclick="setSidebarSort('alpha')" title="アルファベット順">A-Z</button>
+          <button class="sidebar-sort-btn" id="sidebarSortCount" onclick="setSidebarSort('count')" title="件数の多い順">件数順</button>
+        </div>
+      </div>
       <div class="sidebar-list" id="sidebarList"></div>
     </aside>
 
@@ -524,7 +535,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.5
+// reviewcheck v1.7
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -586,6 +597,7 @@ let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
 let viewMode = 'card'; // 'card' | 'table'
+let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
 let _saveInFlight = null;
@@ -677,7 +689,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.5' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.7' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -815,8 +827,20 @@ async function fetchAllProductInfo() {
 
       items.forEach(({ Item: item }) => {
         if (!item) return;
-        const fullCode = item.itemCode || '';
-        const code = fullCode.split(':')[1] || fullCode;
+        // 「商品管理番号」は itemUrl の末尾のパスセグメントから取得
+        // 例: https://item.rakuten.co.jp/yukaiya/10001181/ → "10001181"
+        // ※ item.itemCode の :以降 は楽天の内部システムIDで、商品管理番号とは別物
+        const itemUrl = item.itemUrl || '';
+        let code = '';
+        if (itemUrl) {
+          const m = itemUrl.match(/\/([^\/]+)\/?$/);
+          code = m ? m[1] : '';
+        }
+        // フォールバック: itemUrl から取れなければ itemCode の :以降
+        if (!code) {
+          const fullCode = item.itemCode || '';
+          code = fullCode.split(':')[1] || fullCode;
+        }
         if (!code) return;
 
         const images = (item.mediumImageUrls || []).map(o => o.imageUrl || (typeof o === 'string' ? o : null)).filter(Boolean);
@@ -876,6 +900,72 @@ async function fetchAllProductInfo() {
   }
 
   alert(`取得完了！\n新規: ${newCount}件 / 更新: ${updateCount}件\n合計: ${Object.keys(productCache).length}件`);
+}
+
+// ── 全データクリア（現在の店舗のみ） ──
+async function clearAllData() {
+  const shop = _getCurrentShop();
+  const shopName = shop ? shop.name : '現在の店舗';
+  const confirmMsg = `⚠️ ${shopName} の全データをクリアします\n\n` +
+    `削除されるもの:\n` +
+    `・全商品データ（管理番号・商品名・画像・レビュー）\n` +
+    `・全チェック状態\n` +
+    `・全商品番号（CSVインポート分・手動入力分も含む）\n\n` +
+    `※ GitHub上のデータも削除されます\n` +
+    `※ この操作は取り消せません\n\n` +
+    `本当に実行しますか？`;
+  if (!confirm(confirmMsg)) return;
+
+  // 二重確認
+  if (!confirm('もう一度確認します。本当にクリアしますか？')) return;
+
+  // メモリとlocalStorageをクリア
+  productCache = {};
+  saveCache();
+
+  // GitHub上のファイルも削除
+  const pat = localStorage.getItem('github_pat');
+  if (pat) {
+    _lockUI('GitHub上のデータを削除中...');
+    try {
+      const file = _ghReviewFile();
+      const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
+      const headers = {
+        'Authorization': `token ${pat}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+      // SHA取得
+      const getRes = await fetch(apiUrl, { headers });
+      if (getRes.ok) {
+        const sha = (await getRes.json()).sha;
+        // DELETE
+        const delRes = await fetch(apiUrl, {
+          method: 'DELETE',
+          headers,
+          body: JSON.stringify({
+            message: `Clear review data (${_getCurrentShopId()})`,
+            sha
+          })
+        });
+        if (!delRes.ok) {
+          const e = await delRes.json().catch(() => ({}));
+          console.warn('GitHub削除エラー:', e);
+        } else {
+          console.log('[reviewcheck] GitHub上のデータを削除しました');
+        }
+      } else if (getRes.status === 404) {
+        console.log('[reviewcheck] GitHubには元々データなし');
+      }
+    } catch(e) {
+      console.error('GitHub削除エラー:', e);
+    } finally {
+      _unlockUI();
+    }
+  }
+
+  renderProducts();
+  alert('✓ クリア完了\n\n「🔄 商品データ取得」を押して正しい番号で取り直してください。');
 }
 
 function manualFetchAll() {
@@ -1007,8 +1097,15 @@ function renderSidebar() {
     const cat = _categoryOf(p.itemNumber);
     counts[cat] = (counts[cat] || 0) + 1;
   }
-  // ソート: __unset__ を先頭、それ以外はアルファベット順
-  const cats = Object.keys(counts).filter(c => c !== '__unset__').sort((a, b) => a.localeCompare(b));
+  // ソート: __unset__ を先頭、それ以外は選択中のソートモードで並べる
+  let cats = Object.keys(counts).filter(c => c !== '__unset__');
+  if (sidebarSortMode === 'count') {
+    // 件数の多い順、同数ならアルファベット順
+    cats.sort((a, b) => (counts[b] - counts[a]) || a.localeCompare(b));
+  } else {
+    // アルファベット順
+    cats.sort((a, b) => a.localeCompare(b));
+  }
   const ordered = [];
   if (counts['__unset__']) ordered.push('__unset__');
   ordered.push(...cats);
@@ -1037,6 +1134,24 @@ function renderSidebar() {
 function setCategory(cat) {
   currentCategory = cat;
   renderProducts();
+}
+
+// ── サイドバー並び順切替 ──
+const SIDEBAR_SORT_KEY = 'reviewcheck_sidebar_sort';
+function setSidebarSort(mode) {
+  sidebarSortMode = mode;
+  localStorage.setItem(SIDEBAR_SORT_KEY, mode);
+  document.getElementById('sidebarSortAlpha').classList.toggle('active', mode === 'alpha');
+  document.getElementById('sidebarSortCount').classList.toggle('active', mode === 'count');
+  renderSidebar();
+}
+function _loadSidebarSort() {
+  const saved = localStorage.getItem(SIDEBAR_SORT_KEY);
+  if (saved === 'alpha' || saved === 'count') {
+    sidebarSortMode = saved;
+    document.getElementById('sidebarSortAlpha').classList.toggle('active', sidebarSortMode === 'alpha');
+    document.getElementById('sidebarSortCount').classList.toggle('active', sidebarSortMode === 'count');
+  }
 }
 
 // ── Table row renderer ──
@@ -1713,6 +1828,7 @@ function cancelEditItemNumber(code) {
 async function init() {
   _applyZoom(_getZoom());
   _loadViewMode();
+  _loadSidebarSort();
   updateShopSelectorLabel();
   updateApiStatus();
   loadCache();
@@ -1722,7 +1838,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.5 initialized');
+  console.log('[reviewcheck] v1.7 initialized');
 }
 
 init();
