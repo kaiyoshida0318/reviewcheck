@@ -191,6 +191,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .inline-status-select.status-normal { background: var(--surface); color: var(--text2); border-color: var(--border2); }
 .inline-status-select.status-focus  { background: #fff8e1; color: #c87800; border-color: #f5d68a; }
 .inline-status-select.status-ignore { background: #f5f5f5; color: var(--text3); border-color: var(--border2); }
+.inline-status-select.status-retired { background: #efebe5; color: #6d4c2b; border-color: #d7cfc1; }
 
 /* ── 制作タグ ドロップダウン ── */
 .inline-tag-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
@@ -216,6 +217,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: 110px; }
 .product-table .col-diff-result { width: 90px; text-align: center; }
+.product-table .col-diff-growth { width: 90px; text-align: center; }
 .product-table .diff-onscreen-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: 'DM Mono', monospace; font-size: 13px; text-align: right; outline: none; transition: border-color 0.15s; }
 .product-table .diff-onscreen-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(191, 0, 0, 0.1); }
 .product-table .diff-onscreen-input::-webkit-inner-spin-button { opacity: 0.5; }
@@ -296,6 +298,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .status-btn.active[data-status="focus"] { background: #fff8e1; color: #c87800; border-color: #c87800; }
 .status-btn.active[data-status="normal"] { background: #e6f0fa; color: #1976d2; border-color: #1976d2; }
 .status-btn.active[data-status="ignore"] { background: #f5f5f5; color: var(--text3); border-color: var(--text3); }
+.status-btn.active[data-status="retired"] { background: #efebe5; color: #6d4c2b; border-color: #6d4c2b; }
 .status-btn .status-desc { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; line-height: 1.4; text-align: center; }
 .status-btn.active .status-desc { color: inherit; opacity: 0.8; }
 
@@ -485,7 +488,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.9</span>
+    <span class="build-date">v6.0</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -747,7 +750,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
         <div class="modal-field">
           <label class="modal-label">状態</label>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="status-btn" data-status="normal" onclick="setEditStatus('normal')" id="statusBtnNormal">
               <span style="font-size:14px">👁</span><span>通常</span>
               <div class="status-desc">通常表示・各種フィルタの対象</div>
@@ -759,6 +762,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
             <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
               <span style="font-size:14px">🙈</span><span>無視</span>
               <div class="status-desc">「無視」フィルタ以外では非表示</div>
+            </button>
+            <button class="status-btn" data-status="retired" onclick="setEditStatus('retired')" id="statusBtnRetired">
+              <span style="font-size:14px">🏁</span><span>引退済</span>
+              <div class="status-desc">「引退済」フィルタ以外では非表示</div>
             </button>
           </div>
         </div>
@@ -955,7 +962,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.9
+// reviewcheck v6.0
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1134,7 +1141,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.9' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.0' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1749,17 +1756,20 @@ function renderProducts() {
       return true;
     }
 
-    // 状態フィルタ(注目/通常/無視)
+    // 状態フィルタ(注目/通常/無視/引退済)
     const status = p.status || 'normal'; // 未指定はnormal扱い
     const isIgnored = status === 'ignore';
+    const isRetired = status === 'retired';
     const isFocus = status === 'focus';
     if (currentStatusFilter === 'ignore') {
       if (!isIgnored) return false; // 「無視」モード: 無視のみ表示
+    } else if (currentStatusFilter === 'retired') {
+      if (!isRetired) return false; // 「引退済」モード: 引退済のみ表示
     } else if (currentStatusFilter === 'focus') {
       if (!isFocus) return false; // 「注目」モード: 注目のみ表示
     } else {
-      // 'normal' モード(デフォルト): 通常(=注目でも無視でもない)のみ表示
-      if (isIgnored || isFocus) return false;
+      // 'normal' モード(デフォルト): 通常(=注目でも無視でも引退済でもない)のみ表示
+      if (isIgnored || isRetired || isFocus) return false;
     }
     // カテゴリフィルタ
     if (currentCategory !== 'all') {
@@ -1859,7 +1869,7 @@ function renderSidebar() {
   const counts = {}; // { 'ih': 5, '__unset__': 12, ... }
   for (const code of codes) {
     const p = productCache[code];
-    if (p.status === 'ignore') continue;
+    if (p.status === 'ignore' || p.status === 'retired') continue;
     const cat = _categoryOf(p.itemNumber);
     counts[cat] = (counts[cat] || 0) + 1;
   }
@@ -1897,13 +1907,16 @@ function renderSidebar() {
   list.innerHTML = html;
 
   // ── レビュー評価帯 ──
-  // 「無視」商品は集計から完全除外(状態フィルタが「無視」の時に別カウント表示される)
+  // 「無視」「引退済」商品は集計から完全除外
   const bandCounts = { all: 0, high: 0, mid: 0, low: 0, poor: 0, unrated: 0 };
   let ignoredCount = 0;
+  let retiredCount = 0;
   for (const code of codes) {
     const p = productCache[code];
     if (p.status === 'ignore') {
       ignoredCount++;
+    } else if (p.status === 'retired') {
+      retiredCount++;
     } else {
       bandCounts.all++;
       const band = _scoreBandOf(p.reviewCount, p.reviewAvg);
@@ -1929,27 +1942,28 @@ function renderSidebar() {
   }
   document.getElementById('sidebarScoreList').innerHTML = scoreHtml;
 
-  // ── 状態フィルタ(注目/通常/無視) ──
+  // ── 状態フィルタ(注目/通常/無視/引退済) ──
   let focusCount = 0, normalCount = 0;
   for (const code of codes) {
     const p = productCache[code];
-    if (p.status === 'ignore') continue; // 無視は ignoredCount でカウント済み
+    if (p.status === 'ignore' || p.status === 'retired') continue;
     if (p.status === 'focus') focusCount++;
     else normalCount++; // 'normal' or undefined はすべて通常扱い
   }
   const statusDefs = [
-    { key: 'normal', label: '通常', icon: '👁', count: normalCount },
-    { key: 'focus',  label: '注目', icon: '⭐', count: focusCount },
-    { key: 'ignore', label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
+    { key: 'normal',  label: '通常', icon: '👁', count: normalCount },
+    { key: 'focus',   label: '注目', icon: '⭐', count: focusCount },
+    { key: 'ignore',  label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
+    { key: 'retired', label: '引退済', icon: '🏁', count: retiredCount },
   ];
   let statusHtml = '';
   for (const s of statusDefs) {
     const isActive = currentStatusFilter === s.key;
-    const isIgnoreItem = s.key === 'ignore';
+    const isMutedItem = s.key === 'ignore' || s.key === 'retired';
     if (s.divider) {
       statusHtml += `<div class="sidebar-divider"></div>`;
     }
-    statusHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isIgnoreItem && !isActive ? 'ignored-item' : ''}" onclick="setStatusFilter('${s.key}')">
+    statusHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isMutedItem && !isActive ? 'ignored-item' : ''}" onclick="setStatusFilter('${s.key}')">
       <span class="cat-name">${s.icon} ${_escape(s.label)}</span>
       <span class="cat-count">${s.count}</span>
     </button>`;
@@ -1960,7 +1974,7 @@ function renderSidebar() {
   const tagCounts = { renewal: 0, boost: 0, boostPlan: 0 };
   for (const code of codes) {
     const p = productCache[code];
-    if (p.status === 'ignore') continue;
+    if (p.status === 'ignore' || p.status === 'retired') continue;
     const tags = p.tags || {};
     if (tags.renewal) tagCounts.renewal++;
     if (tags.boost) tagCounts.boost++;
@@ -2310,19 +2324,29 @@ function _renderTableRow(code) {
   if (tableMode === 'diff') {
     const onScreen = (typeof p.onScreenCount === 'number') ? p.onScreenCount : null;
     const apiCount = p.reviewCount || 0;
-    let diffHtml;
+    let diffHtml, growthHtml;
     if (onScreen === null) {
       diffHtml = `<span class="diff-result-empty">—</span>`;
+      growthHtml = `<span class="diff-result-empty">—</span>`;
     } else {
       const diff = apiCount - onScreen;
       const sign = diff > 0 ? '+' : '';
       const cls = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-zero');
       diffHtml = `<span class="diff-result ${cls}">${sign}${diff}</span>`;
+      // 上昇率: 画面上件数を基準。0なら1として計算
+      const base = onScreen === 0 ? 1 : onScreen;
+      const growth = (diff / base) * 100;
+      const gSign = growth > 0 ? '+' : '';
+      const gCls = growth > 0 ? 'diff-positive' : (growth < 0 ? 'diff-negative' : 'diff-zero');
+      // 桁数: 100%以上は整数、それ以下は小数1桁
+      const gStr = Math.abs(growth) >= 100 ? Math.round(growth).toString() : growth.toFixed(1);
+      growthHtml = `<span class="diff-result ${gCls}">${gSign}${gStr}%</span>`;
     }
     diffCells = `<td class="col-diff-onscreen">
         <input type="number" min="0" class="diff-onscreen-input" value="${onScreen !== null ? onScreen : ''}" placeholder="—" onchange="setOnScreenCount('${_escape(code)}', this.value)" id="onscreen-${_escape(code)}">
       </td>
-      <td class="col-diff-result" id="diffresult-${_escape(code)}">${diffHtml}</td>`;
+      <td class="col-diff-result" id="diffresult-${_escape(code)}">${diffHtml}</td>
+      <td class="col-diff-growth" id="diffgrowth-${_escape(code)}">${growthHtml}</td>`;
   }
 
   return `<tr id="row-${_escape(code)}">
@@ -2357,9 +2381,10 @@ function _renderStatusButtons(code, savedStatus) {
   const current = (pendingEdits[code] && pendingEdits[code].status !== undefined) ? pendingEdits[code].status : saved;
   const isPending = (pendingEdits[code] && pendingEdits[code].status !== undefined && pendingEdits[code].status !== saved);
   const opts = [
-    { key: 'normal', label: '👁 通常' },
-    { key: 'focus',  label: '⭐ 注目' },
-    { key: 'ignore', label: '🙈 無視' },
+    { key: 'normal',  label: '👁 通常' },
+    { key: 'focus',   label: '⭐ 注目' },
+    { key: 'ignore',  label: '🙈 無視' },
+    { key: 'retired', label: '🏁 引退済' },
   ];
   let html = `<select class="inline-status-select ${isPending ? 'pending' : ''} status-${current}" onchange="setInlineStatus('${_escape(code)}', this.value)">`;
   for (const o of opts) {
@@ -2512,18 +2537,26 @@ function setOnScreenCount(code, value) {
     const n = parseInt(v, 10);
     productCache[code].onScreenCount = isNaN(n) ? null : n;
   }
-  // 差異セルだけ更新
+  // 差異セルと上昇率セルを更新
   const diffEl = document.getElementById('diffresult-' + code);
-  if (diffEl) {
-    const onScreen = productCache[code].onScreenCount;
-    const apiCount = productCache[code].reviewCount || 0;
-    if (onScreen === null) {
-      diffEl.innerHTML = `<span class="diff-result-empty">—</span>`;
-    } else {
-      const diff = apiCount - onScreen;
-      const sign = diff > 0 ? '+' : '';
-      const cls = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-zero');
-      diffEl.innerHTML = `<span class="diff-result ${cls}">${sign}${diff}</span>`;
+  const growthEl = document.getElementById('diffgrowth-' + code);
+  const onScreen = productCache[code].onScreenCount;
+  const apiCount = productCache[code].reviewCount || 0;
+  if (onScreen === null) {
+    if (diffEl) diffEl.innerHTML = `<span class="diff-result-empty">—</span>`;
+    if (growthEl) growthEl.innerHTML = `<span class="diff-result-empty">—</span>`;
+  } else {
+    const diff = apiCount - onScreen;
+    const sign = diff > 0 ? '+' : '';
+    const cls = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-zero');
+    if (diffEl) diffEl.innerHTML = `<span class="diff-result ${cls}">${sign}${diff}</span>`;
+    if (growthEl) {
+      const base = onScreen === 0 ? 1 : onScreen;
+      const growth = (diff / base) * 100;
+      const gSign = growth > 0 ? '+' : '';
+      const gCls = growth > 0 ? 'diff-positive' : (growth < 0 ? 'diff-negative' : 'diff-zero');
+      const gStr = Math.abs(growth) >= 100 ? Math.round(growth).toString() : growth.toFixed(1);
+      growthEl.innerHTML = `<span class="diff-result ${gCls}">${gSign}${gStr}%</span>`;
     }
   }
   scheduleGitHubSave();
@@ -2568,8 +2601,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.9 */ }
-function _loadViewMode() { /* removed in v5.9 */ }
+function setViewMode(mode) { /* removed in v6.0 */ }
+function _loadViewMode() { /* removed in v6.0 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2597,9 +2630,9 @@ function _updateTableColumns() {
   const thead = document.querySelector('#productTableWrap thead tr');
   if (!thead) return;
   // 既存の差異列を削除
-  thead.querySelectorAll('.col-diff-onscreen, .col-diff-result').forEach(el => el.remove());
+  thead.querySelectorAll('.col-diff-onscreen, .col-diff-result, .col-diff-growth').forEach(el => el.remove());
   if (tableMode === 'diff') {
-    // 「レビュー」(col-review)の直後に2列追加
+    // 「レビュー」(col-review)の直後に3列追加
     const reviewTh = thead.querySelector('.col-review');
     if (reviewTh) {
       const onscreenTh = document.createElement('th');
@@ -2610,8 +2643,13 @@ function _updateTableColumns() {
       diffTh.className = 'col-diff-result';
       diffTh.innerHTML = '件数差異';
       diffTh.title = 'API取得値 - 画面上件数';
+      const growthTh = document.createElement('th');
+      growthTh.className = 'col-diff-growth';
+      growthTh.innerHTML = '上昇率';
+      growthTh.title = '画面上件数からの上昇率(%)。0件は1件として計算';
       reviewTh.after(onscreenTh);
       onscreenTh.after(diffTh);
+      diffTh.after(growthTh);
     }
   }
 }
@@ -2683,8 +2721,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.9 */ }
-function setFilter(f) { /* removed in v5.9 */ }
+function toggleCheck(code) { /* removed in v6.0 */ }
+function setFilter(f) { /* removed in v6.0 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3406,6 +3444,7 @@ function openProductEditModal(code) {
   const p = productCache[code];
   // 状態は productCache の値をそのまま読む。未設定なら 'normal'
   if (p.status === 'ignore') _editingTempStatus = 'ignore';
+  else if (p.status === 'retired') _editingTempStatus = 'retired';
   else if (p.status === 'focus') _editingTempStatus = 'focus';
   else _editingTempStatus = 'normal';
   // 制作タグ
@@ -3629,6 +3668,7 @@ function _updateStatusBtns() {
   document.getElementById('statusBtnFocus').classList.toggle('active', _editingTempStatus === 'focus');
   document.getElementById('statusBtnNormal').classList.toggle('active', _editingTempStatus === 'normal');
   document.getElementById('statusBtnIgnore').classList.toggle('active', _editingTempStatus === 'ignore');
+  document.getElementById('statusBtnRetired').classList.toggle('active', _editingTempStatus === 'retired');
 }
 function toggleEditTag(tag) {
   // 排他選択: 同じタグを再クリックでオフ、別タグなら他をオフにして新しいのをオン
@@ -3682,7 +3722,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.9 initialized');
+  console.log('[reviewcheck] v6.0 initialized');
 }
 
 init();
