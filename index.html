@@ -182,9 +182,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-image { width: 100px; }
 .product-table .col-action { width: 130px; text-align: center; }
 .product-table .col-status { width: 100px; }
-.product-table .col-tags { width: 140px; }
+.product-table .col-tags { width: 160px; }
 
-/* ── インライン編集 縦並びリスト(状態・制作タグ) ── */
+/* ── インライン編集 縦並びリスト(状態) ── */
 .inline-text-list { display: flex; flex-direction: column; gap: 1px; padding: 2px; border-radius: var(--radius-sm); transition: background 0.15s; }
 .inline-text-list.pending { background: #fff7d6; box-shadow: inset 0 0 0 1px #f5d68a; }
 .inline-text-row { font-size: 11px; padding: 3px 7px; border-radius: 3px; cursor: pointer; user-select: none; color: var(--text3); white-space: nowrap; transition: all 0.1s; line-height: 1.4; }
@@ -193,9 +193,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .inline-text-row.active[data-status="focus"]  { color: #c87800; background: #fff8e1; }
 .inline-text-row.active[data-status="normal"] { color: #1976d2; background: #e6f0fa; }
 .inline-text-row.active[data-status="ignore"] { color: var(--text); background: #f5f5f5; }
-.inline-text-row.active[data-tag="renewal"]   { color: #2e7d32; background: #e8f5e9; }
-.inline-text-row.active[data-tag="boost"]     { color: #e65100; background: #fff3e0; }
-.inline-text-row.active[data-tag="boostPlan"] { color: #7b1fa2; background: #f3e5f5; }
+
+/* ── 制作タグ ドロップダウン ── */
+.inline-tag-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
+.inline-tag-select:hover { border-color: var(--text3); }
+.inline-tag-select.pending { background: #fff7d6; border-color: #f5d68a; box-shadow: 0 0 0 1px #f5d68a; }
+.inline-tag-select.tag-renewal   { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+.inline-tag-select.tag-boost     { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+.inline-tag-select.tag-boostPlan { background: #f3e5f5; color: #7b1fa2; border-color: #ce93d8; }
+.inline-tag-select.tag-none      { color: var(--text3); }
 
 /* ── ペンディング保存バー ── */
 .pending-edits-group { background: #fff7d6; border: 1px solid #f5d68a; border-radius: var(--radius-sm); padding: 4px 10px; gap: 8px; }
@@ -474,7 +480,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.4</span>
+    <span class="build-date">v5.5</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -720,7 +726,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         </div>
 
         <div class="modal-field">
-          <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(複数選択可)</span></label>
+          <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(1つだけ選択)</span></label>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
               <span style="font-size:14px">🔄</span><span>リニューアル</span>
@@ -737,13 +743,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="modal-field">
           <label class="modal-label">状態</label>
           <div style="display:flex;gap:8px">
-            <button class="status-btn" data-status="focus" onclick="setEditStatus('focus')" id="statusBtnFocus">
-              <span style="font-size:14px">⭐</span><span>注目</span>
-              <div class="status-desc">「注目」フィルタで強調表示</div>
-            </button>
             <button class="status-btn" data-status="normal" onclick="setEditStatus('normal')" id="statusBtnNormal">
               <span style="font-size:14px">👁</span><span>通常</span>
               <div class="status-desc">通常表示・各種フィルタの対象</div>
+            </button>
+            <button class="status-btn" data-status="focus" onclick="setEditStatus('focus')" id="statusBtnFocus">
+              <span style="font-size:14px">⭐</span><span>注目</span>
+              <div class="status-desc">「注目」フィルタで強調表示</div>
             </button>
             <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
               <span style="font-size:14px">🙈</span><span>無視</span>
@@ -944,7 +950,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.4
+// reviewcheck v5.5
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1123,7 +1129,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.4' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.5' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1925,8 +1931,8 @@ function renderSidebar() {
     else normalCount++; // 'normal' or undefined はすべて通常扱い
   }
   const statusDefs = [
-    { key: 'focus',  label: '注目', icon: '⭐', count: focusCount },
     { key: 'normal', label: '通常', icon: '👁', count: normalCount },
+    { key: 'focus',  label: '注目', icon: '⭐', count: focusCount },
     { key: 'ignore', label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
   ];
   let statusHtml = '';
@@ -2344,8 +2350,8 @@ function _renderStatusButtons(code, savedStatus) {
   const current = (pendingEdits[code] && pendingEdits[code].status !== undefined) ? pendingEdits[code].status : saved;
   const isPending = (pendingEdits[code] && pendingEdits[code].status !== undefined && pendingEdits[code].status !== saved);
   const opts = [
-    { key: 'focus',  label: '注目', icon: '⭐' },
     { key: 'normal', label: '通常', icon: '👁' },
+    { key: 'focus',  label: '注目', icon: '⭐' },
     { key: 'ignore', label: '無視', icon: '🙈' },
   ];
   let html = `<div class="inline-text-list ${isPending ? 'pending' : ''}">`;
@@ -2358,26 +2364,35 @@ function _renderStatusButtons(code, savedStatus) {
 }
 
 // 制作タグボタン群 - 縦並び文字リスト
+// savedTagsオブジェクトから現在のタグキー(1つ)を取得
+function _getActiveTagKey(savedTags) {
+  if (!savedTags) return '';
+  if (savedTags.renewal)   return 'renewal';
+  if (savedTags.boost)     return 'boost';
+  if (savedTags.boostPlan) return 'boostPlan';
+  return '';
+}
+
 function _renderTagsButtons(code, savedTags) {
   savedTags = savedTags || {};
-  const pending = (pendingEdits[code] && pendingEdits[code].tags) || null;
-  const current = pending !== null ? pending : { renewal: !!savedTags.renewal, boost: !!savedTags.boost, boostPlan: !!savedTags.boostPlan };
-  const isPending = pending !== null && (
-    !!current.renewal !== !!savedTags.renewal ||
-    !!current.boost !== !!savedTags.boost ||
-    !!current.boostPlan !== !!savedTags.boostPlan
-  );
+  const savedTagKey = _getActiveTagKey(savedTags);
+  // pendingEditsには文字列で保存(空文字=なし)
+  const pending = (pendingEdits[code] && pendingEdits[code].tagKey !== undefined) ? pendingEdits[code].tagKey : null;
+  const current = pending !== null ? pending : savedTagKey;
+  const isPending = pending !== null && pending !== savedTagKey;
+  // ドロップダウン
   const opts = [
-    { key: 'renewal',   label: 'リニューアル', icon: '🔄' },
-    { key: 'boost',     label: '盛り上げ制作', icon: '🚀' },
-    { key: 'boostPlan', label: '盛り上げ予定', icon: '📅' },
+    { key: '',          label: '— なし —' },
+    { key: 'renewal',   label: '🔄 リニューアル' },
+    { key: 'boost',     label: '🚀 盛り上げ制作' },
+    { key: 'boostPlan', label: '📅 盛り上げ予定' },
   ];
-  let html = `<div class="inline-text-list ${isPending ? 'pending' : ''}">`;
+  let html = `<select class="inline-tag-select ${isPending ? 'pending' : ''} tag-${current || 'none'}" onchange="setInlineTag('${_escape(code)}', this.value)">`;
   for (const o of opts) {
-    const active = current[o.key] ? 'active' : '';
-    html += `<div class="inline-text-row tag-row ${active}" data-tag="${o.key}" onclick="toggleInlineTag('${_escape(code)}', '${o.key}')">${o.icon} ${_escape(o.label)}</div>`;
+    const sel = current === o.key ? 'selected' : '';
+    html += `<option value="${o.key}" ${sel}>${_escape(o.label)}</option>`;
   }
-  html += `</div>`;
+  html += `</select>`;
   return html;
 }
 
@@ -2399,21 +2414,16 @@ function setInlineStatus(code, status) {
 }
 
 // 制作タグをインラインでトグル(保留)
-function toggleInlineTag(code, tagKey) {
+function setInlineTag(code, tagKey) {
   const savedTags = (productCache[code] || {}).tags || {};
+  const savedTagKey = _getActiveTagKey(savedTags);
   if (!pendingEdits[code]) pendingEdits[code] = {};
-  if (!pendingEdits[code].tags) {
-    // 既存のsavedTagsから初期化
-    pendingEdits[code].tags = { renewal: !!savedTags.renewal, boost: !!savedTags.boost, boostPlan: !!savedTags.boostPlan };
-  }
-  pendingEdits[code].tags[tagKey] = !pendingEdits[code].tags[tagKey];
-  // saved と一致したらpending削除
-  const t = pendingEdits[code].tags;
-  if (!!t.renewal === !!savedTags.renewal &&
-      !!t.boost === !!savedTags.boost &&
-      !!t.boostPlan === !!savedTags.boostPlan) {
-    delete pendingEdits[code].tags;
+  if (tagKey === savedTagKey) {
+    // 元に戻された
+    delete pendingEdits[code].tagKey;
     if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
+  } else {
+    pendingEdits[code].tagKey = tagKey;
   }
   // 該当セルだけ再描画
   const cell = document.getElementById('tagsCell-' + code);
@@ -2443,12 +2453,12 @@ function commitPendingEdits() {
     if (change.status !== undefined) {
       productCache[code].status = change.status;
     }
-    if (change.tags) {
-      // true のキーだけ持つよう正規化
+    if (change.tagKey !== undefined) {
+      // 1つだけのタグキーをセット(空文字なら全部解除)
       const newTags = {};
-      if (change.tags.renewal) newTags.renewal = true;
-      if (change.tags.boost) newTags.boost = true;
-      if (change.tags.boostPlan) newTags.boostPlan = true;
+      if (change.tagKey === 'renewal')   newTags.renewal = true;
+      else if (change.tagKey === 'boost')     newTags.boost = true;
+      else if (change.tagKey === 'boostPlan') newTags.boostPlan = true;
       productCache[code].tags = newTags;
     }
   }
@@ -2530,8 +2540,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.4 */ }
-function _loadViewMode() { /* removed in v5.4 */ }
+function setViewMode(mode) { /* removed in v5.5 */ }
+function _loadViewMode() { /* removed in v5.5 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2645,8 +2655,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.4 */ }
-function setFilter(f) { /* removed in v5.4 */ }
+function toggleCheck(code) { /* removed in v5.5 */ }
+function setFilter(f) { /* removed in v5.5 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3593,7 +3603,13 @@ function _updateStatusBtns() {
   document.getElementById('statusBtnIgnore').classList.toggle('active', _editingTempStatus === 'ignore');
 }
 function toggleEditTag(tag) {
-  _editingTempTags[tag] = !_editingTempTags[tag];
+  // 排他選択: 同じタグを再クリックでオフ、別タグなら他をオフにして新しいのをオン
+  if (_editingTempTags[tag]) {
+    _editingTempTags = { renewal: false, boost: false, boostPlan: false };
+  } else {
+    _editingTempTags = { renewal: false, boost: false, boostPlan: false };
+    _editingTempTags[tag] = true;
+  }
   _updateTagBtns();
 }
 function _updateTagBtns() {
@@ -3638,7 +3654,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.4 initialized');
+  console.log('[reviewcheck] v5.5 initialized');
 }
 
 init();
