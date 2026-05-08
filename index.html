@@ -485,7 +485,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.8</span>
+    <span class="build-date">v5.9</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -955,7 +955,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.8
+// reviewcheck v5.9
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1134,7 +1134,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.8' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.9' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1789,12 +1789,12 @@ function renderProducts() {
       case 'code':       cmp = a.localeCompare(b, 'ja'); break;
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
-      case 'review':     cmp = (pb.reviewCount || 0) - (pa.reviewCount || 0); break; // レビューはデフォ多い順
+      case 'review':     cmp = (pa.reviewCount || 0) - (pb.reviewCount || 0); break; // 昇順比較(▲表示時に少→多)
       case 'sales': {
         const md = monthlySales[currentSalesMonth] || {};
         const sa = (md[a] && md[a].sales) || 0;
         const sb = (md[b] && md[b].sales) || 0;
-        cmp = sb - sa; // 売上はデフォ多い順
+        cmp = sa - sb; // 昇順比較(▲表示時に少→多)
         break;
       }
       default:           cmp = a.localeCompare(b, 'ja');
@@ -2568,8 +2568,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.8 */ }
-function _loadViewMode() { /* removed in v5.8 */ }
+function setViewMode(mode) { /* removed in v5.9 */ }
+function _loadViewMode() { /* removed in v5.9 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2683,8 +2683,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.8 */ }
-function setFilter(f) { /* removed in v5.8 */ }
+function toggleCheck(code) { /* removed in v5.9 */ }
+function setFilter(f) { /* removed in v5.9 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3682,7 +3682,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.8 initialized');
+  console.log('[reviewcheck] v5.9 initialized');
 }
 
 init();
