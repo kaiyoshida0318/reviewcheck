@@ -317,7 +317,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v1.7</span>
+    <span class="build-date">v1.8</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -535,7 +535,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v1.7
+// reviewcheck v1.8
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -689,7 +689,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.7' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v1.8' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -827,21 +827,35 @@ async function fetchAllProductInfo() {
 
       items.forEach(({ Item: item }) => {
         if (!item) return;
-        // 「商品管理番号」は itemUrl の末尾のパスセグメントから取得
-        // 例: https://item.rakuten.co.jp/yukaiya/10001181/ → "10001181"
-        // ※ item.itemCode の :以降 は楽天の内部システムIDで、商品管理番号とは別物
-        const itemUrl = item.itemUrl || '';
+        // 「商品管理番号」を itemUrl から取得
+        // パターン1（通常）: https://item.rakuten.co.jp/yukaiya/10001181/ → "10001181"
+        // パターン2（アフィリエイト中継）: https://hb.afl.rakuten.co.jp/.../?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fyukaiya%2F10001181%2F&... → "10001181"
+        const rawUrl = item.itemUrl || '';
         let code = '';
-        if (itemUrl) {
-          const m = itemUrl.match(/\/([^\/]+)\/?$/);
-          code = m ? m[1] : '';
+        if (rawUrl) {
+          // アフィリエイト中継URLの場合、pc=の値をデコードして本URLを取り出す
+          let directUrl = rawUrl;
+          const pcMatch = rawUrl.match(/[?&]pc=([^&]+)/);
+          if (pcMatch) {
+            try { directUrl = decodeURIComponent(pcMatch[1]); } catch(e) {}
+          }
+          // クエリ・ハッシュを削除
+          directUrl = directUrl.split('?')[0].split('#')[0];
+          // item.rakuten.co.jp/{shopCode}/{code}/ の {code} を抜き出す
+          const m = directUrl.match(/item\.rakuten\.co\.jp\/[^\/]+\/([^\/]+)\/?$/);
+          if (m) code = m[1];
         }
-        // フォールバック: itemUrl から取れなければ itemCode の :以降
+        // フォールバック: itemCodeの:以降（通常はOKなはず、アフィリ無効時）
         if (!code) {
           const fullCode = item.itemCode || '';
           code = fullCode.split(':')[1] || fullCode;
         }
         if (!code) return;
+        // 念のため URL エンコード文字や ? を含むものは無効化
+        if (code.includes('?') || code.includes('=') || code.includes('%')) {
+          console.warn('[reviewcheck] 不正な商品管理番号を検出してスキップ:', code, 'rawUrl:', rawUrl);
+          return;
+        }
 
         const images = (item.mediumImageUrls || []).map(o => o.imageUrl || (typeof o === 'string' ? o : null)).filter(Boolean);
         // 1枚目, 2枚目, 3枚目 → indices 0, 1, 2 (楽天APIは最大3枚まで返す)
@@ -851,6 +865,9 @@ async function fetchAllProductInfo() {
           _hiResImg(images[2] || null),
         ];
 
+        // 直URLを構築 (アフィリエイト中継URLは保存しない)
+        const directItemUrl = `https://item.rakuten.co.jp/${shop.shopCode}/${code}/`;
+
         if (!productCache[code]) {
           newCount++;
           productCache[code] = {
@@ -858,7 +875,7 @@ async function fetchAllProductInfo() {
             images: targetImages,
             reviewCount: item.reviewCount || 0,
             reviewAvg: item.reviewAverage || 0,
-            itemUrl: item.itemUrl || '',
+            itemUrl: directItemUrl,
             lastFetched: new Date().toISOString(),
             checked: false,
             itemNumber: null,
@@ -870,7 +887,7 @@ async function fetchAllProductInfo() {
           productCache[code].images = targetImages;
           productCache[code].reviewCount = item.reviewCount || 0;
           productCache[code].reviewAvg = item.reviewAverage || 0;
-          productCache[code].itemUrl = item.itemUrl || productCache[code].itemUrl;
+          productCache[code].itemUrl = directItemUrl;
           productCache[code].lastFetched = new Date().toISOString();
         }
       });
@@ -1838,7 +1855,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v1.7 initialized');
+  console.log('[reviewcheck] v1.8 initialized');
 }
 
 init();
