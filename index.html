@@ -58,13 +58,13 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .save-status.error { background: var(--red-light); color: var(--danger); }
 
 /* ── Layout ── */
-.container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+.container { max-width: none; margin: 0; padding: 20px 16px; }
 
 /* ── Layout with sidebar ── */
 .main-layout { display: flex; gap: 20px; align-items: flex-start; }
-.sidebar-stack { flex-shrink: 0; display: flex; flex-direction: row; gap: 12px; position: sticky; top: 72px; max-height: calc(100vh - 92px); z-index: 20; align-items: flex-start; }
-.sidebar-col-left { display: flex; flex-direction: column; gap: 12px; width: 200px; flex-shrink: 0; }
-.sidebar-col-right { width: 180px; flex-shrink: 0; max-height: calc(100vh - 92px); overflow-y: auto; }
+.sidebar-stack { flex-shrink: 0; display: flex; flex-direction: row; gap: 12px; position: sticky; top: 72px; height: calc(100vh - 92px); z-index: 20; align-items: flex-start; overscroll-behavior: contain; }
+.sidebar-col-left { display: flex; flex-direction: column; gap: 12px; width: 200px; flex-shrink: 0; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+.sidebar-col-right { width: 180px; flex-shrink: 0; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
 .sidebar-col-right .sidebar { max-height: none; }
 .sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); }
 .sidebar-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text3); padding: 4px 8px 8px; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
@@ -439,7 +439,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.9</span>
+    <span class="build-date">v4.0</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -849,7 +849,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.9
+// reviewcheck v4.0
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1022,7 +1022,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.9' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.0' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2033,8 +2033,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v3.9 */ }
-function _loadViewMode() { /* removed in v3.9 */ }
+function setViewMode(mode) { /* removed in v4.0 */ }
+function _loadViewMode() { /* removed in v4.0 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2148,8 +2148,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v3.9 */ }
-function setFilter(f) { /* removed in v3.9 */ }
+function toggleCheck(code) { /* removed in v4.0 */ }
+function setFilter(f) { /* removed in v4.0 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3126,7 +3126,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v3.9 initialized');
+  console.log('[reviewcheck] v4.0 initialized');
 }
 
 init();
