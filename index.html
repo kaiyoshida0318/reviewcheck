@@ -439,7 +439,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v4.2</span>
+    <span class="build-date">v4.3</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -882,7 +882,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v4.2
+// reviewcheck v4.3
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1055,7 +1055,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.2' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v4.3' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1179,8 +1179,9 @@ async function fetchAllProductInfo() {
 
   while (hasMore) {
     try {
-      // elements指定: itemName, itemCode, mediumImageUrls, itemUrl, reviewCount, reviewAverage
-      const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&format=json&elements=itemName,itemCode,mediumImageUrls,itemUrl,reviewCount,reviewAverage`;
+      // elements指定 + sort=+itemPrice でページネーション順序を安定化
+      // (ソートなしだと楽天API側で順序が不定になり、ページ間で重複/取り漏れが発生)
+      const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&sort=%2BitemPrice&format=json&elements=itemName,itemCode,mediumImageUrls,itemUrl,reviewCount,reviewAverage`;
       const res = await fetch(url, { headers });
       if (res.status === 429) {
         rateLimitHits++;
@@ -1292,7 +1293,7 @@ async function fetchAllProductInfo() {
     await saveToGitHub({ showLock: true });
   }
 
-  alert(`取得完了！\n新規: ${newCount}件 / 更新: ${updateCount}件\n合計: ${Object.keys(productCache).length}件`);
+  alert(`取得完了！\n新規: ${newCount}件 / 更新: ${updateCount}件\n合計: ${Object.keys(productCache).length}件\n\n※ 取り漏れが疑われる場合は「⚙ 初期設定 → 🔍 取得状況の診断」で確認できます`);
 }
 
 // ── 全データクリア（現在の店舗のみ） ──
@@ -1359,7 +1360,7 @@ async function diagnoseFetchAll() {
   let pageCount = 0;
 
   while (hasMore) {
-    const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&format=json&elements=itemName,itemCode,itemUrl,reviewCount,reviewAverage`;
+    const url = `${BASE}?applicationId=${shop.appId}&accessKey=${shop.accessKey}&shopCode=${shop.shopCode}&hits=30&page=${page}&sort=%2BitemPrice&format=json&elements=itemName,itemCode,itemUrl,reviewCount,reviewAverage`;
     try {
       const res = await fetch(url, { headers: { 'Origin': 'https://kaiyoshida0318.github.io' } });
       if (!res.ok) {
@@ -1457,6 +1458,9 @@ async function diagnoseFetchAll() {
     }
     if (orphanInCache.length > 20) html += `<span style="color:var(--text3)">…他 ${orphanInCache.length - 20} 件</span>`;
     html += `</div>`;
+    // 削除ボタン
+    const orphansJson = JSON.stringify(orphanInCache).replace(/"/g, '&quot;');
+    html += `<button class="modal-btn" style="margin-top:8px;font-size:11px" onclick='cleanupOrphanProducts(${orphansJson})'>🗑 古いデータ ${orphanInCache.length}件を削除</button>`;
   }
   if (missingInCache.length === 0 && orphanInCache.length === 0) {
     html += `<br><span style="color:#1d9e75;font-weight:700">✓ APIとproductCacheが完全一致</span>`;
@@ -1488,6 +1492,23 @@ async function diagnoseFetchAll() {
   resultEl.innerHTML = html;
   btn.disabled = false;
   btn.textContent = '🔄 全件診断を再実行';
+}
+
+function cleanupOrphanProducts(codes) {
+  if (!Array.isArray(codes) || codes.length === 0) return;
+  if (!confirm(`古いデータ ${codes.length}件 を productCache から削除します。\n\n※ 出品再開時に再取得すれば復活します。\n※ チェック状態・商品番号・タグは消えます。\n\n実行しますか？`)) return;
+  let deleted = 0;
+  for (const c of codes) {
+    if (productCache[c]) {
+      delete productCache[c];
+      deleted++;
+    }
+  }
+  saveCache();
+  scheduleGitHubSave();
+  renderProducts();
+  alert(`✓ ${deleted}件 を削除しました`);
+  closeDiagnoseModal();
 }
 
 async function clearAllData() {
@@ -2260,8 +2281,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v4.2 */ }
-function _loadViewMode() { /* removed in v4.2 */ }
+function setViewMode(mode) { /* removed in v4.3 */ }
+function _loadViewMode() { /* removed in v4.3 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2375,8 +2396,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v4.2 */ }
-function setFilter(f) { /* removed in v4.2 */ }
+function toggleCheck(code) { /* removed in v4.3 */ }
+function setFilter(f) { /* removed in v4.3 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3353,7 +3374,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v4.2 initialized');
+  console.log('[reviewcheck] v4.3 initialized');
 }
 
 init();
