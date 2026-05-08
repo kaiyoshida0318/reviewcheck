@@ -62,7 +62,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
 /* ── Layout with sidebar ── */
 .main-layout { display: flex; gap: 20px; align-items: flex-start; }
-.sidebar-stack { flex-shrink: 0; width: 200px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; z-index: 20; }
+.sidebar-stack { flex-shrink: 0; display: flex; flex-direction: row; gap: 12px; position: sticky; top: 72px; max-height: calc(100vh - 92px); z-index: 20; align-items: flex-start; }
+.sidebar-col-left { display: flex; flex-direction: column; gap: 12px; width: 200px; flex-shrink: 0; }
+.sidebar-col-right { width: 180px; flex-shrink: 0; max-height: calc(100vh - 92px); overflow-y: auto; }
+.sidebar-col-right .sidebar { max-height: none; }
 .sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); }
 .sidebar-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text3); padding: 4px 8px 8px; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
 .sidebar-sort-toggle { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px; }
@@ -367,10 +370,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .zoom-label { font-size: 11px; color: var(--text3); min-width: 36px; text-align: center; }
 
 /* ── Responsive ── */
+@media (max-width: 1100px) {
+  .sidebar-stack { flex-direction: column; max-height: none; position: sticky; }
+  .sidebar-col-left, .sidebar-col-right { width: 200px; max-height: none; overflow: visible; }
+}
 @media (max-width: 900px) {
   .main-layout { flex-direction: column; }
   .sidebar-stack { width: 100%; position: static; max-height: none; flex-direction: row; }
-  .sidebar-stack .sidebar { flex: 1; }
+  .sidebar-col-left, .sidebar-col-right { width: 100%; flex: 1; }
+  .sidebar-col-left { flex-direction: column; }
 }
 @media (max-width: 700px) {
   .product-grid { grid-template-columns: 1fr; }
@@ -431,7 +439,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.8</span>
+    <span class="build-date">v3.9</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -454,32 +462,37 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- Main container -->
 <div class="container">
   <div class="main-layout">
-    <!-- Sidebar -->
+    <!-- Sidebar (2-column: left=review+production, right=category) -->
     <aside class="sidebar-stack" id="sidebar" style="display:none">
-      <!-- レビュー評価フィルタ（独立カード） -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <span>レビュー評価</span>
-        </div>
-        <div class="sidebar-list" id="sidebarScoreList"></div>
-      </div>
-      <!-- 制作タグフィルタ（独立カード） -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <span>制作</span>
-        </div>
-        <div class="sidebar-list" id="sidebarTagList"></div>
-      </div>
-      <!-- カテゴリフィルタ（独立カード） -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <span>カテゴリ</span>
-          <div class="sidebar-sort-toggle">
-            <button class="sidebar-sort-btn active" id="sidebarSortAlpha" onclick="setSidebarSort('alpha')" title="アルファベット順">A-Z</button>
-            <button class="sidebar-sort-btn" id="sidebarSortCount" onclick="setSidebarSort('count')" title="件数の多い順">件数順</button>
+      <!-- 左列: レビュー評価カード + 制作カード -->
+      <div class="sidebar-col-left">
+        <!-- レビュー評価フィルタ -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <span>レビュー評価</span>
           </div>
+          <div class="sidebar-list" id="sidebarScoreList"></div>
         </div>
-        <div class="sidebar-list" id="sidebarList"></div>
+        <!-- 制作タグフィルタ -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <span>制作</span>
+          </div>
+          <div class="sidebar-list" id="sidebarTagList"></div>
+        </div>
+      </div>
+      <!-- 右列: カテゴリカード(縦長) -->
+      <div class="sidebar-col-right">
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <span>カテゴリ</span>
+            <div class="sidebar-sort-toggle">
+              <button class="sidebar-sort-btn active" id="sidebarSortAlpha" onclick="setSidebarSort('alpha')" title="アルファベット順">A-Z</button>
+              <button class="sidebar-sort-btn" id="sidebarSortCount" onclick="setSidebarSort('count')" title="件数の多い順">件数順</button>
+            </div>
+          </div>
+          <div class="sidebar-list" id="sidebarList"></div>
+        </div>
       </div>
     </aside>
 
@@ -836,7 +849,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.8
+// reviewcheck v3.9
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1009,7 +1022,7 @@ async function saveToGitHub(opts = {}) {
         const { checked, checkedAt, ...rest } = v;
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.8' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v3.9' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2020,8 +2033,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v3.8 */ }
-function _loadViewMode() { /* removed in v3.8 */ }
+function setViewMode(mode) { /* removed in v3.9 */ }
+function _loadViewMode() { /* removed in v3.9 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2135,8 +2148,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v3.8 */ }
-function setFilter(f) { /* removed in v3.8 */ }
+function toggleCheck(code) { /* removed in v3.9 */ }
+function setFilter(f) { /* removed in v3.9 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3113,7 +3126,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v3.8 initialized');
+  console.log('[reviewcheck] v3.9 initialized');
 }
 
 init();
