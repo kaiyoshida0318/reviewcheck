@@ -78,6 +78,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .sidebar-item.active .cat-count { background: rgba(191, 0, 0, 0.15); color: var(--accent); }
 .sidebar-item.unset { color: var(--amber); font-style: italic; }
 .sidebar-item.unset.active { background: #fff8e1; color: var(--amber); }
+.sidebar-item.ignored-item { color: var(--text3); opacity: 0.7; }
+.sidebar-item.ignored-item:hover { opacity: 1; }
+.sidebar-item.active.ignored-item, .sidebar-item.ignored-item.active { background: #f5f5f5; color: var(--text); opacity: 1; }
 .main-content { flex: 1; min-width: 0; }
 
 /* ── Toolbar ── */
@@ -210,6 +213,14 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* ── Menu modal (large action buttons) ── */
 .menu-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
 .menu-action-btn { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; text-align: left; transition: all 0.15s; width: 100%; }
+
+/* ── Product edit modal: status buttons ── */
+.status-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 10px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text2); transition: all 0.15s; }
+.status-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.status-btn.active[data-status="watch"] { background: #e6f0fa; color: #1976d2; border-color: #1976d2; }
+.status-btn.active[data-status="ignore"] { background: #f5f5f5; color: var(--text3); border-color: var(--text3); }
+.status-btn .status-desc { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; line-height: 1.4; text-align: center; }
+.status-btn.active .status-desc { color: inherit; opacity: 0.8; }
 
 /* ── Mapping modal (CSV import wizard) ── */
 .mapping-modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 920px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
@@ -362,7 +373,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v2.9</span>
+    <span class="build-date">v3.0</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -515,6 +526,38 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeSetupMenuModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product detail edit modal -->
+<div class="modal-overlay" id="productEditModal">
+  <div class="modal" style="max-width:480px">
+    <h3>✎ 商品詳細編集</h3>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace" id="productEditMeta"></div>
+
+    <div class="modal-field">
+      <label class="modal-label">商品番号</label>
+      <input type="text" class="modal-input" id="productEditItemNumber" placeholder="例: ih-22-04-set1">
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">状態</label>
+      <div style="display:flex;gap:8px">
+        <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
+          <span style="font-size:14px">👁</span><span>注視</span>
+          <div class="status-desc">通常表示・各種フィルタの対象</div>
+        </button>
+        <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
+          <span style="font-size:14px">🙈</span><span>無視</span>
+          <div class="status-desc">「無視」フィルタ以外では非表示</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeProductEditModal()">キャンセル</button>
+      <button class="modal-btn save" onclick="saveProductEdit()">保存</button>
     </div>
   </div>
 </div>
@@ -676,7 +719,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v2.9
+// reviewcheck v3.0
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -831,7 +874,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.9' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.0' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1218,6 +1261,15 @@ function renderProducts() {
   const sortKey = document.getElementById('sortSelect')?.value || 'default';
   let visible = codes.filter(code => {
     const p = productCache[code];
+    // 「無視」ロジック: サイドバーで「無視」を選んだ時だけ無視商品が表示、それ以外では非表示
+    const isIgnored = p.status === 'ignore';
+    if (currentScoreBand === 'ignored') {
+      // 「無視」フィルタ選択時 → 無視商品だけ表示
+      if (!isIgnored) return false;
+    } else {
+      // それ以外のフィルタ選択時 → 無視商品は除外
+      if (isIgnored) return false;
+    }
     if (currentFilter === 'checked' && !p.checked) return false;
     if (currentFilter === 'unchecked' && p.checked) return false;
     if (currentFilter === 'hasReviews' && (!p.reviewCount || p.reviewCount === 0)) return false;
@@ -1230,8 +1282,8 @@ function renderProducts() {
         if (cat !== currentCategory) return false;
       }
     }
-    // スコアバンドフィルタ
-    if (currentScoreBand !== 'all') {
+    // スコアバンドフィルタ ('ignored' 以外で適用)
+    if (currentScoreBand !== 'all' && currentScoreBand !== 'ignored') {
       if (_scoreBandOf(p.reviewCount, p.reviewAvg) !== currentScoreBand) return false;
     }
     if (search) {
@@ -1277,10 +1329,11 @@ function _categoryOf(itemNumber) {
 // ── サイドバー描画 ──
 function renderSidebar() {
   const codes = Object.keys(productCache);
-  // カテゴリ集計
+  // カテゴリ集計（無視商品は除外）
   const counts = {}; // { 'ih': 5, '__unset__': 12, ... }
   for (const code of codes) {
     const p = productCache[code];
+    if (p.status === 'ignore') continue;
     const cat = _categoryOf(p.itemNumber);
     counts[cat] = (counts[cat] || 0) + 1;
   }
@@ -1297,7 +1350,7 @@ function renderSidebar() {
   if (counts['__unset__']) ordered.push('__unset__');
   ordered.push(...cats);
 
-  const total = codes.length;
+  const total = codes.filter(c => productCache[c].status !== 'ignore').length;
   const list = document.getElementById('sidebarList');
   let html = '';
   // 「全て」項目
@@ -1318,26 +1371,34 @@ function renderSidebar() {
   list.innerHTML = html;
 
   // ── レビュー評価帯 ──
-  const bandCounts = { all: codes.length, high: 0, mid: 0, low: 0, poor: 0, unrated: 0 };
+  // 「無視」商品は通常の点数集計から除外。ignoredとして別カウント
+  const bandCounts = { all: 0, high: 0, mid: 0, low: 0, poor: 0, unrated: 0, ignored: 0 };
   for (const code of codes) {
     const p = productCache[code];
-    const band = _scoreBandOf(p.reviewCount, p.reviewAvg);
-    bandCounts[band] = (bandCounts[band] || 0) + 1;
+    if (p.status === 'ignore') {
+      bandCounts.ignored++;
+    } else {
+      bandCounts.all++;
+      const band = _scoreBandOf(p.reviewCount, p.reviewAvg);
+      bandCounts[band] = (bandCounts[band] || 0) + 1;
+    }
   }
   const bandDefs = [
-    { key: 'all',     label: '全て',       color: null },
-    { key: 'high',    label: '4.5 〜',     color: '#1976d2' },
-    { key: 'mid',     label: '4.2 〜 4.5', color: '#1d9e75' },
-    { key: 'low',     label: '4.0 〜 4.2', color: '#ed8936' },
-    { key: 'poor',    label: '〜 4.0',     color: '#a32d2d' },
-    { key: 'unrated', label: '未評価',     color: null },
+    { key: 'all',     label: '全て',       color: null,      icon: '' },
+    { key: 'high',    label: '4.5 〜',     color: '#1976d2', icon: '★ ' },
+    { key: 'mid',     label: '4.2 〜 4.5', color: '#1d9e75', icon: '★ ' },
+    { key: 'low',     label: '4.0 〜 4.2', color: '#ed8936', icon: '★ ' },
+    { key: 'poor',    label: '〜 4.0',     color: '#a32d2d', icon: '★ ' },
+    { key: 'unrated', label: '未評価',     color: null,      icon: '★ ' },
+    { key: 'ignored', label: '無視',       color: null,      icon: '🙈 ' },
   ];
   let scoreHtml = '';
   for (const b of bandDefs) {
     const isActive = currentScoreBand === b.key;
     const colorStyle = b.color ? `color:${b.color};font-weight:600` : '';
-    scoreHtml += `<button class="sidebar-item ${isActive ? 'active' : ''}" onclick="setScoreBand('${b.key}')">
-      <span class="cat-name" style="${colorStyle}">${b.key === 'all' ? '' : '★ '}${_escape(b.label)}</span>
+    const isIgnoredItem = b.key === 'ignored';
+    scoreHtml += `<button class="sidebar-item ${isActive ? 'active' : ''} ${isIgnoredItem && !isActive ? 'ignored-item' : ''}" onclick="setScoreBand('${b.key}')">
+      <span class="cat-name" style="${colorStyle}">${b.icon}${_escape(b.label)}</span>
       <span class="cat-count">${bandCounts[b.key] || 0}</span>
     </button>`;
   }
@@ -1416,7 +1477,7 @@ function _renderTableRow(code) {
     </td>
     ${imageCells}
     <td class="col-action">
-      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="editItemNumberInTable('${_escape(code)}')" title="商品番号を編集">✎ 編集</button>
+      <button class="modal-btn" style="font-size:11px;padding:4px 8px" onclick="openProductEditModal('${_escape(code)}')" title="詳細を編集">✎ 編集</button>
     </td>
   </tr>`;
 }
@@ -1526,7 +1587,11 @@ function _renderCard(code) {
     <div class="image-strip">${imagesHtml}</div>
     <div class="product-meta">
       <span>取得: ${lastFetchedDate}</span>
-      ${checkedAtDate ? `<span class="checked-info">✓ チェック済: ${checkedAtDate}</span>` : ''}
+      <span style="display:flex;gap:8px;align-items:center">
+        ${checkedAtDate ? `<span class="checked-info">✓ ${checkedAtDate}</span>` : ''}
+        ${p.status === 'ignore' ? `<span style="color:var(--text3);font-weight:600">🙈 無視</span>` : ''}
+        <button class="modal-btn" style="font-size:10px;padding:3px 8px" onclick="openProductEditModal('${_escape(code)}')" title="詳細を編集">✎ 詳細編集</button>
+      </span>
     </div>
   </div>`;
 }
@@ -2266,6 +2331,47 @@ function cancelEditItemNumber(code) {
   if (card) card.outerHTML = _renderCard(code);
 }
 
+// ── 商品詳細編集モーダル ──
+let _editingProductCode = null;
+let _editingTempStatus = 'watch';
+
+function openProductEditModal(code) {
+  if (!productCache[code]) return;
+  _editingProductCode = code;
+  const p = productCache[code];
+  // 状態は 'ignore' 以外は 'watch'(デフォルト)扱い
+  _editingTempStatus = p.status === 'ignore' ? 'ignore' : 'watch';
+
+  document.getElementById('productEditMeta').innerHTML =
+    `商品管理番号: <strong>${_escape(code)}</strong><br>商品名: ${_escape((p.name || '').substring(0, 60))}${(p.name || '').length > 60 ? '...' : ''}`;
+  document.getElementById('productEditItemNumber').value = p.itemNumber || '';
+  _updateStatusBtns();
+  document.getElementById('productEditModal').classList.add('open');
+  setTimeout(() => document.getElementById('productEditItemNumber').focus(), 50);
+}
+function closeProductEditModal() {
+  document.getElementById('productEditModal').classList.remove('open');
+  _editingProductCode = null;
+}
+function setEditStatus(status) {
+  _editingTempStatus = status;
+  _updateStatusBtns();
+}
+function _updateStatusBtns() {
+  document.getElementById('statusBtnWatch').classList.toggle('active', _editingTempStatus === 'watch');
+  document.getElementById('statusBtnIgnore').classList.toggle('active', _editingTempStatus === 'ignore');
+}
+function saveProductEdit() {
+  const code = _editingProductCode;
+  if (!code || !productCache[code]) return;
+  const newItemNumber = document.getElementById('productEditItemNumber').value.trim() || null;
+  productCache[code].itemNumber = newItemNumber;
+  productCache[code].status = _editingTempStatus; // 'watch' | 'ignore'
+  closeProductEditModal();
+  renderProducts();
+  scheduleGitHubSave();
+}
+
 // ── 起動 ──
 async function init() {
   _applyZoom(_getZoom());
@@ -2280,7 +2386,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v2.9 initialized');
+  console.log('[reviewcheck] v3.0 initialized');
 }
 
 init();
