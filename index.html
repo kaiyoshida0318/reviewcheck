@@ -181,22 +181,21 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-review { width: 120px; }
 .product-table .col-image { width: 100px; }
 .product-table .col-action { width: 130px; text-align: center; }
-.product-table .col-status { width: 110px; }
-.product-table .col-tags { width: 130px; }
+.product-table .col-status { width: 100px; }
+.product-table .col-tags { width: 140px; }
 
-/* ── インライン編集ボタン群(状態・制作タグ) ── */
-.inline-btn-group { display: flex; gap: 3px; padding: 3px; border-radius: var(--radius-sm); transition: background 0.15s; }
-.inline-btn-group.pending { background: #fff7d6; box-shadow: inset 0 0 0 1px #f5d68a; }
-.inline-status-btn, .inline-tag-btn { width: 30px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border2); background: var(--surface); cursor: pointer; border-radius: 4px; font-size: 13px; padding: 0; font-family: inherit; transition: all 0.12s; opacity: 0.5; filter: grayscale(0.6); }
-.inline-status-btn:hover, .inline-tag-btn:hover { opacity: 0.85; filter: grayscale(0.2); border-color: var(--text3); }
-.inline-status-btn.active { opacity: 1; filter: none; border-width: 1.5px; font-weight: 700; }
-.inline-status-btn.active[data-status="focus"]  { background: #fff8e1; border-color: #c87800; box-shadow: 0 0 0 1px #c87800; }
-.inline-status-btn.active[data-status="normal"] { background: #e6f0fa; border-color: #1976d2; box-shadow: 0 0 0 1px #1976d2; }
-.inline-status-btn.active[data-status="ignore"] { background: #f5f5f5; border-color: var(--text3); box-shadow: 0 0 0 1px var(--text3); }
-.inline-tag-btn.active { opacity: 1; filter: none; border-width: 1.5px; }
-.inline-tag-btn.active[data-tag="renewal"]   { background: #e8f5e9; border-color: #2e7d32; box-shadow: 0 0 0 1px #2e7d32; }
-.inline-tag-btn.active[data-tag="boost"]     { background: #fff3e0; border-color: #e65100; box-shadow: 0 0 0 1px #e65100; }
-.inline-tag-btn.active[data-tag="boostPlan"] { background: #f3e5f5; border-color: #7b1fa2; box-shadow: 0 0 0 1px #7b1fa2; }
+/* ── インライン編集 縦並びリスト(状態・制作タグ) ── */
+.inline-text-list { display: flex; flex-direction: column; gap: 1px; padding: 2px; border-radius: var(--radius-sm); transition: background 0.15s; }
+.inline-text-list.pending { background: #fff7d6; box-shadow: inset 0 0 0 1px #f5d68a; }
+.inline-text-row { font-size: 11px; padding: 3px 7px; border-radius: 3px; cursor: pointer; user-select: none; color: var(--text3); white-space: nowrap; transition: all 0.1s; line-height: 1.4; }
+.inline-text-row:hover { background: var(--surface2); color: var(--text2); }
+.inline-text-row.active { font-weight: 700; }
+.inline-text-row.active[data-status="focus"]  { color: #c87800; background: #fff8e1; }
+.inline-text-row.active[data-status="normal"] { color: #1976d2; background: #e6f0fa; }
+.inline-text-row.active[data-status="ignore"] { color: var(--text); background: #f5f5f5; }
+.inline-text-row.active[data-tag="renewal"]   { color: #2e7d32; background: #e8f5e9; }
+.inline-text-row.active[data-tag="boost"]     { color: #e65100; background: #fff3e0; }
+.inline-text-row.active[data-tag="boostPlan"] { color: #7b1fa2; background: #f3e5f5; }
 
 /* ── ペンディング保存バー ── */
 .pending-edits-group { background: #fff7d6; border: 1px solid #f5d68a; border-radius: var(--radius-sm); padding: 4px 10px; gap: 8px; }
@@ -475,7 +474,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.3</span>
+    <span class="build-date">v5.4</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -945,7 +944,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.3
+// reviewcheck v5.4
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1124,7 +1123,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.3' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.4' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2339,33 +2338,30 @@ function _renderTableRow(code) {
   </tr>`;
 }
 
-// 状態ボタン群(注目/通常/無視)
+// 状態ボタン群(注目/通常/無視) - 縦並び文字リスト
 function _renderStatusButtons(code, savedStatus) {
   const saved = savedStatus || 'normal';
-  // pendingEdits を反映した「現在の選択」
   const current = (pendingEdits[code] && pendingEdits[code].status !== undefined) ? pendingEdits[code].status : saved;
-  // 変更されてるか
   const isPending = (pendingEdits[code] && pendingEdits[code].status !== undefined && pendingEdits[code].status !== saved);
   const opts = [
     { key: 'focus',  label: '注目', icon: '⭐' },
     { key: 'normal', label: '通常', icon: '👁' },
     { key: 'ignore', label: '無視', icon: '🙈' },
   ];
-  let html = `<div class="inline-btn-group ${isPending ? 'pending' : ''}">`;
+  let html = `<div class="inline-text-list ${isPending ? 'pending' : ''}">`;
   for (const o of opts) {
     const active = current === o.key ? 'active' : '';
-    html += `<button class="inline-status-btn ${active}" data-status="${o.key}" onclick="setInlineStatus('${_escape(code)}', '${o.key}')" title="${_escape(o.label)}">${o.icon}</button>`;
+    html += `<div class="inline-text-row ${active}" data-status="${o.key}" onclick="setInlineStatus('${_escape(code)}', '${o.key}')">${o.icon} ${_escape(o.label)}</div>`;
   }
   html += `</div>`;
   return html;
 }
 
-// 制作タグボタン群(リニューアル/盛り上げ制作/盛り上げ予定)
+// 制作タグボタン群 - 縦並び文字リスト
 function _renderTagsButtons(code, savedTags) {
   savedTags = savedTags || {};
   const pending = (pendingEdits[code] && pendingEdits[code].tags) || null;
   const current = pending !== null ? pending : { renewal: !!savedTags.renewal, boost: !!savedTags.boost, boostPlan: !!savedTags.boostPlan };
-  // 変更されているかは、各値とsaved値の比較で判定
   const isPending = pending !== null && (
     !!current.renewal !== !!savedTags.renewal ||
     !!current.boost !== !!savedTags.boost ||
@@ -2376,10 +2372,10 @@ function _renderTagsButtons(code, savedTags) {
     { key: 'boost',     label: '盛り上げ制作', icon: '🚀' },
     { key: 'boostPlan', label: '盛り上げ予定', icon: '📅' },
   ];
-  let html = `<div class="inline-btn-group ${isPending ? 'pending' : ''}">`;
+  let html = `<div class="inline-text-list ${isPending ? 'pending' : ''}">`;
   for (const o of opts) {
     const active = current[o.key] ? 'active' : '';
-    html += `<button class="inline-tag-btn ${active}" data-tag="${o.key}" onclick="toggleInlineTag('${_escape(code)}', '${o.key}')" title="${_escape(o.label)}">${o.icon}</button>`;
+    html += `<div class="inline-text-row tag-row ${active}" data-tag="${o.key}" onclick="toggleInlineTag('${_escape(code)}', '${o.key}')">${o.icon} ${_escape(o.label)}</div>`;
   }
   html += `</div>`;
   return html;
@@ -2534,8 +2530,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.3 */ }
-function _loadViewMode() { /* removed in v5.3 */ }
+function setViewMode(mode) { /* removed in v5.4 */ }
+function _loadViewMode() { /* removed in v5.4 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2649,8 +2645,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.3 */ }
-function setFilter(f) { /* removed in v5.3 */ }
+function toggleCheck(code) { /* removed in v5.4 */ }
+function setFilter(f) { /* removed in v5.4 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3642,7 +3638,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.3 initialized');
+  console.log('[reviewcheck] v5.4 initialized');
 }
 
 init();
