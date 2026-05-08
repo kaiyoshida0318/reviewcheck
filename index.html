@@ -188,7 +188,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .inline-status-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
 .inline-status-select:hover { border-color: var(--text3); }
 .inline-status-select.pending { background: #fff7d6; border-color: #f5d68a; box-shadow: 0 0 0 1px #f5d68a; }
-.inline-status-select.status-normal { background: #e6f0fa; color: #1976d2; border-color: #c4dcf4; }
+.inline-status-select.status-normal { background: var(--surface); color: var(--text2); border-color: var(--border2); }
 .inline-status-select.status-focus  { background: #fff8e1; color: #c87800; border-color: #f5d68a; }
 .inline-status-select.status-ignore { background: #f5f5f5; color: var(--text3); border-color: var(--border2); }
 
@@ -485,7 +485,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v5.7</span>
+    <span class="build-date">v5.8</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -955,7 +955,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v5.7
+// reviewcheck v5.8
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1134,7 +1134,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.7' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v5.8' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2568,8 +2568,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v5.7 */ }
-function _loadViewMode() { /* removed in v5.7 */ }
+function setViewMode(mode) { /* removed in v5.8 */ }
+function _loadViewMode() { /* removed in v5.8 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2683,8 +2683,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v5.7 */ }
-function setFilter(f) { /* removed in v5.7 */ }
+function toggleCheck(code) { /* removed in v5.8 */ }
+function setFilter(f) { /* removed in v5.8 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3682,7 +3682,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v5.7 initialized');
+  console.log('[reviewcheck] v5.8 initialized');
 }
 
 init();
