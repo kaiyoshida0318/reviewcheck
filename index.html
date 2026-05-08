@@ -135,7 +135,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .star { color: #ddd; font-size: 14px; line-height: 1; }
 .star.filled { color: var(--gold); }
 .star.half { background: linear-gradient(90deg, var(--gold) 50%, #ddd 50%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.review-avg { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
+.review-avg { font-size: 18px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
 .review-count { font-size: 13px; color: var(--text2); margin-left: auto; }
 .review-count strong { color: var(--text); font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; margin-right: 2px; }
 .review-link-btn { margin-left: auto; font-size: 11px; padding: 5px 10px; border: 1px solid var(--accent); border-radius: var(--radius-sm); background: var(--surface); color: var(--accent); text-decoration: none; font-weight: 600; transition: all 0.15s; white-space: nowrap; }
@@ -165,9 +165,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .table-img-cell.empty { display: flex; align-items: center; justify-content: center; cursor: default; font-size: 9px; color: var(--text3); }
 .product-table .table-review { display: flex; flex-direction: column; gap: 2px; }
 .product-table .table-review-line1 { display: flex; align-items: center; gap: 4px; }
-.product-table .table-review-avg { font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+.product-table .table-review-avg { font-weight: 700; font-family: 'DM Mono', monospace; font-size: 18px; color: var(--text); }
+.product-table .table-review-numbers { display: flex; align-items: baseline; gap: 12px; margin-top: 2px; }
 .product-table .table-review-count { color: var(--text2); font-size: 10px; }
-.product-table .table-review-count-big { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.product-table .table-review-count-big { font-size: 12px; color: var(--text2); }
 .product-table .table-review-count-big strong { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); margin-right: 2px; }
 .product-table .table-review-link { font-size: 10px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); text-decoration: none; display: inline-block; white-space: nowrap; }
 .product-table .table-review-link:hover { background: var(--accent); color: #fff; }
@@ -358,7 +359,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v2.3</span>
+    <span class="build-date">v2.6</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -662,7 +663,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v2.3
+// reviewcheck v2.6
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -816,7 +817,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.3' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.6' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1127,8 +1128,21 @@ function _reviewPageUrl(itemCode) {
 }
 
 // ── 星表示 ──
+// ── レビュー点数の色分け（5段階） ──
+// 4.5以上: 青、 4.2-4.5未満: 緑、 4.0-4.2未満: オレンジ、 4.0未満（0含む）: 赤
+function _reviewScoreColor(avg) {
+  const v = avg || 0;
+  if (v >= 4.5) return '#1976d2';   // 青
+  if (v >= 4.2) return '#1d9e75';   // 緑（既存の--greenと揃える）
+  if (v >= 4.0) return '#ed8936';   // オレンジ
+  return '#a32d2d';                 // 赤（既存の--dangerと揃える）
+}
+
 function _renderStars(avg) {
-  if (!avg || avg <= 0) return '<span style="color:var(--text3);font-size:11px">未評価</span>';
+  if (!avg || avg <= 0) {
+    // 未評価の場合は灰色の☆を5つ表示（点数なしを視覚的に示す）
+    return '<span class="review-stars">' + '<span class="star">★</span>'.repeat(5) + '</span>';
+  }
   const full = Math.floor(avg);
   const half = (avg - full) >= 0.25 && (avg - full) < 0.75;
   const fullStars = half ? full : Math.round(avg);
@@ -1333,9 +1347,11 @@ function _renderTableRow(code) {
       <div class="table-review">
         <div class="table-review-line1">
           ${_renderStars(p.reviewAvg)}
-          <span class="table-review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
         </div>
-        <div class="table-review-count-big"><strong>${p.reviewCount || 0}</strong>件</div>
+        <div class="table-review-numbers">
+          <span class="table-review-avg" style="color:${_reviewScoreColor(p.reviewAvg)}">${(p.reviewAvg || 0).toFixed(2)}</span>
+          <span class="table-review-count-big"><strong>${p.reviewCount || 0}</strong>件</span>
+        </div>
       </div>
     </td>
     ${imageCells}
@@ -1444,7 +1460,7 @@ function _renderCard(code) {
     </div>
     <div class="review-summary">
       ${_renderStars(p.reviewAvg)}
-      <span class="review-avg">${(p.reviewAvg || 0).toFixed(2)}</span>
+      <span class="review-avg" style="color:${_reviewScoreColor(p.reviewAvg)}">${(p.reviewAvg || 0).toFixed(2)}</span>
       <span class="review-count"><strong>${p.reviewCount || 0}</strong>件</span>
     </div>
     <div class="image-strip">${imagesHtml}</div>
@@ -2204,7 +2220,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v2.3 initialized');
+  console.log('[reviewcheck] v2.6 initialized');
 }
 
 init();
