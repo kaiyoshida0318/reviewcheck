@@ -378,7 +378,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v3.2</span>
+    <span class="build-date">v3.3</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -554,17 +554,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
 
     <div class="modal-field">
-      <label class="modal-label">状態</label>
-      <div style="display:flex;gap:8px">
-        <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
-          <span style="font-size:14px">👁</span><span>注視</span>
-          <div class="status-desc">通常表示・各種フィルタの対象</div>
-        </button>
-        <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
-          <span style="font-size:14px">🙈</span><span>無視</span>
-          <div class="status-desc">「無視」フィルタ以外では非表示</div>
-        </button>
-      </div>
+      <label class="modal-label">商品名</label>
+      <textarea class="modal-input" id="productEditName" rows="2" style="resize:vertical;font-family:inherit;line-height:1.5" placeholder="商品名を入力"></textarea>
     </div>
 
     <div class="modal-field">
@@ -575,6 +566,20 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         </button>
         <button class="tag-btn" data-tag="boost" onclick="toggleEditTag('boost')" id="tagBtnBoost">
           <span style="font-size:14px">🚀</span><span>盛り上げ制作</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">状態</label>
+      <div style="display:flex;gap:8px">
+        <button class="status-btn" data-status="watch" onclick="setEditStatus('watch')" id="statusBtnWatch">
+          <span style="font-size:14px">👁</span><span>注視</span>
+          <div class="status-desc">通常表示・各種フィルタの対象</div>
+        </button>
+        <button class="status-btn" data-status="ignore" onclick="setEditStatus('ignore')" id="statusBtnIgnore">
+          <span style="font-size:14px">🙈</span><span>無視</span>
+          <div class="status-desc">「無視」フィルタ以外では非表示</div>
         </button>
       </div>
     </div>
@@ -743,7 +748,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v3.2
+// reviewcheck v3.3
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -899,7 +904,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.2' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v3.3' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -2426,8 +2431,9 @@ function openProductEditModal(code) {
   _editingTempTags = { renewal: !!tags.renewal, boost: !!tags.boost };
 
   document.getElementById('productEditMeta').innerHTML =
-    `商品管理番号: <strong>${_escape(code)}</strong><br>商品名: ${_escape((p.name || '').substring(0, 60))}${(p.name || '').length > 60 ? '...' : ''}`;
+    `商品管理番号: <strong>${_escape(code)}</strong>`;
   document.getElementById('productEditItemNumber').value = p.itemNumber || '';
+  document.getElementById('productEditName').value = p.name || '';
   _updateStatusBtns();
   _updateTagBtns();
   document.getElementById('productEditModal').classList.add('open');
@@ -2457,7 +2463,10 @@ function saveProductEdit() {
   const code = _editingProductCode;
   if (!code || !productCache[code]) return;
   const newItemNumber = document.getElementById('productEditItemNumber').value.trim() || null;
+  const newName = document.getElementById('productEditName').value.trim();
   productCache[code].itemNumber = newItemNumber;
+  // 商品名は空なら既存値を保持(誤クリアによるデータ損失防止)
+  if (newName) productCache[code].name = newName;
   productCache[code].status = _editingTempStatus; // 'watch' | 'ignore'
   // タグ保存(true のものだけ持つ)
   const newTags = {};
@@ -2483,7 +2492,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v3.2 initialized');
+  console.log('[reviewcheck] v3.3 initialized');
 }
 
 init();
