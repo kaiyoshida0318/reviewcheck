@@ -356,7 +356,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v2.0</span>
+    <span class="build-date">v2.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="viewToggleCard" onclick="setViewMode('card')" title="カード表示">▦ カード</button>
       <button class="view-toggle-btn" id="viewToggleTable" onclick="setViewMode('table')" title="テーブル表示">☰ テーブル</button>
@@ -660,7 +660,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v2.0
+// reviewcheck v2.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -814,7 +814,7 @@ async function saveToGitHub(opts = {}) {
         if (getRes.ok) sha = (await getRes.json()).sha;
       } catch(e) {}
       // 2. PUT
-      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.0' };
+      const payload = { productCache, savedAt: new Date().toISOString(), version: 'v2.1' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1824,6 +1824,7 @@ function adjustZoom(delta) {
 const MAPPING_TARGETS = [
   { value: '__skip__', label: '(使わない)' },
   { value: '__match_kanri__', label: '🔑 マッチング: 商品管理番号' },
+  { value: 'name', label: '🏷 商品名 (name)' },
   { value: 'itemNumber', label: '✏ 商品番号 (itemNumber)' },
   // 将来の追加例:
   // { value: 'memo', label: 'メモ' },
@@ -1921,10 +1922,11 @@ function openMappingModal() {
   // マッピング行を生成
   const rowsHtml = state.headers.map(h => {
     const sample = state.rows.slice(0, 3).map(r => r[h]).filter(Boolean).join(' / ');
-    // 自動推測: 「商品番号」→ itemNumber、その他は (使わない)
+    // 自動推測: ヘッダー名にキーワードが含まれていればマッピング
     let autoTarget = '__skip__';
-    if (h === '商品番号') autoTarget = 'itemNumber';
-    else if (h === '商品管理番号') autoTarget = '__match_kanri__';
+    if (h === '商品管理番号') autoTarget = '__match_kanri__';
+    else if (h === '商品番号') autoTarget = 'itemNumber';
+    else if (h.includes('商品名') || h.includes('品名')) autoTarget = 'name';
 
     const optsHtml = MAPPING_TARGETS.map(t =>
       `<option value="${t.value}" ${t.value === autoTarget ? 'selected' : ''}>${_escape(t.label)}</option>`
@@ -2202,7 +2204,7 @@ async function init() {
     _setSaveStatus('saved');
   }
   renderProducts();
-  console.log('[reviewcheck] v2.0 initialized');
+  console.log('[reviewcheck] v2.1 initialized');
 }
 
 init();
