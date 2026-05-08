@@ -488,7 +488,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.1</span>
+    <span class="build-date">v6.2</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -962,7 +962,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.1
+// reviewcheck v6.2
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1141,7 +1141,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.2' };
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1808,27 +1808,31 @@ function renderProducts() {
         break;
       }
       case 'onscreen': {
-        // 未入力(null)はソート末尾に置く
-        const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : Number.POSITIVE_INFINITY;
-        const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : Number.POSITIVE_INFINITY;
+        // 未入力(null)とマイナスは0扱い → 降順時に末尾
+        const oa = (typeof pa.onScreenCount === 'number' && pa.onScreenCount > 0) ? pa.onScreenCount : 0;
+        const ob = (typeof pb.onScreenCount === 'number' && pb.onScreenCount > 0) ? pb.onScreenCount : 0;
         cmp = oa - ob;
         break;
       }
       case 'diff': {
-        // 未入力はソート末尾
+        // 未入力(null)とマイナスは0扱い → 降順時に末尾
         const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : null;
         const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : null;
-        const da = oa === null ? Number.POSITIVE_INFINITY : (pa.reviewCount || 0) - oa;
-        const db = ob === null ? Number.POSITIVE_INFINITY : (pb.reviewCount || 0) - ob;
+        const rawA = oa === null ? -1 : (pa.reviewCount || 0) - oa;
+        const rawB = ob === null ? -1 : (pb.reviewCount || 0) - ob;
+        const da = rawA > 0 ? rawA : 0;
+        const db = rawB > 0 ? rawB : 0;
         cmp = da - db;
         break;
       }
       case 'growth': {
-        // 未入力はソート末尾。0は1基準で計算(セル表示と一致)
+        // 未入力(null)とマイナスは0扱い → 降順時に末尾。0件は1基準で計算
         const oa = (typeof pa.onScreenCount === 'number') ? pa.onScreenCount : null;
         const ob = (typeof pb.onScreenCount === 'number') ? pb.onScreenCount : null;
-        const ga = oa === null ? Number.POSITIVE_INFINITY : ((pa.reviewCount || 0) - oa) / (oa === 0 ? 1 : oa);
-        const gb = ob === null ? Number.POSITIVE_INFINITY : ((pb.reviewCount || 0) - ob) / (ob === 0 ? 1 : ob);
+        const rawA = oa === null ? -1 : ((pa.reviewCount || 0) - oa) / (oa === 0 ? 1 : oa);
+        const rawB = ob === null ? -1 : ((pb.reviewCount || 0) - ob) / (ob === 0 ? 1 : ob);
+        const ga = rawA > 0 ? rawA : 0;
+        const gb = rawB > 0 ? rawB : 0;
         cmp = ga - gb;
         break;
       }
@@ -2626,8 +2630,8 @@ function saveItemNumberInTable(code) {
 
 // ── レガシー: View mode (card/table) は廃止 ──
 const VIEW_MODE_KEY = 'reviewcheck_view_mode';
-function setViewMode(mode) { /* removed in v6.1 */ }
-function _loadViewMode() { /* removed in v6.1 */ }
+function setViewMode(mode) { /* removed in v6.2 */ }
+function _loadViewMode() { /* removed in v6.2 */ }
 
 // ── テーブル表示モード(基本/差異確認) ──
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
@@ -2757,8 +2761,8 @@ function _escape(s) {
 
 // ── チェック切替 ──
 // ── レガシー: チェック機能は廃止、関数はno-op ──
-function toggleCheck(code) { /* removed in v6.1 */ }
-function setFilter(f) { /* removed in v6.1 */ }
+function toggleCheck(code) { /* removed in v6.2 */ }
+function setFilter(f) { /* removed in v6.2 */ }
 
 // ── Lightbox ──
 function openLightbox(url) {
@@ -3758,7 +3762,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.1 initialized');
+  console.log('[reviewcheck] v6.2 initialized');
 }
 
 init();
