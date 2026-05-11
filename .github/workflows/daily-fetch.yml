@@ -1,0 +1,43 @@
+name: Daily Review Fetch
+
+on:
+  # 毎日 JST 06:00 (UTC 21:00 前日) に自動実行
+  schedule:
+    - cron: '0 21 * * *'
+  # 手動実行も可能(Actionsタブから "Run workflow" ボタンで実行)
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run daily fetch script
+        env:
+          RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_SHOP_CODE: ${{ secrets.RAKUTEN_SHOP_CODE }}
+          RAKUTEN_SHOP_ID: ${{ secrets.RAKUTEN_SHOP_ID }}
+        run: node scripts/daily-fetch.js
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions (Daily Fetch)"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "変更なし — コミットスキップ"
+          else
+            TIMESTAMP=$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')
+            git commit -m "Auto: Daily review fetch ($TIMESTAMP)"
+            git push
+          fi
