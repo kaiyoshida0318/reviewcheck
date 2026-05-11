@@ -56,6 +56,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .save-status.pending { background: #fff8e1; color: var(--amber); }
 .save-status.saving { background: #e3f2fd; color: #0288d1; }
 .save-status.error { background: var(--red-light); color: var(--danger); }
+.auto-fetch-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-family: 'DM Mono', monospace; background: #eef2ff; color: #3949ab; border: 1px solid #c5cae9; cursor: default; }
+.auto-fetch-status.stale { background: #fff3cd; color: #6d4c00; border-color: #ffe082; }
+.auto-fetch-status.error { background: var(--red-light); color: var(--danger); border-color: rgba(163,45,45,0.3); }
 
 /* ── Layout ── */
 .container { max-width: none; margin: 0; padding: 0 16px 20px; }
@@ -491,7 +494,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.5</span>
+    <span class="build-date">v6.6</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -502,6 +505,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
       <button class="zoom-btn" style="font-size:15px" onclick="adjustZoom(+0.02)" title="文字を大きく">A+</button>
     </div>
     <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
+    <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
     <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📋 商品番号・商品名取得</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
@@ -978,7 +982,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.5
+// reviewcheck v6.6
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1144,11 +1148,20 @@ async function saveToGitHub(opts = {}) {
       };
       const file = _ghReviewFile();
       const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
-      // 1. 現在のSHA取得
+      // 1. 現在のSHA + 既存lastAutoFetch取得
       let sha = null;
+      let existingLastAutoFetch = null;
       try {
         const getRes = await fetch(apiUrl, { headers });
-        if (getRes.ok) sha = (await getRes.json()).sha;
+        if (getRes.ok) {
+          const got = await getRes.json();
+          sha = got.sha;
+          try {
+            const decoded = decodeURIComponent(escape(atob(got.content.replace(/\n/g, ''))));
+            const parsed = JSON.parse(decoded);
+            if (parsed.lastAutoFetch) existingLastAutoFetch = parsed.lastAutoFetch;
+          } catch(e) {}
+        }
       } catch(e) {}
       // 2. PUT (チェック関連の旧フィールドを除外して保存)
       const cleanCache = {};
@@ -1157,7 +1170,9 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.5' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.6' };
+      // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
+      if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
       const body = { message: `Update review data (${_getCurrentShopId()})`, content: base64 };
       if (sha) body.sha = sha;
@@ -1236,9 +1251,42 @@ async function loadFromGitHub() {
       saveMonthlySalesCache();
       console.log(`[reviewcheck] 月別売上データ ${Object.keys(monthlySales).length}ヶ月分 読込完了`);
     }
+    // v6.6: GitHub Actions による自動取得の最終時刻
+    if (parsed.lastAutoFetch) {
+      _updateAutoFetchStatus(parsed.lastAutoFetch);
+    } else {
+      _updateAutoFetchStatus(null);
+    }
   } catch(e) {
     console.error('[reviewcheck] GitHub読込エラー:', e);
   }
+}
+
+// ── v6.6: 自動取得ステータス表示更新 ──
+function _updateAutoFetchStatus(isoStr) {
+  const el = document.getElementById('autoFetchStatus');
+  if (!el) return;
+  if (!isoStr) {
+    el.style.display = 'none';
+    return;
+  }
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) {
+    el.style.display = 'none';
+    return;
+  }
+  // JST 表示
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  el.textContent = `🤖 自動: ${mm}/${dd} ${hh}:${mi}`;
+  // 経過時間で色変化
+  const hoursAgo = (Date.now() - d.getTime()) / 36e5;
+  el.classList.remove('stale', 'error');
+  if (hoursAgo > 36)      el.classList.add('error');   // 1.5日以上 = 異常(赤)
+  else if (hoursAgo > 26) el.classList.add('stale');   // 26時間以上 = やや古い(黄)
+  el.style.display = '';
 }
 
 // ── 画像URL高解像化 ──
@@ -3964,7 +4012,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.5 initialized');
+  console.log('[reviewcheck] v6.6 initialized');
 }
 
 init();
