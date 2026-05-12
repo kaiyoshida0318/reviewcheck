@@ -501,7 +501,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.8</span>
+    <span class="build-date">v6.8.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -556,7 +556,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
           <span style="font-size:14px">🔄</span><span>クリア</span>
         </button>
         <!-- v6.8: 全レビュー(日別合計)モーダルを開くボタン -->
-        <button class="all-reviews-btn" onclick="openAllReviewsModal()" title="引退済を除く全商品のレビュー件数を日別に集計して表示">
+        <button class="all-reviews-btn" onclick="openAllReviewsModal()" title="全商品(引退済含む)のレビュー件数を日別に集計して表示">
           <span style="font-size:14px">📊</span><span>全レビュー</span>
         </button>
       </div>
@@ -816,7 +816,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 </div>
 
-<!-- v6.8: All reviews aggregation modal (引退済を除く全商品の日別集計) -->
+<!-- v6.8: All reviews aggregation modal (全商品の日別集計、引退済含む) -->
 <div class="modal-overlay" id="allReviewsModal">
   <div class="modal product-edit-modal">
     <div class="edit-header-row">
@@ -828,7 +828,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <div style="font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace" id="allReviewsMeta"></div>
 
     <div class="edit-half">
-      <div class="edit-section-title">⭐ 全商品レビュー件数の推移(引退済を除く)</div>
+      <div class="edit-section-title">⭐ 全商品レビュー件数の推移(引退済含む)</div>
       <div class="sales-chart-wrap">
         <canvas id="allReviewsChart" width="1000" height="220"></canvas>
         <div class="sales-chart-empty" id="allReviewsChartEmpty" style="display:none">レビュー履歴がありません</div>
@@ -1024,7 +1024,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.8
+// reviewcheck v6.8.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1212,7 +1212,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.8' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.8.1' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3831,19 +3831,19 @@ function _renderReviewHistoryTable(code) {
   table.innerHTML = html;
 }
 
-// ── v6.8: 全レビュー集計(引退済を除く全商品の日別合計、補間方式) ──
+// ── v6.8.1: 全レビュー集計(全商品の日別合計、補間方式) ──
+// 引退済も含めて集計する(引退タイミングで合計値がブレるのを防ぐため)
 //
 // 集計ロジック:
-//   1. 引退済(status==='retired')を除く全商品の reviewHistory を収集
+//   1. 全商品の reviewHistory を収集(status不問)
 //   2. 全商品で出現した日付をユニークに集めて昇順ソート
 //   3. 各日付について、各商品の「その日以前の最新の記録値」を合算
 //      - その日以前に記録がない商品は 0 として扱う(まだ存在しなかったとみなす)
 //
 function _computeAllReviewsAggregation() {
-  // 対象商品(引退済を除く)
+  // 対象商品(全商品)
   const targets = [];
   for (const [code, p] of Object.entries(productCache)) {
-    if ((p.status || 'normal') === 'retired') continue;
     if (!p.reviewHistory || typeof p.reviewHistory !== 'object') continue;
     // 各商品の履歴を [date, count] の配列(昇順)に変換
     const entries = Object.entries(p.reviewHistory)
@@ -3899,8 +3899,8 @@ function openAllReviewsModal() {
   if (meta) {
     const latest = agg.totals.length ? agg.totals[agg.totals.length - 1] : null;
     meta.textContent = latest
-      ? `集計対象: ${agg.productCount}商品(引退済を除く) / 最新 ${latest.date}: ${latest.count.toLocaleString()}件`
-      : `集計対象: ${agg.productCount}商品(引退済を除く) / データなし`;
+      ? `集計対象: ${agg.productCount}商品(引退済含む全商品) / 最新 ${latest.date}: ${latest.count.toLocaleString()}件`
+      : `集計対象: ${agg.productCount}商品(引退済含む全商品) / データなし`;
   }
   // canvasサイズはモーダルを開いた後でないと正しく取れないので setTimeout で遅延
   setTimeout(() => {
@@ -4284,7 +4284,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.8 initialized');
+  console.log('[reviewcheck] v6.8.1 initialized');
 }
 
 init();
