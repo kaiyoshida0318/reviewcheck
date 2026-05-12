@@ -70,10 +70,12 @@ function extractCode(itemUrl, shopCode) {
 async function fetchPage(page) {
   const elements = 'itemName,itemCode,mediumImageUrls,itemUrl,reviewCount,reviewAverage';
   const url = `${BASE}?applicationId=${APP_ID}&accessKey=${ACCESS_KEY}&shopCode=${SHOP_CODE}&hits=30&page=${page}&sort=%2BitemPrice&format=json&elements=${elements}`;
-  // v6.6.1: 楽天Web Service はリファラ送信を要求するため、ブラウザと同じヘッダを付ける
+  // v6.6.2: 楽天Web Service はOrigin/Referer両方を要求する場合がある
+  // (REFERRER_MISSINGエラーは実際にはOriginヘッダで解決するケースが報告されている)
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'reviewcheck-daily-fetch/6.6 (+https://kaiyoshida0318.github.io/reviewcheck/)',
+      'Origin': 'https://kaiyoshida0318.github.io',
       'Referer': 'https://kaiyoshida0318.github.io/reviewcheck/'
     }
   });
@@ -225,7 +227,7 @@ async function fetchPage(page) {
 
   // ── 保存 ──
   store.savedAt = new Date().toISOString();
-  store.version = 'v6.6.1';
+  store.version = 'v6.6.2';
   store.lastAutoFetch = new Date().toISOString();  // 自動取得の最終時刻(reviewcheck側で表示用)
   fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf8');
 
