@@ -70,7 +70,13 @@ function extractCode(itemUrl, shopCode) {
 async function fetchPage(page) {
   const elements = 'itemName,itemCode,mediumImageUrls,itemUrl,reviewCount,reviewAverage';
   const url = `${BASE}?applicationId=${APP_ID}&accessKey=${ACCESS_KEY}&shopCode=${SHOP_CODE}&hits=30&page=${page}&sort=%2BitemPrice&format=json&elements=${elements}`;
-  const res = await fetch(url);
+  // v6.6.1: 楽天Web Service はリファラ送信を要求するため、ブラウザと同じヘッダを付ける
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'reviewcheck-daily-fetch/6.6 (+https://kaiyoshida0318.github.io/reviewcheck/)',
+      'Referer': 'https://kaiyoshida0318.github.io/reviewcheck/'
+    }
+  });
   return res;
 }
 
@@ -104,6 +110,7 @@ async function fetchPage(page) {
   let updateCount = 0;
   let rateLimitHits = 0;
   let hasMore = true;
+  let fatalError = null;  // v6.6.1: API失敗を追跡
 
   while (hasMore && page <= 100) {
     try {
@@ -114,6 +121,7 @@ async function fetchPage(page) {
         console.warn(`[daily-fetch] 429 rate limit (${rateLimitHits}/${MAX_RATE_LIMIT}). 5秒待機...`);
         if (rateLimitHits >= MAX_RATE_LIMIT) {
           console.error('[daily-fetch] 429多発で中断');
+          fatalError = `Rate limit (429) ${MAX_RATE_LIMIT}回連続`;
           break;
         }
         await sleep(5000);
@@ -123,6 +131,7 @@ async function fetchPage(page) {
       if (!res.ok) {
         const txt = await res.text().catch(() => '');
         console.error(`[daily-fetch] HTTP ${res.status}: ${txt.slice(0, 300)}`);
+        fatalError = `HTTP ${res.status}: ${txt.slice(0, 200)}`;
         break;
       }
 
@@ -130,7 +139,13 @@ async function fetchPage(page) {
       const items = (data.Items || []).map(w => w.Item || w);
 
       if (items.length === 0) {
-        console.log('[daily-fetch] アイテムなし — 終了');
+        // page=1 で 0件は異常(全商品が削除されたとは考えにくい)
+        if (page === 1) {
+          console.error('[daily-fetch] page=1 で 0件 — 異常');
+          fatalError = 'page=1 で 0件取得';
+        } else {
+          console.log('[daily-fetch] アイテムなし — 正常終了(全ページ取得済み)');
+        }
         break;
       }
 
@@ -190,13 +205,27 @@ async function fetchPage(page) {
 
     } catch (e) {
       console.error('[daily-fetch] fetch エラー:', e.message);
+      fatalError = `Exception: ${e.message}`;
       break;
     }
   }
 
+  // ── v6.6.1: エラー時はファイルを更新せずに異常終了 ──
+  if (fatalError) {
+    console.error(`[daily-fetch] ✗ エラー終了: ${fatalError}`);
+    console.error('[daily-fetch] データファイルは更新せず、ジョブを失敗扱いにします');
+    process.exit(1);
+  }
+
+  // 取得 0件でエラー無しは通常ありえないが念のため
+  if (totalFetched === 0) {
+    console.error('[daily-fetch] ✗ 取得件数 0 — 保存スキップ');
+    process.exit(1);
+  }
+
   // ── 保存 ──
   store.savedAt = new Date().toISOString();
-  store.version = 'v6.6';
+  store.version = 'v6.6.1';
   store.lastAutoFetch = new Date().toISOString();  // 自動取得の最終時刻(reviewcheck側で表示用)
   fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf8');
 
