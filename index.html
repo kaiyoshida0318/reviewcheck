@@ -501,7 +501,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.8.1</span>
+    <span class="build-date">v6.9</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -1024,7 +1024,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.8.1
+// reviewcheck v6.9
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1212,7 +1212,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.8.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.9' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -1810,24 +1810,25 @@ function _reviewPageUrl(itemCode) {
 }
 
 // ── 星表示 ──
-// ── レビュー点数の色分け（5段階） ──
-// 4.5以上: 青、 4.2-4.5未満: 緑、 4.0-4.2未満: オレンジ、 4.0未満（0含む）: 赤
+// ── レビュー点数の色分け（4段階） ──
+// v6.9: 4.50以上: 青、 4.25-4.50未満: 緑、 4.00-4.25未満: オレンジ、 4.00未満（0含む）: 赤
 function _reviewScoreColor(avg) {
   const v = avg || 0;
-  if (v >= 4.5) return '#1976d2';   // 青
-  if (v >= 4.2) return '#1d9e75';   // 緑（既存の--greenと揃える）
-  if (v >= 4.0) return '#ed8936';   // オレンジ
-  return '#a32d2d';                 // 赤（既存の--dangerと揃える）
+  if (v >= 4.5)  return '#1976d2';   // 青
+  if (v >= 4.25) return '#1d9e75';   // 緑（既存の--greenと揃える）
+  if (v >= 4.0)  return '#ed8936';   // オレンジ
+  return '#a32d2d';                  // 赤（既存の--dangerと揃える）
 }
 
 // ── 点数バンドの判定（フィルタ用） ──
-// 'unrated' (0件) / 'high' (4.5-) / 'mid' (4.2-4.5) / 'low' (4.0-4.2) / 'poor' (-4.0)
+// 'unrated' (0件) / 'high' (4.50-) / 'mid' (4.25-4.50) / 'low' (4.00-4.25) / 'poor' (-4.00)
 function _scoreBandOf(reviewCount, reviewAvg) {
   if (!reviewCount || reviewCount === 0) return 'unrated';
   const v = reviewAvg || 0;
-  if (v >= 4.5) return 'high';
-  if (v >= 4.2) return 'mid';
-  if (v >= 4.0) return 'low';
+  // v6.9: 評価帯を細分化(4.25 で mid/low を分割)
+  if (v >= 4.5)  return 'high';
+  if (v >= 4.25) return 'mid';
+  if (v >= 4.0)  return 'low';
   return 'poor';
 }
 
@@ -2085,12 +2086,12 @@ function renderSidebar() {
     }
   }
   const bandDefs = [
-    { key: 'all',     label: '全て',       color: null,      icon: '' },
-    { key: 'high',    label: '4.5 〜',     color: '#1976d2', icon: '★ ' },
-    { key: 'mid',     label: '4.2 〜 4.5', color: '#1d9e75', icon: '★ ' },
-    { key: 'low',     label: '4.0 〜 4.2', color: '#ed8936', icon: '★ ' },
-    { key: 'poor',    label: '〜 4.0',     color: '#a32d2d', icon: '★ ' },
-    { key: 'unrated', label: '未評価',     color: null,      icon: '★ ' },
+    { key: 'all',     label: '全て',         color: null,      icon: '' },
+    { key: 'high',    label: '4.50-',        color: '#1976d2', icon: '★ ' },
+    { key: 'mid',     label: '4.25-4.50',    color: '#1d9e75', icon: '★ ' },
+    { key: 'low',     label: '4.00-4.25',    color: '#ed8936', icon: '★ ' },
+    { key: 'poor',    label: '-4.00',        color: '#a32d2d', icon: '★ ' },
+    { key: 'unrated', label: '未評価',       color: null,      icon: '★ ' },
   ];
   let scoreHtml = '';
   for (const b of bandDefs) {
@@ -4284,7 +4285,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.8.1 initialized');
+  console.log('[reviewcheck] v6.9 initialized');
 }
 
 init();
