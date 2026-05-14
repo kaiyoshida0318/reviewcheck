@@ -508,7 +508,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.10.1</span>
+    <span class="build-date">v6.10.2</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -630,8 +630,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-review" id="sortHeader-review">
                 <div class="review-sort-head">
                   <span class="review-sort-buttons">
-                    <span class="review-sort-btn" onclick="setSortKey('review')" id="sortBtn-review" title="件数で並べ替え">件数<span class="sort-indicator" id="sortInd-review"></span></span>
                     <span class="review-sort-btn" onclick="setSortKey('reviewAvg')" id="sortBtn-reviewAvg" title="評価で並べ替え">評価<span class="sort-indicator" id="sortInd-reviewAvg"></span></span>
+                    <span class="review-sort-btn" onclick="setSortKey('review')" id="sortBtn-review" title="件数で並べ替え">件数<span class="sort-indicator" id="sortInd-review"></span></span>
                   </span>
                 </div>
               </th>
@@ -1226,7 +1226,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.10.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.10.2' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -4327,7 +4327,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.10.1 initialized');
+  console.log('[reviewcheck] v6.10.2 initialized');
 }
 
 init();
