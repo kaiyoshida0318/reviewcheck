@@ -174,6 +174,14 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table thead th .sort-indicator { display: inline-block; margin-left: 4px; color: var(--text3); font-size: 10px; min-width: 10px; }
 .product-table thead th.sort-active { color: var(--text); }
 .product-table thead th.sort-active .sort-indicator { color: var(--accent); font-weight: 700; }
+/* v6.10: レビュー列の2ボタンヘッダー(件数/評価それぞれ独立ソート) */
+.review-sort-head { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; }
+.review-sort-title { font-size: 11px; color: var(--text3); }
+.review-sort-buttons { display: inline-flex; gap: 6px; }
+.review-sort-btn { display: inline-flex; align-items: center; cursor: pointer; user-select: none; padding: 2px 6px; border-radius: 3px; font-size: 11px; color: var(--text2); font-weight: 600; transition: background 0.1s, color 0.1s; }
+.review-sort-btn:hover { background: #ebe9e3; color: var(--text); }
+.review-sort-btn.sort-active { color: var(--text); background: rgba(191,0,0,0.05); }
+.review-sort-btn.sort-active .sort-indicator { color: var(--accent); font-weight: 700; }
 .product-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .product-table tbody tr { transition: background 0.1s; }
 .product-table tbody tr:hover { background: var(--surface2); }
@@ -501,7 +509,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.9</span>
+    <span class="build-date">v6.10</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -620,7 +628,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
               <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
-              <th class="col-review sortable" onclick="setSortKey('review')" id="sortHeader-review">レビュー <span class="sort-indicator" id="sortInd-review"></span></th>
+              <th class="col-review" id="sortHeader-review">
+                <div class="review-sort-head">
+                  <span class="review-sort-title">レビュー</span>
+                  <span class="review-sort-buttons">
+                    <span class="review-sort-btn" onclick="setSortKey('review')" id="sortBtn-review" title="件数で並べ替え">件数<span class="sort-indicator" id="sortInd-review"></span></span>
+                    <span class="review-sort-btn" onclick="setSortKey('reviewAvg')" id="sortBtn-reviewAvg" title="評価で並べ替え">評価<span class="sort-indicator" id="sortInd-reviewAvg"></span></span>
+                  </span>
+                </div>
+              </th>
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
@@ -1024,7 +1040,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.9
+// reviewcheck v6.10
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1212,7 +1228,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.9' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.10' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -1933,6 +1949,16 @@ function renderProducts() {
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'review':     cmp = (pa.reviewCount || 0) - (pb.reviewCount || 0); break; // 昇順比較(▲表示時に少→多)
+      case 'reviewAvg': {
+        // v6.10: 評価点(reviewAvg)による昇順比較。
+        // レビュー0件の商品は reviewAvg=0 になっていることが多いが、
+        // 「未評価」を昇順時に末尾、降順時にも末尾(=評価あり商品を優先)にしたいので
+        // 0件商品は -1 として扱う(0未満は通常ありえない)
+        const va = (pa.reviewCount > 0) ? (pa.reviewAvg || 0) : -1;
+        const vb = (pb.reviewCount > 0) ? (pb.reviewAvg || 0) : -1;
+        cmp = va - vb;
+        break;
+      }
       case 'sales': {
         const md = monthlySales[currentSalesMonth] || {};
         const sa = (md[a] && md[a].sales) || 0;
@@ -1986,7 +2012,7 @@ function renderProducts() {
 }
 
 // ── 列ヘッダーソート ──
-let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'review'
+let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'review' | 'reviewAvg'
 let currentSortDir = 'asc';     // 'asc' | 'desc'
 function setSortKey(key) {
   if (currentSortKey === key) {
@@ -1994,13 +2020,15 @@ function setSortKey(key) {
     currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
   } else {
     currentSortKey = key;
-    // 数値系列: 多い順スタート(降順)
-    currentSortDir = (key === 'review' || key === 'sales' || key === 'onscreen' || key === 'diff' || key === 'growth') ? 'desc' : 'asc';
+    // 数値系列: 多い順スタート(降順) ※v6.10: reviewAvg も追加
+    currentSortDir = (key === 'review' || key === 'reviewAvg' || key === 'sales' || key === 'onscreen' || key === 'diff' || key === 'growth') ? 'desc' : 'asc';
   }
   renderProducts();
 }
 function _updateSortIndicators() {
-  ['code', 'itemNumber', 'name', 'review', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
+  // v6.10: review/reviewAvg は <th> ではなく内側の <span class="review-sort-btn"> で制御
+  // それ以外のキーは従来通り <th id="sortHeader-XX"> で制御
+  ['code', 'itemNumber', 'name', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
@@ -2012,6 +2040,22 @@ function _updateSortIndicators() {
       ind.textContent = '';
     }
   });
+  // レビュー列の2ボタン(件数 / 評価)
+  ['review', 'reviewAvg'].forEach(k => {
+    const btn = document.getElementById('sortBtn-' + k);
+    const ind = document.getElementById('sortInd-' + k);
+    if (!btn || !ind) return;
+    if (k === currentSortKey) {
+      btn.classList.add('sort-active');
+      ind.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+    } else {
+      btn.classList.remove('sort-active');
+      ind.textContent = '';
+    }
+  });
+  // レビュー列の <th> 自体には sort-active を付けない(2ボタン構成なので)
+  const reviewTh = document.getElementById('sortHeader-review');
+  if (reviewTh) reviewTh.classList.remove('sort-active');
 }
 
 // ── カテゴリ抽出 ──
@@ -4285,7 +4329,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.9 initialized');
+  console.log('[reviewcheck] v6.10 initialized');
 }
 
 init();
