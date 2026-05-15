@@ -508,7 +508,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.10.2</span>
+    <span class="build-date">v6.11</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -521,7 +521,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
     <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
-    <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📋 商品番号・商品名取得</button>
+    <button class="header-btn" onclick="openDataMenuModal()" id="fetchBtn">📋 商品番号・商品名</button>
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
@@ -653,8 +653,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- Data menu modal -->
 <div class="modal-overlay" id="dataMenuModal">
   <div class="modal" style="max-width:520px">
-    <h3>📋 商品番号・商品名取得</h3>
-    <p>CSVファイルから商品番号・商品名・分類など各種データを取り込みます。</p>
+    <h3>📋 商品番号・商品名</h3>
+    <p>CSVファイルから商品番号・商品名・分類など各種データを取り込み、または現在のデータをエクスポートできます。</p>
     <div class="menu-modal-actions">
       <button class="menu-action-btn" onclick="closeDataMenuModal();document.getElementById('csvFileInput').click()">
         <div class="action-title"><span class="action-title-icon">📋</span><span>商品番号一括入力</span></div>
@@ -663,6 +663,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
       <button class="menu-action-btn" onclick="closeDataMenuModal();document.getElementById('mappingFileInput').click()">
         <div class="action-title"><span class="action-title-icon">📊</span><span>選択データ一括更新</span></div>
         <div class="action-desc">任意のCSVファイルをアップロードしてプレビューを確認し、どのカラムをreviewcheckのどのフィールドに反映させるかを選択してから一括更新します。データ分析シート等から柔軟にデータを取り込めます。</div>
+      </button>
+      <!-- v6.11: 商品データのCSVエクスポート -->
+      <button class="menu-action-btn" onclick="closeDataMenuModal();exportProductMappingCSV()">
+        <div class="action-title"><span class="action-title-icon">⬇</span><span>商品番号・商品名エクスポート</span></div>
+        <div class="action-desc">現在の全商品(引退済含む)の「商品管理番号 / 商品番号 / 商品名」をCSVファイルとしてダウンロードします。バックアップや他システム連携にどうぞ。</div>
       </button>
     </div>
     <div class="modal-actions">
@@ -1038,7 +1043,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.10.1
+// reviewcheck v6.11
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1226,7 +1231,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.10.2' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.11' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2960,6 +2965,58 @@ function openDataMenuModal() {
 function closeDataMenuModal() {
   document.getElementById('dataMenuModal').classList.remove('open');
 }
+
+// ── v6.11: 商品マッピング(商品管理番号/商品番号/商品名)のCSVエクスポート ──
+// 全商品(引退済含む)を対象に、3列のみのシンプルなCSVを生成してダウンロード
+function exportProductMappingCSV() {
+  const rows = [];
+  // ヘッダー行
+  rows.push(['商品管理番号', '商品番号', '商品名']);
+  // 商品管理番号(code)昇順で並べる
+  const codes = Object.keys(productCache).sort();
+  for (const code of codes) {
+    const p = productCache[code] || {};
+    rows.push([code, p.itemNumber || '', p.name || '']);
+  }
+  if (rows.length <= 1) {
+    alert('エクスポート可能な商品がありません。');
+    return;
+  }
+  // CSV化(Excel互換のためBOM付き、ダブルクオートエスケープ)
+  const escapeCell = (v) => {
+    const s = String(v == null ? '' : v);
+    // ダブルクオート、カンマ、改行いずれかが含まれていたら引用
+    if (/["\n\r,]/.test(s)) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  };
+  const csvBody = rows.map(r => r.map(escapeCell).join(',')).join('\r\n');
+  const csvText = '\uFEFF' + csvBody; // UTF-8 BOM(Excel日本語対応)
+
+  // ファイル名: 店舗ID + 日時
+  const shopId = _getCurrentShopId() || 'shop';
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const filename = `reviewcheck_${shopId}_商品番号_${yyyy}${mm}${dd}_${hh}${mi}.csv`;
+
+  // ダウンロード
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  console.log(`[reviewcheck] CSV エクスポート完了: ${filename} (${rows.length - 1}商品)`);
+}
 function openSetupMenuModal() {
   document.getElementById('setupMenuModal').classList.add('open');
 }
@@ -4327,7 +4384,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.10.2 initialized');
+  console.log('[reviewcheck] v6.11 initialized');
 }
 
 init();
