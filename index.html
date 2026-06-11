@@ -397,6 +397,12 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .modal-label { display: block; font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
 .modal-input { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: inherit; }
 .modal-input:focus { outline: none; border-color: var(--accent); }
+/* v6.11.1: PAT入力欄の表示切替ボタン */
+.pat-input-wrap { position: relative; display: block; }
+.pat-input-wrap .pat-input { padding-right: 38px; }
+.pat-toggle-btn { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); background: transparent; border: none; padding: 4px 8px; cursor: pointer; font-size: 16px; line-height: 1; color: var(--text3); border-radius: 4px; transition: background 0.1s, color 0.1s; }
+.pat-toggle-btn:hover { background: #ebe9e3; color: var(--text); }
+.pat-toggle-btn.active { color: var(--accent); }
 .modal-hint { font-size: 10px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
 .modal-status { font-size: 11px; padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 10px; min-height: 32px; }
 .modal-status.ok { background: #e6f9f1; color: var(--green); }
@@ -508,7 +514,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.11</span>
+    <span class="build-date">v6.11.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -950,7 +956,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
     </div>
     <div class="modal-field">
       <label class="modal-label">GitHub PAT（データ共有用・任意）</label>
-      <input type="password" class="modal-input" id="githubPatInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <div class="pat-input-wrap">
+        <input type="password" class="modal-input pat-input" id="githubPatInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <button type="button" class="pat-toggle-btn" id="patToggleBtn" onclick="togglePatVisibility()" title="表示/非表示を切り替え" aria-label="PAT表示切り替え">👁</button>
+      </div>
       <div class="modal-hint">入力すると全PCでデータを共有できます。GitHubのSettings → Developer settings → Personal access tokens で発行（repo権限）。</div>
     </div>
     <div id="modalStatus" class="modal-status"></div>
@@ -1043,7 +1052,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.11
+// reviewcheck v6.11.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1231,7 +1240,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.11' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.11.1' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3039,6 +3048,28 @@ function loadSettings() {
   document.getElementById('githubPatInput').value = localStorage.getItem('github_pat') || '';
   document.getElementById('modalStatus').className = 'modal-status';
   document.getElementById('modalStatus').textContent = '';
+  // v6.11.1: モーダルを開くたびにPATは必ず非表示状態にリセット
+  const patInput = document.getElementById('githubPatInput');
+  const patBtn = document.getElementById('patToggleBtn');
+  if (patInput) patInput.type = 'password';
+  if (patBtn) { patBtn.classList.remove('active'); patBtn.textContent = '👁'; }
+}
+// v6.11.1: GitHub PAT の表示/非表示を切り替え(1クリックで全文表示)
+function togglePatVisibility() {
+  const input = document.getElementById('githubPatInput');
+  const btn   = document.getElementById('patToggleBtn');
+  if (!input || !btn) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.classList.add('active');
+    btn.textContent = '🙈';
+    btn.title = 'クリックで非表示にする';
+  } else {
+    input.type = 'password';
+    btn.classList.remove('active');
+    btn.textContent = '👁';
+    btn.title = 'クリックで表示する';
+  }
 }
 function saveSettings() {
   const appId     = document.getElementById('appIdInput').value.trim();
@@ -4384,7 +4415,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.11 initialized');
+  console.log('[reviewcheck] v6.11.1 initialized');
 }
 
 init();
