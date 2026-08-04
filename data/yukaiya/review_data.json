@@ -7,10 +7,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-25-05-mori-01.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-25-05-mori-02a.jpg"
       ],
-      "reviewCount": 152,
+      "reviewCount": 153,
       "reviewAvg": 4.59,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/565955/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "si-25-05",
       "onScreenCount": 120,
       "tags": {},
@@ -101,7 +101,8 @@
         "2026-08-01": 151,
         "2026-08-02": 151,
         "2026-08-03": 151,
-        "2026-08-04": 152
+        "2026-08-04": 152,
+        "2026-08-05": 153
       }
     },
     "10000176": {
@@ -114,7 +115,7 @@
       "reviewCount": 13,
       "reviewAvg": 4.31,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000176/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cab-16-02-01",
       "onScreenCount": null,
       "reviewHistory": {
@@ -204,7 +205,8 @@
         "2026-08-01": 13,
         "2026-08-02": 13,
         "2026-08-03": 13,
-        "2026-08-04": 13
+        "2026-08-04": 13,
+        "2026-08-05": 13
       }
     },
     "10000255": {
@@ -263,7 +265,7 @@
       "reviewCount": 4,
       "reviewAvg": 4.25,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000256/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-01-blue",
       "status": "ignore",
       "reviewHistory": {
@@ -353,7 +355,8 @@
         "2026-08-01": 4,
         "2026-08-02": 4,
         "2026-08-03": 4,
-        "2026-08-04": 4
+        "2026-08-04": 4,
+        "2026-08-05": 4
       }
     },
     "10000257": {
@@ -366,7 +369,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000257/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-01-brown",
       "status": "ignore",
       "reviewHistory": {
@@ -456,7 +459,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000258": {
@@ -469,7 +473,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000258/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-01-gray",
       "status": "ignore",
       "reviewHistory": {
@@ -559,7 +563,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000259": {
@@ -572,7 +577,7 @@
       "reviewCount": 3,
       "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000259/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-01-green",
       "status": "ignore",
       "reviewHistory": {
@@ -653,7 +658,8 @@
         "2026-08-01": 3,
         "2026-08-02": 3,
         "2026-08-03": 3,
-        "2026-08-04": 3
+        "2026-08-04": 3,
+        "2026-08-05": 3
       }
     },
     "10000260": {
@@ -666,7 +672,7 @@
       "reviewCount": 3,
       "reviewAvg": 3.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000260/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-01-navy",
       "status": "ignore",
       "reviewHistory": {
@@ -756,7 +762,8 @@
         "2026-08-01": 3,
         "2026-08-02": 3,
         "2026-08-03": 3,
-        "2026-08-04": 3
+        "2026-08-04": 3,
+        "2026-08-05": 3
       }
     },
     "10000262": {
@@ -835,7 +842,7 @@
       "reviewCount": 2,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000263/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-01-purple",
       "status": "ignore",
       "reviewHistory": {
@@ -925,7 +932,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000264": {
@@ -1097,7 +1105,7 @@
       "reviewCount": 2,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000266/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-01-yellow",
       "status": "ignore",
       "reviewHistory": {
@@ -1187,7 +1195,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000269": {
@@ -1246,7 +1255,7 @@
       "reviewCount": 21,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000397/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "neck-pair-01",
       "reviewHistory": {
         "2026-05-08": 20,
@@ -1335,7 +1344,8 @@
         "2026-08-01": 21,
         "2026-08-02": 21,
         "2026-08-03": 21,
-        "2026-08-04": 21
+        "2026-08-04": 21,
+        "2026-08-05": 21
       }
     },
     "10000469": {
@@ -1348,7 +1358,7 @@
       "reviewCount": 19,
       "reviewAvg": 4.37,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000469/",
-      "lastFetched": "2026-08-03T21:57:26.314Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "wat-18-01",
       "status": "ignore",
       "tags": {},
@@ -1439,7 +1449,8 @@
         "2026-08-01": 19,
         "2026-08-02": 19,
         "2026-08-03": 19,
-        "2026-08-04": 19
+        "2026-08-04": 19,
+        "2026-08-05": 19
       }
     },
     "10000472": {
@@ -1452,7 +1463,7 @@
       "reviewCount": 41,
       "reviewAvg": 4.37,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000472/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-18-04-set",
       "reviewHistory": {
         "2026-05-08": 41,
@@ -1541,7 +1552,8 @@
         "2026-08-01": 41,
         "2026-08-02": 41,
         "2026-08-03": 41,
-        "2026-08-04": 41
+        "2026-08-04": 41,
+        "2026-08-05": 41
       }
     },
     "10000473": {
@@ -1554,7 +1566,7 @@
       "reviewCount": 82,
       "reviewAvg": 3.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000473/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-18-05-set",
       "tags": {
         "renewal": true
@@ -1646,7 +1658,8 @@
         "2026-08-01": 82,
         "2026-08-02": 82,
         "2026-08-03": 82,
-        "2026-08-04": 82
+        "2026-08-04": 82,
+        "2026-08-05": 82
       }
     },
     "10000527": {
@@ -1659,7 +1672,7 @@
       "reviewCount": 93,
       "reviewAvg": 4.59,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000527/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "eq-24-01",
       "onScreenCount": 90,
       "tags": {},
@@ -1750,7 +1763,8 @@
         "2026-08-01": 93,
         "2026-08-02": 93,
         "2026-08-03": 93,
-        "2026-08-04": 93
+        "2026-08-04": 93,
+        "2026-08-05": 93
       }
     },
     "10000563": {
@@ -1763,7 +1777,7 @@
       "reviewCount": 3,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000563/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "wat-18-07",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -1852,7 +1866,8 @@
         "2026-08-01": 3,
         "2026-08-02": 3,
         "2026-08-03": 3,
-        "2026-08-04": 3
+        "2026-08-04": 3,
+        "2026-08-05": 3
       }
     },
     "10000565": {
@@ -1865,7 +1880,7 @@
       "reviewCount": 17,
       "reviewAvg": 4.12,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000565/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "wat-18-08-set",
       "reviewHistory": {
         "2026-05-08": 16,
@@ -1954,7 +1969,8 @@
         "2026-08-01": 17,
         "2026-08-02": 17,
         "2026-08-03": 17,
-        "2026-08-04": 17
+        "2026-08-04": 17,
+        "2026-08-05": 17
       }
     },
     "10000571": {
@@ -1967,7 +1983,7 @@
       "reviewCount": 17,
       "reviewAvg": 3.71,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000571/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-18-14-set",
       "reviewHistory": {
         "2026-05-08": 16,
@@ -2056,7 +2072,8 @@
         "2026-08-01": 17,
         "2026-08-02": 17,
         "2026-08-03": 17,
-        "2026-08-04": 17
+        "2026-08-04": 17,
+        "2026-08-05": 17
       }
     },
     "10000588": {
@@ -2069,7 +2086,7 @@
       "reviewCount": 130,
       "reviewAvg": 4.49,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000588/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "sb-01",
       "onScreenCount": 118,
       "reviewHistory": {
@@ -2159,7 +2176,8 @@
         "2026-08-01": 130,
         "2026-08-02": 130,
         "2026-08-03": 130,
-        "2026-08-04": 130
+        "2026-08-04": 130,
+        "2026-08-05": 130
       }
     },
     "10000595": {
@@ -2172,7 +2190,7 @@
       "reviewCount": 19,
       "reviewAvg": 4.68,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000595/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "bg-01-con-20set",
       "reviewHistory": {
         "2026-05-08": 18,
@@ -2261,7 +2279,8 @@
         "2026-08-01": 19,
         "2026-08-02": 19,
         "2026-08-03": 19,
-        "2026-08-04": 19
+        "2026-08-04": 19,
+        "2026-08-05": 19
       }
     },
     "10000603": {
@@ -2274,7 +2293,7 @@
       "reviewCount": 1,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000603/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-12",
       "reviewHistory": {
         "2026-05-08": 1,
@@ -2363,7 +2382,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10000604": {
@@ -2376,7 +2396,7 @@
       "reviewCount": 2,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000604/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-14",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -2465,7 +2485,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000605": {
@@ -2478,7 +2499,7 @@
       "reviewCount": 1,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000605/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-16",
       "reviewHistory": {
         "2026-05-08": 1,
@@ -2552,7 +2573,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10000606": {
@@ -2565,7 +2587,7 @@
       "reviewCount": 5,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000606/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-18",
       "reviewHistory": {
         "2026-05-08": 5,
@@ -2654,7 +2676,8 @@
         "2026-08-01": 5,
         "2026-08-02": 5,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10000607": {
@@ -2667,7 +2690,7 @@
       "reviewCount": 11,
       "reviewAvg": 4.36,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000607/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-20",
       "reviewHistory": {
         "2026-05-08": 11,
@@ -2756,7 +2779,8 @@
         "2026-08-01": 11,
         "2026-08-02": 11,
         "2026-08-03": 11,
-        "2026-08-04": 11
+        "2026-08-04": 11,
+        "2026-08-05": 11
       }
     },
     "10000610": {
@@ -2769,7 +2793,7 @@
       "reviewCount": 1,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000610/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-24",
       "reviewHistory": {
         "2026-05-08": 1,
@@ -2858,7 +2882,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10000612": {
@@ -2871,7 +2896,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000612/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-28",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -2960,7 +2985,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000613": {
@@ -2973,7 +2999,7 @@
       "reviewCount": 2,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000613/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-30",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -3062,7 +3088,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000634": {
@@ -3075,7 +3102,7 @@
       "reviewCount": 37,
       "reviewAvg": 4.43,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000634/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-sma-04-set2",
       "reviewHistory": {
         "2026-05-08": 37,
@@ -3164,7 +3191,8 @@
         "2026-08-01": 37,
         "2026-08-02": 37,
         "2026-08-03": 37,
-        "2026-08-04": 37
+        "2026-08-04": 37,
+        "2026-08-05": 37
       }
     },
     "10000732": {
@@ -3177,7 +3205,7 @@
       "reviewCount": 51,
       "reviewAvg": 4.22,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000732/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-02",
       "reviewHistory": {
         "2026-05-08": 49,
@@ -3266,7 +3294,8 @@
         "2026-08-01": 50,
         "2026-08-02": 50,
         "2026-08-03": 51,
-        "2026-08-04": 51
+        "2026-08-04": 51,
+        "2026-08-05": 51
       }
     },
     "10000754": {
@@ -3279,7 +3308,7 @@
       "reviewCount": 51,
       "reviewAvg": 3.8,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000754/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-18-22-0set",
       "reviewHistory": {
         "2026-05-08": 50,
@@ -3368,7 +3397,8 @@
         "2026-08-01": 51,
         "2026-08-02": 51,
         "2026-08-03": 51,
-        "2026-08-04": 51
+        "2026-08-04": 51,
+        "2026-08-05": 51
       }
     },
     "10000773": {
@@ -3381,7 +3411,7 @@
       "reviewCount": 13,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000773/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "wat-18-07-set2",
       "reviewHistory": {
         "2026-05-08": 13,
@@ -3470,7 +3500,8 @@
         "2026-08-01": 13,
         "2026-08-02": 13,
         "2026-08-03": 13,
-        "2026-08-04": 13
+        "2026-08-04": 13,
+        "2026-08-05": 13
       }
     },
     "10000797": {
@@ -3571,7 +3602,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000805/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "bloop-18-01-26a",
       "reviewHistory": {
         "2026-05-08": 0,
@@ -3660,7 +3691,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000812": {
@@ -3673,7 +3705,7 @@
       "reviewCount": 44,
       "reviewAvg": 3.95,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000812/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "nt-19-01a",
       "status": "ignore",
       "reviewHistory": {
@@ -3763,7 +3795,8 @@
         "2026-08-01": 44,
         "2026-08-02": 44,
         "2026-08-03": 44,
-        "2026-08-04": 44
+        "2026-08-04": 44,
+        "2026-08-05": 44
       }
     },
     "10000823": {
@@ -3776,7 +3809,7 @@
       "reviewCount": 1,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000823/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-02-green",
       "status": "ignore",
       "reviewHistory": {
@@ -3866,7 +3899,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10000824": {
@@ -3879,7 +3913,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000824/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-02-navy",
       "status": "ignore",
       "reviewHistory": {
@@ -3969,7 +4003,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000825": {
@@ -3982,7 +4017,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000825/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-02-orange",
       "status": "ignore",
       "reviewHistory": {
@@ -4072,7 +4107,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000826": {
@@ -4085,7 +4121,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000826/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-02-purple",
       "status": "ignore",
       "reviewHistory": {
@@ -4175,7 +4211,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000827": {
@@ -4188,7 +4225,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000827/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-02-red2",
       "status": "ignore",
       "reviewHistory": {
@@ -4278,7 +4315,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10000828": {
@@ -4291,7 +4329,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000828/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "fas-16-02-yellow",
       "status": "ignore",
       "reviewHistory": {
@@ -4381,7 +4419,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10000830": {
@@ -4394,7 +4433,7 @@
       "reviewCount": 20,
       "reviewAvg": 4.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000830/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "neck-long-1",
       "status": "normal",
       "tags": {},
@@ -4485,7 +4524,8 @@
         "2026-08-01": 20,
         "2026-08-02": 20,
         "2026-08-03": 20,
-        "2026-08-04": 20
+        "2026-08-04": 20,
+        "2026-08-05": 20
       }
     },
     "10000834": {
@@ -4498,7 +4538,7 @@
       "reviewCount": 22,
       "reviewAvg": 4.64,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000834/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "pc-19-02",
       "status": "ignore",
       "reviewHistory": {
@@ -4588,7 +4628,8 @@
         "2026-08-01": 22,
         "2026-08-02": 22,
         "2026-08-03": 22,
-        "2026-08-04": 22
+        "2026-08-04": 22,
+        "2026-08-05": 22
       }
     },
     "10000846": {
@@ -4601,7 +4642,7 @@
       "reviewCount": 9,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000846/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "bloop-18-01-22a",
       "reviewHistory": {
         "2026-05-08": 9,
@@ -4690,7 +4731,8 @@
         "2026-08-01": 9,
         "2026-08-02": 9,
         "2026-08-03": 9,
-        "2026-08-04": 9
+        "2026-08-04": 9,
+        "2026-08-05": 9
       }
     },
     "10000901": {
@@ -4703,7 +4745,7 @@
       "reviewCount": 222,
       "reviewAvg": 4.43,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10000901/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "sb-04",
       "reviewHistory": {
         "2026-05-08": 218,
@@ -4792,7 +4834,8 @@
         "2026-08-01": 222,
         "2026-08-02": 222,
         "2026-08-03": 222,
-        "2026-08-04": 222
+        "2026-08-04": 222,
+        "2026-08-05": 222
       }
     },
     "10001032": {
@@ -4805,7 +4848,7 @@
       "reviewCount": 46,
       "reviewAvg": 3.98,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001032/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-fb-12",
       "status": "ignore",
       "reviewHistory": {
@@ -4895,7 +4938,8 @@
         "2026-08-01": 46,
         "2026-08-02": 46,
         "2026-08-03": 46,
-        "2026-08-04": 46
+        "2026-08-04": 46,
+        "2026-08-05": 46
       }
     },
     "10001036": {
@@ -4908,7 +4952,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001036/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "fas-16-01-orange1",
       "status": "ignore",
       "reviewHistory": {
@@ -4998,7 +5042,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001057": {
@@ -5011,7 +5056,7 @@
       "reviewCount": 320,
       "reviewAvg": 4.54,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001057/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "tape-24-02",
       "onScreenCount": 145,
       "reviewHistory": {
@@ -5101,7 +5146,8 @@
         "2026-08-01": 319,
         "2026-08-02": 319,
         "2026-08-03": 320,
-        "2026-08-04": 320
+        "2026-08-04": 320,
+        "2026-08-05": 320
       }
     },
     "10001063": {
@@ -5114,7 +5160,7 @@
       "reviewCount": 2,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001063/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "tape-24-03-hera",
       "status": "ignore",
       "reviewHistory": {
@@ -5204,7 +5250,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001067": {
@@ -5217,7 +5264,7 @@
       "reviewCount": 612,
       "reviewAvg": 4.58,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001067/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "wat-sma-01",
       "status": "normal",
       "tags": {},
@@ -5308,7 +5355,8 @@
         "2026-08-01": 612,
         "2026-08-02": 612,
         "2026-08-03": 612,
-        "2026-08-04": 612
+        "2026-08-04": 612,
+        "2026-08-05": 612
       }
     },
     "10001069": {
@@ -5420,7 +5468,7 @@
       "reviewCount": 16,
       "reviewAvg": 4.63,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001072/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "bg-08-usb-mesu-20set",
       "reviewHistory": {
         "2026-05-08": 14,
@@ -5509,7 +5557,8 @@
         "2026-08-01": 16,
         "2026-08-02": 16,
         "2026-08-03": 16,
-        "2026-08-04": 16
+        "2026-08-04": 16,
+        "2026-08-05": 16
       }
     },
     "10001083": {
@@ -5522,7 +5571,7 @@
       "reviewCount": 12,
       "reviewAvg": 4.58,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001083/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "bg-07-usb-osu-20set",
       "reviewHistory": {
         "2026-05-08": 11,
@@ -5611,7 +5660,8 @@
         "2026-08-01": 12,
         "2026-08-02": 12,
         "2026-08-03": 12,
-        "2026-08-04": 12
+        "2026-08-04": 12,
+        "2026-08-05": 12
       }
     },
     "10001087": {
@@ -5624,7 +5674,7 @@
       "reviewCount": 12,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001087/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "tape-24-04-heraset",
       "reviewHistory": {
         "2026-05-08": 12,
@@ -5713,7 +5763,8 @@
         "2026-08-01": 12,
         "2026-08-02": 12,
         "2026-08-03": 12,
-        "2026-08-04": 12
+        "2026-08-04": 12,
+        "2026-08-05": 12
       }
     },
     "10001095": {
@@ -5726,7 +5777,7 @@
       "reviewCount": 209,
       "reviewAvg": 4.71,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001095/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "mus-01-set",
       "onScreenCount": 192,
       "reviewHistory": {
@@ -5816,7 +5867,8 @@
         "2026-08-01": 209,
         "2026-08-02": 209,
         "2026-08-03": 209,
-        "2026-08-04": 209
+        "2026-08-04": 209,
+        "2026-08-05": 209
       }
     },
     "10001096": {
@@ -5826,10 +5878,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-21-01-a-01b.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-21-01-a-02.jpg"
       ],
-      "reviewCount": 1948,
+      "reviewCount": 1949,
       "reviewAvg": 4.66,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001096/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "ih-21-01",
       "onScreenCount": 1635,
       "reviewHistory": {
@@ -5919,7 +5971,8 @@
         "2026-08-01": 1948,
         "2026-08-02": 1948,
         "2026-08-03": 1948,
-        "2026-08-04": 1948
+        "2026-08-04": 1948,
+        "2026-08-05": 1949
       }
     },
     "10001098": {
@@ -5932,7 +5985,7 @@
       "reviewCount": 1374,
       "reviewAvg": 4.65,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001098/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ih-21-02",
       "onScreenCount": 852,
       "reviewHistory": {
@@ -6022,7 +6075,8 @@
         "2026-08-01": 1374,
         "2026-08-02": 1374,
         "2026-08-03": 1374,
-        "2026-08-04": 1374
+        "2026-08-04": 1374,
+        "2026-08-05": 1374
       }
     },
     "10001109": {
@@ -6035,7 +6089,7 @@
       "reviewCount": 52,
       "reviewAvg": 4.42,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001109/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-sma-02",
       "reviewHistory": {
         "2026-05-08": 52,
@@ -6124,7 +6178,8 @@
         "2026-08-01": 52,
         "2026-08-02": 52,
         "2026-08-03": 52,
-        "2026-08-04": 52
+        "2026-08-04": 52,
+        "2026-08-05": 52
       }
     },
     "10001110": {
@@ -6137,7 +6192,7 @@
       "reviewCount": 47,
       "reviewAvg": 4.51,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001110/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-sma-00",
       "reviewHistory": {
         "2026-05-08": 47,
@@ -6226,7 +6281,8 @@
         "2026-08-01": 47,
         "2026-08-02": 47,
         "2026-08-03": 47,
-        "2026-08-04": 47
+        "2026-08-04": 47,
+        "2026-08-05": 47
       }
     },
     "10001113": {
@@ -6239,7 +6295,7 @@
       "reviewCount": 224,
       "reviewAvg": 4.6,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001113/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-sma-01-0set2",
       "reviewHistory": {
         "2026-05-08": 223,
@@ -6328,7 +6384,8 @@
         "2026-08-01": 224,
         "2026-08-02": 224,
         "2026-08-03": 224,
-        "2026-08-04": 224
+        "2026-08-04": 224,
+        "2026-08-05": 224
       }
     },
     "10001114": {
@@ -6341,7 +6398,7 @@
       "reviewCount": 14,
       "reviewAvg": 4.64,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001114/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "wat-sma-02-0set2",
       "reviewHistory": {
         "2026-05-08": 14,
@@ -6430,7 +6487,8 @@
         "2026-08-01": 14,
         "2026-08-02": 14,
         "2026-08-03": 14,
-        "2026-08-04": 14
+        "2026-08-04": 14,
+        "2026-08-05": 14
       }
     },
     "10001116": {
@@ -6443,7 +6501,7 @@
       "reviewCount": 230,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001116/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-sma-03",
       "reviewHistory": {
         "2026-05-08": 229,
@@ -6532,7 +6590,8 @@
         "2026-08-01": 230,
         "2026-08-02": 230,
         "2026-08-03": 230,
-        "2026-08-04": 230
+        "2026-08-04": 230,
+        "2026-08-05": 230
       }
     },
     "10001118": {
@@ -6545,7 +6604,7 @@
       "reviewCount": 204,
       "reviewAvg": 4.41,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001118/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-sma-04-set1",
       "reviewHistory": {
         "2026-05-08": 201,
@@ -6634,7 +6693,8 @@
         "2026-08-01": 204,
         "2026-08-02": 204,
         "2026-08-03": 204,
-        "2026-08-04": 204
+        "2026-08-04": 204,
+        "2026-08-05": 204
       }
     },
     "10001119": {
@@ -6647,7 +6707,7 @@
       "reviewCount": 26,
       "reviewAvg": 4.46,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001119/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-sma-03-0set1",
       "status": "normal",
       "tags": {},
@@ -6738,7 +6798,8 @@
         "2026-08-01": 26,
         "2026-08-02": 26,
         "2026-08-03": 26,
-        "2026-08-04": 26
+        "2026-08-04": 26,
+        "2026-08-05": 26
       }
     },
     "10001120": {
@@ -6751,7 +6812,7 @@
       "reviewCount": 181,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001120/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "sb-02",
       "onScreenCount": 154,
       "reviewHistory": {
@@ -6841,7 +6902,8 @@
         "2026-08-01": 181,
         "2026-08-02": 181,
         "2026-08-03": 181,
-        "2026-08-04": 181
+        "2026-08-04": 181,
+        "2026-08-05": 181
       }
     },
     "10001121": {
@@ -6854,7 +6916,7 @@
       "reviewCount": 21,
       "reviewAvg": 4.14,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001121/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-sma-05",
       "reviewHistory": {
         "2026-05-08": 21,
@@ -6943,7 +7005,8 @@
         "2026-08-01": 21,
         "2026-08-02": 21,
         "2026-08-03": 21,
-        "2026-08-04": 21
+        "2026-08-04": 21,
+        "2026-08-05": 21
       }
     },
     "10001122": {
@@ -6956,7 +7019,7 @@
       "reviewCount": 19,
       "reviewAvg": 4.32,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001122/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "mus-25-04-sack",
       "reviewHistory": {
         "2026-05-08": 19,
@@ -7045,7 +7108,8 @@
         "2026-08-01": 19,
         "2026-08-02": 19,
         "2026-08-03": 19,
-        "2026-08-04": 19
+        "2026-08-04": 19,
+        "2026-08-05": 19
       }
     },
     "10001123": {
@@ -7058,7 +7122,7 @@
       "reviewCount": 161,
       "reviewAvg": 4.6,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001123/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "sb-05",
       "reviewHistory": {
         "2026-05-08": 159,
@@ -7147,7 +7211,8 @@
         "2026-08-01": 161,
         "2026-08-02": 161,
         "2026-08-03": 161,
-        "2026-08-04": 161
+        "2026-08-04": 161,
+        "2026-08-05": 161
       }
     },
     "10001124": {
@@ -7160,7 +7225,7 @@
       "reviewCount": 88,
       "reviewAvg": 4.55,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001124/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-sma-06",
       "reviewHistory": {
         "2026-05-08": 87,
@@ -7249,7 +7314,8 @@
         "2026-08-01": 88,
         "2026-08-02": 88,
         "2026-08-03": 88,
-        "2026-08-04": 88
+        "2026-08-04": 88,
+        "2026-08-05": 88
       }
     },
     "10001125": {
@@ -7262,7 +7328,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001125/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "mus-25-05-rc1",
       "reviewHistory": {
         "2026-05-08": 0,
@@ -7351,7 +7417,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001126": {
@@ -7364,7 +7431,7 @@
       "reviewCount": 5,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001126/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "mus-04",
       "reviewHistory": {
         "2026-05-08": 5,
@@ -7451,7 +7518,8 @@
         "2026-07-31": 5,
         "2026-08-01": 5,
         "2026-08-02": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001127": {
@@ -7464,7 +7532,7 @@
       "reviewCount": 72,
       "reviewAvg": 4.61,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001127/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "sb-06",
       "reviewHistory": {
         "2026-05-08": 72,
@@ -7553,7 +7621,8 @@
         "2026-08-01": 72,
         "2026-08-02": 72,
         "2026-08-03": 72,
-        "2026-08-04": 72
+        "2026-08-04": 72,
+        "2026-08-05": 72
       }
     },
     "10001129": {
@@ -7566,7 +7635,7 @@
       "reviewCount": 70,
       "reviewAvg": 4.47,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001129/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "sb-08",
       "reviewHistory": {
         "2026-05-08": 70,
@@ -7655,7 +7724,8 @@
         "2026-08-01": 70,
         "2026-08-02": 70,
         "2026-08-03": 70,
-        "2026-08-04": 70
+        "2026-08-04": 70,
+        "2026-08-05": 70
       }
     },
     "10001130": {
@@ -7668,7 +7738,7 @@
       "reviewCount": 161,
       "reviewAvg": 4.25,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001130/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-fb-21-02",
       "status": "normal",
       "tags": {},
@@ -7759,7 +7829,8 @@
         "2026-08-01": 160,
         "2026-08-02": 160,
         "2026-08-03": 160,
-        "2026-08-04": 161
+        "2026-08-04": 161,
+        "2026-08-05": 161
       }
     },
     "10001131": {
@@ -7772,7 +7843,7 @@
       "reviewCount": 54,
       "reviewAvg": 4.3,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001131/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-fb-21-03",
       "reviewHistory": {
         "2026-05-08": 54,
@@ -7861,7 +7932,8 @@
         "2026-08-01": 54,
         "2026-08-02": 54,
         "2026-08-03": 54,
-        "2026-08-04": 54
+        "2026-08-04": 54,
+        "2026-08-05": 54
       }
     },
     "10001134": {
@@ -7874,7 +7946,7 @@
       "reviewCount": 80,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001134/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "cab-25-04",
       "onScreenCount": 19,
       "reviewHistory": {
@@ -7964,7 +8036,8 @@
         "2026-08-01": 79,
         "2026-08-02": 79,
         "2026-08-03": 80,
-        "2026-08-04": 80
+        "2026-08-04": 80,
+        "2026-08-05": 80
       }
     },
     "10001135": {
@@ -7977,7 +8050,7 @@
       "reviewCount": 4481,
       "reviewAvg": 4.55,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001135/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cg-22-01",
       "onScreenCount": 4108,
       "reviewHistory": {
@@ -8066,7 +8139,8 @@
         "2026-08-01": 4476,
         "2026-08-02": 4477,
         "2026-08-03": 4480,
-        "2026-08-04": 4481
+        "2026-08-04": 4481,
+        "2026-08-05": 4481
       }
     },
     "10001136": {
@@ -8079,7 +8153,7 @@
       "reviewCount": 60,
       "reviewAvg": 4.35,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001136/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "wat-fb-21-00",
       "reviewHistory": {
         "2026-05-08": 60,
@@ -8168,7 +8242,8 @@
         "2026-08-01": 60,
         "2026-08-02": 60,
         "2026-08-03": 60,
-        "2026-08-04": 60
+        "2026-08-04": 60,
+        "2026-08-05": 60
       }
     },
     "10001137": {
@@ -8181,7 +8256,7 @@
       "reviewCount": 48,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001137/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-fb-21-06",
       "reviewHistory": {
         "2026-05-08": 38,
@@ -8270,7 +8345,8 @@
         "2026-08-01": 48,
         "2026-08-02": 48,
         "2026-08-03": 48,
-        "2026-08-04": 48
+        "2026-08-04": 48,
+        "2026-08-05": 48
       }
     },
     "10001138": {
@@ -8283,7 +8359,7 @@
       "reviewCount": 13,
       "reviewAvg": 4.38,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001138/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-fb-21-07",
       "reviewHistory": {
         "2026-05-08": 13,
@@ -8372,7 +8448,8 @@
         "2026-08-01": 13,
         "2026-08-02": 13,
         "2026-08-03": 13,
-        "2026-08-04": 13
+        "2026-08-04": 13,
+        "2026-08-05": 13
       }
     },
     "10001139": {
@@ -8385,7 +8462,7 @@
       "reviewCount": 28,
       "reviewAvg": 4.21,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001139/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "wat-fb-21-08-0set",
       "reviewHistory": {
         "2026-05-08": 28,
@@ -8474,7 +8551,8 @@
         "2026-08-01": 28,
         "2026-08-02": 28,
         "2026-08-03": 28,
-        "2026-08-04": 28
+        "2026-08-04": 28,
+        "2026-08-05": 28
       }
     },
     "10001140": {
@@ -8487,7 +8565,7 @@
       "reviewCount": 2,
       "reviewAvg": 4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001140/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "wat-fb-21-09",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -8576,7 +8654,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001141": {
@@ -8589,7 +8668,7 @@
       "reviewCount": 320,
       "reviewAvg": 4.63,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001141/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "ih-22-01",
       "onScreenCount": 311,
       "reviewHistory": {
@@ -8679,7 +8758,8 @@
         "2026-08-01": 320,
         "2026-08-02": 320,
         "2026-08-03": 320,
-        "2026-08-04": 320
+        "2026-08-04": 320,
+        "2026-08-05": 320
       }
     },
     "10001142": {
@@ -8692,7 +8772,7 @@
       "reviewCount": 17,
       "reviewAvg": 4.76,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001142/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "si-22-02",
       "reviewHistory": {
         "2026-05-08": 14,
@@ -8780,7 +8860,8 @@
         "2026-08-01": 17,
         "2026-08-02": 17,
         "2026-08-03": 17,
-        "2026-08-04": 17
+        "2026-08-04": 17,
+        "2026-08-05": 17
       }
     },
     "10001143": {
@@ -8793,7 +8874,7 @@
       "reviewCount": 28,
       "reviewAvg": 4.39,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001143/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "gar-25-01",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -8883,7 +8964,8 @@
         "2026-08-01": 28,
         "2026-08-02": 28,
         "2026-08-03": 28,
-        "2026-08-04": 28
+        "2026-08-04": 28,
+        "2026-08-05": 28
       }
     },
     "10001146": {
@@ -8893,10 +8975,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/eq/a-02.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/eq/a-03b.jpg"
       ],
-      "reviewCount": 1892,
+      "reviewCount": 1895,
       "reviewAvg": 4.65,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001146/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "eq-22-01-clear",
       "onScreenCount": 1583,
       "reviewHistory": {
@@ -8986,7 +9068,8 @@
         "2026-08-01": 1888,
         "2026-08-02": 1889,
         "2026-08-03": 1891,
-        "2026-08-04": 1892
+        "2026-08-04": 1892,
+        "2026-08-05": 1895
       }
     },
     "10001149": {
@@ -8999,7 +9082,7 @@
       "reviewCount": 243,
       "reviewAvg": 4.51,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001149/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "eq-22-02a",
       "onScreenCount": 134,
       "reviewHistory": {
@@ -9089,7 +9172,8 @@
         "2026-08-01": 241,
         "2026-08-02": 241,
         "2026-08-03": 243,
-        "2026-08-04": 243
+        "2026-08-04": 243,
+        "2026-08-05": 243
       }
     },
     "10001150": {
@@ -9102,7 +9186,7 @@
       "reviewCount": 78,
       "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001150/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-22-04-00set",
       "tags": {
         "renewal": true
@@ -9194,7 +9278,8 @@
         "2026-08-01": 78,
         "2026-08-02": 78,
         "2026-08-03": 78,
-        "2026-08-04": 78
+        "2026-08-04": 78,
+        "2026-08-05": 78
       }
     },
     "10001151": {
@@ -9207,7 +9292,7 @@
       "reviewCount": 53,
       "reviewAvg": 4.45,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001151/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "gar-25-03",
       "onScreenCount": 32,
       "reviewHistory": {
@@ -9297,7 +9382,8 @@
         "2026-08-01": 53,
         "2026-08-02": 53,
         "2026-08-03": 53,
-        "2026-08-04": 53
+        "2026-08-04": 53,
+        "2026-08-05": 53
       }
     },
     "10001152": {
@@ -9310,7 +9396,7 @@
       "reviewCount": 30,
       "reviewAvg": 4.53,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001152/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "gar-25-02-set",
       "onScreenCount": 6,
       "reviewHistory": {
@@ -9400,7 +9486,8 @@
         "2026-08-01": 30,
         "2026-08-02": 30,
         "2026-08-03": 30,
-        "2026-08-04": 30
+        "2026-08-04": 30,
+        "2026-08-05": 30
       }
     },
     "10001153": {
@@ -9413,7 +9500,7 @@
       "reviewCount": 21,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001153/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "gar-feni-03-set",
       "reviewHistory": {
         "2026-05-08": 21,
@@ -9502,7 +9589,8 @@
         "2026-08-01": 21,
         "2026-08-02": 21,
         "2026-08-03": 21,
-        "2026-08-04": 21
+        "2026-08-04": 21,
+        "2026-08-05": 21
       }
     },
     "10001155": {
@@ -9512,10 +9600,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/cable2/cab-25-02-mori-01a.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/cable2/cab-25-02-mori-02a.jpg"
       ],
-      "reviewCount": 73,
-      "reviewAvg": 4.63,
+      "reviewCount": 74,
+      "reviewAvg": 4.62,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001155/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "cab-25-02",
       "onScreenCount": 50,
       "reviewHistory": {
@@ -9605,7 +9693,8 @@
         "2026-08-01": 74,
         "2026-08-02": 74,
         "2026-08-03": 74,
-        "2026-08-04": 73
+        "2026-08-04": 73,
+        "2026-08-05": 74
       }
     },
     "10001156": {
@@ -9618,7 +9707,7 @@
       "reviewCount": 1160,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001156/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cg-22-02",
       "onScreenCount": 1117,
       "reviewHistory": {
@@ -9708,7 +9797,8 @@
         "2026-08-01": 1160,
         "2026-08-02": 1160,
         "2026-08-03": 1160,
-        "2026-08-04": 1160
+        "2026-08-04": 1160,
+        "2026-08-05": 1160
       }
     },
     "10001158": {
@@ -9721,7 +9811,7 @@
       "reviewCount": 1006,
       "reviewAvg": 4.53,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001158/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-22-05",
       "onScreenCount": 823,
       "reviewHistory": {
@@ -9811,7 +9901,8 @@
         "2026-08-01": 1007,
         "2026-08-02": 1006,
         "2026-08-03": 1006,
-        "2026-08-04": 1006
+        "2026-08-04": 1006,
+        "2026-08-05": 1006
       },
       "tags": {
         "renewal": true
@@ -9827,7 +9918,7 @@
       "reviewCount": 37,
       "reviewAvg": 4.51,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001159/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "cam-21-01",
       "onScreenCount": 31,
       "reviewHistory": {
@@ -9917,7 +10008,8 @@
         "2026-08-01": 37,
         "2026-08-02": 37,
         "2026-08-03": 37,
-        "2026-08-04": 37
+        "2026-08-04": 37,
+        "2026-08-05": 37
       }
     },
     "10001160": {
@@ -9930,7 +10022,7 @@
       "reviewCount": 18,
       "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001160/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "cam-21-02",
       "reviewHistory": {
         "2026-05-08": 18,
@@ -10019,7 +10111,8 @@
         "2026-08-01": 18,
         "2026-08-02": 18,
         "2026-08-03": 18,
-        "2026-08-04": 18
+        "2026-08-04": 18,
+        "2026-08-05": 18
       }
     },
     "10001162": {
@@ -10032,7 +10125,7 @@
       "reviewCount": 34,
       "reviewAvg": 4.68,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001162/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "fel-22-01-3set",
       "onScreenCount": 31,
       "reviewHistory": {
@@ -10122,7 +10215,8 @@
         "2026-08-01": 34,
         "2026-08-02": 34,
         "2026-08-03": 34,
-        "2026-08-04": 34
+        "2026-08-04": 34,
+        "2026-08-05": 34
       }
     },
     "10001163": {
@@ -10135,7 +10229,7 @@
       "reviewCount": 165,
       "reviewAvg": 4.61,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001163/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "fel-22-02",
       "onScreenCount": 131,
       "reviewHistory": {
@@ -10225,7 +10319,8 @@
         "2026-08-01": 165,
         "2026-08-02": 165,
         "2026-08-03": 165,
-        "2026-08-04": 165
+        "2026-08-04": 165,
+        "2026-08-05": 165
       }
     },
     "10001164": {
@@ -10238,7 +10333,7 @@
       "reviewCount": 1462,
       "reviewAvg": 4.51,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001164/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cg-22-03",
       "onScreenCount": 1285,
       "reviewHistory": {
@@ -10328,7 +10423,8 @@
         "2026-08-01": 1461,
         "2026-08-02": 1461,
         "2026-08-03": 1462,
-        "2026-08-04": 1462
+        "2026-08-04": 1462,
+        "2026-08-05": 1462
       }
     },
     "10001165": {
@@ -10341,7 +10437,7 @@
       "reviewCount": 9,
       "reviewAvg": 4.56,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001165/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cg-22-04",
       "reviewHistory": {
         "2026-05-08": 9,
@@ -10429,7 +10525,8 @@
         "2026-08-01": 9,
         "2026-08-02": 9,
         "2026-08-03": 9,
-        "2026-08-04": 9
+        "2026-08-04": 9,
+        "2026-08-05": 9
       }
     },
     "10001166": {
@@ -10442,7 +10539,7 @@
       "reviewCount": 103,
       "reviewAvg": 4.47,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001166/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "foot-22-01",
       "onScreenCount": 77,
       "reviewHistory": {
@@ -10532,7 +10629,8 @@
         "2026-08-01": 103,
         "2026-08-02": 103,
         "2026-08-03": 103,
-        "2026-08-04": 103
+        "2026-08-04": 103,
+        "2026-08-05": 103
       }
     },
     "10001167": {
@@ -10545,7 +10643,7 @@
       "reviewCount": 154,
       "reviewAvg": 4.43,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001167/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "foot-22-02",
       "onScreenCount": 84,
       "reviewHistory": {
@@ -10634,7 +10732,8 @@
         "2026-08-01": 154,
         "2026-08-02": 154,
         "2026-08-03": 154,
-        "2026-08-04": 154
+        "2026-08-04": 154,
+        "2026-08-05": 154
       }
     },
     "10001168": {
@@ -10647,7 +10746,7 @@
       "reviewCount": 72,
       "reviewAvg": 4.44,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001168/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "foot-22-03-3set",
       "onScreenCount": 20,
       "reviewHistory": {
@@ -10734,7 +10833,8 @@
         "2026-07-31": 71,
         "2026-08-02": 72,
         "2026-08-03": 72,
-        "2026-08-04": 72
+        "2026-08-04": 72,
+        "2026-08-05": 72
       }
     },
     "10001169": {
@@ -10747,7 +10847,7 @@
       "reviewCount": 559,
       "reviewAvg": 4.52,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001169/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "foot-22-04-2set",
       "onScreenCount": 353,
       "reviewHistory": {
@@ -10837,7 +10937,8 @@
         "2026-08-01": 558,
         "2026-08-02": 559,
         "2026-08-03": 559,
-        "2026-08-04": 559
+        "2026-08-04": 559,
+        "2026-08-05": 559
       }
     },
     "10001172": {
@@ -10850,7 +10951,7 @@
       "reviewCount": 333,
       "reviewAvg": 4.71,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001172/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "ih-22-02a",
       "onScreenCount": 266,
       "reviewHistory": {
@@ -10940,7 +11041,8 @@
         "2026-08-01": 333,
         "2026-08-02": 333,
         "2026-08-03": 333,
-        "2026-08-04": 333
+        "2026-08-04": 333,
+        "2026-08-05": 333
       }
     },
     "10001173": {
@@ -10953,7 +11055,7 @@
       "reviewCount": 124,
       "reviewAvg": 4.56,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001173/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "cg-22-05",
       "reviewHistory": {
         "2026-05-08": 122,
@@ -11042,7 +11144,8 @@
         "2026-08-01": 124,
         "2026-08-02": 124,
         "2026-08-03": 124,
-        "2026-08-04": 124
+        "2026-08-04": 124,
+        "2026-08-05": 124
       }
     },
     "10001174": {
@@ -11055,7 +11158,7 @@
       "reviewCount": 128,
       "reviewAvg": 4.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001174/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "cg-22-06",
       "reviewHistory": {
         "2026-05-08": 125,
@@ -11144,7 +11247,8 @@
         "2026-08-01": 128,
         "2026-08-02": 128,
         "2026-08-03": 128,
-        "2026-08-04": 128
+        "2026-08-04": 128,
+        "2026-08-05": 128
       }
     },
     "10001176": {
@@ -11157,7 +11261,7 @@
       "reviewCount": 97,
       "reviewAvg": 4.69,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001176/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "si-22-01a",
       "reviewHistory": {
         "2026-05-08": 96,
@@ -11246,7 +11350,8 @@
         "2026-08-01": 97,
         "2026-08-02": 97,
         "2026-08-03": 97,
-        "2026-08-04": 97
+        "2026-08-04": 97,
+        "2026-08-05": 97
       }
     },
     "10001177": {
@@ -11259,7 +11364,7 @@
       "reviewCount": 106,
       "reviewAvg": 4.76,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001177/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "eq-22-04-clear-mat",
       "reviewHistory": {
         "2026-05-08": 106,
@@ -11348,7 +11453,8 @@
         "2026-08-01": 106,
         "2026-08-02": 106,
         "2026-08-03": 106,
-        "2026-08-04": 106
+        "2026-08-04": 106,
+        "2026-08-05": 106
       }
     },
     "10001179": {
@@ -11358,10 +11464,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-22-03a-01c.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-22-03a-02a.jpg"
       ],
-      "reviewCount": 205,
+      "reviewCount": 206,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001179/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "ih-22-03-20set",
       "onScreenCount": 171,
       "reviewHistory": {
@@ -11451,7 +11557,8 @@
         "2026-08-01": 205,
         "2026-08-02": 205,
         "2026-08-03": 205,
-        "2026-08-04": 205
+        "2026-08-04": 205,
+        "2026-08-05": 206
       }
     },
     "10001180": {
@@ -11464,7 +11571,7 @@
       "reviewCount": 688,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001180/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-24-04",
       "onScreenCount": 542,
       "reviewHistory": {
@@ -11554,7 +11661,8 @@
         "2026-08-01": 688,
         "2026-08-02": 688,
         "2026-08-03": 688,
-        "2026-08-04": 688
+        "2026-08-04": 688,
+        "2026-08-05": 688
       }
     },
     "10001181": {
@@ -11567,7 +11675,7 @@
       "reviewCount": 709,
       "reviewAvg": 4.6,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001181/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "ih-22-04-set1",
       "onScreenCount": 396,
       "reviewHistory": {
@@ -11657,7 +11765,8 @@
         "2026-08-01": 709,
         "2026-08-02": 709,
         "2026-08-03": 709,
-        "2026-08-04": 709
+        "2026-08-04": 709,
+        "2026-08-05": 709
       }
     },
     "10001182": {
@@ -11670,7 +11779,7 @@
       "reviewCount": 71,
       "reviewAvg": 4.45,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001182/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ih-22-05",
       "reviewHistory": {
         "2026-05-08": 69,
@@ -11755,7 +11864,8 @@
         "2026-07-31": 71,
         "2026-08-01": 71,
         "2026-08-03": 71,
-        "2026-08-04": 71
+        "2026-08-04": 71,
+        "2026-08-05": 71
       }
     },
     "10001183": {
@@ -11768,7 +11878,7 @@
       "reviewCount": 80,
       "reviewAvg": 4.38,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001183/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "si-22-07a",
       "reviewHistory": {
         "2026-05-08": 77,
@@ -11857,7 +11967,8 @@
         "2026-08-01": 80,
         "2026-08-02": 80,
         "2026-08-03": 80,
-        "2026-08-04": 80
+        "2026-08-04": 80,
+        "2026-08-05": 80
       },
       "tags": {
         "renewal": true
@@ -11873,7 +11984,7 @@
       "reviewCount": 59,
       "reviewAvg": 4.42,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001185/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-sma-07",
       "reviewHistory": {
         "2026-05-08": 59,
@@ -11962,7 +12073,8 @@
         "2026-08-01": 59,
         "2026-08-02": 59,
         "2026-08-03": 59,
-        "2026-08-04": 59
+        "2026-08-04": 59,
+        "2026-08-05": 59
       }
     },
     "10001186": {
@@ -11975,7 +12087,7 @@
       "reviewCount": 77,
       "reviewAvg": 4.44,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001186/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "bc-01",
       "reviewHistory": {
         "2026-05-08": 76,
@@ -12064,7 +12176,8 @@
         "2026-08-01": 77,
         "2026-08-02": 77,
         "2026-08-03": 77,
-        "2026-08-04": 77
+        "2026-08-04": 77,
+        "2026-08-05": 77
       }
     },
     "10001187": {
@@ -12077,7 +12190,7 @@
       "reviewCount": 454,
       "reviewAvg": 4.62,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001187/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "baby-23-01-miton",
       "onScreenCount": 285,
       "reviewHistory": {
@@ -12167,7 +12280,8 @@
         "2026-08-01": 454,
         "2026-08-02": 454,
         "2026-08-03": 454,
-        "2026-08-04": 454
+        "2026-08-04": 454,
+        "2026-08-05": 454
       }
     },
     "10001189": {
@@ -12180,7 +12294,7 @@
       "reviewCount": 159,
       "reviewAvg": 4.54,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001189/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "bg-02-con-hook",
       "onScreenCount": 119,
       "reviewHistory": {
@@ -12270,7 +12384,8 @@
         "2026-08-01": 158,
         "2026-08-02": 159,
         "2026-08-03": 159,
-        "2026-08-04": 159
+        "2026-08-04": 159,
+        "2026-08-05": 159
       }
     },
     "10001191": {
@@ -12283,7 +12398,7 @@
       "reviewCount": 15,
       "reviewAvg": 4.8,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001191/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "bg-04-nylon-10set",
       "reviewHistory": {
         "2026-05-08": 15,
@@ -12372,7 +12487,8 @@
         "2026-08-01": 15,
         "2026-08-02": 15,
         "2026-08-03": 15,
-        "2026-08-04": 15
+        "2026-08-04": 15,
+        "2026-08-05": 15
       }
     },
     "10001192": {
@@ -12385,7 +12501,7 @@
       "reviewCount": 14,
       "reviewAvg": 4.29,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001192/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "bg-05-ori-5set",
       "reviewHistory": {
         "2026-05-08": 14,
@@ -12474,7 +12590,8 @@
         "2026-08-01": 14,
         "2026-08-02": 14,
         "2026-08-03": 14,
-        "2026-08-04": 14
+        "2026-08-04": 14,
+        "2026-08-05": 14
       }
     },
     "10001193": {
@@ -12487,7 +12604,7 @@
       "reviewCount": 10,
       "reviewAvg": 4.3,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001193/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "bg-06-kakon-10set",
       "reviewHistory": {
         "2026-05-08": 10,
@@ -12575,7 +12692,8 @@
         "2026-08-01": 10,
         "2026-08-02": 10,
         "2026-08-03": 10,
-        "2026-08-04": 10
+        "2026-08-04": 10,
+        "2026-08-05": 10
       }
     },
     "10001196": {
@@ -12588,7 +12706,7 @@
       "reviewCount": 5,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001196/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "bg-09-usbc-osu-20set",
       "reviewHistory": {
         "2026-05-08": 5,
@@ -12674,7 +12792,8 @@
         "2026-07-31": 5,
         "2026-08-01": 5,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001197": {
@@ -12687,7 +12806,7 @@
       "reviewCount": 5,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001197/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "bg-10-usbc-mesu-20set",
       "reviewHistory": {
         "2026-05-08": 5,
@@ -12776,7 +12895,8 @@
         "2026-08-01": 5,
         "2026-08-02": 5,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001201": {
@@ -12789,7 +12909,7 @@
       "reviewCount": 10,
       "reviewAvg": 4.1,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001201/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-sma-08",
       "reviewHistory": {
         "2026-05-08": 10,
@@ -12878,7 +12998,8 @@
         "2026-08-01": 10,
         "2026-08-02": 10,
         "2026-08-03": 10,
-        "2026-08-04": 10
+        "2026-08-04": 10,
+        "2026-08-05": 10
       }
     },
     "10001202": {
@@ -12891,7 +13012,7 @@
       "reviewCount": 14,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001202/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "wat-sma-09",
       "reviewHistory": {
         "2026-05-08": 14,
@@ -12980,7 +13101,8 @@
         "2026-08-01": 14,
         "2026-08-02": 14,
         "2026-08-03": 14,
-        "2026-08-04": 14
+        "2026-08-04": 14,
+        "2026-08-05": 14
       }
     },
     "10001203": {
@@ -12993,7 +13115,7 @@
       "reviewCount": 58,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001203/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "wat-sma-10",
       "reviewHistory": {
         "2026-05-08": 58,
@@ -13082,7 +13204,8 @@
         "2026-08-01": 58,
         "2026-08-02": 58,
         "2026-08-03": 58,
-        "2026-08-04": 58
+        "2026-08-04": 58,
+        "2026-08-05": 58
       }
     },
     "10001204": {
@@ -13095,7 +13218,7 @@
       "reviewCount": 176,
       "reviewAvg": 4.59,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001204/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ih-22-09",
       "onScreenCount": 115,
       "reviewHistory": {
@@ -13185,7 +13308,8 @@
         "2026-08-01": 176,
         "2026-08-02": 176,
         "2026-08-03": 176,
-        "2026-08-04": 176
+        "2026-08-04": 176,
+        "2026-08-05": 176
       }
     },
     "10001205": {
@@ -13198,7 +13322,7 @@
       "reviewCount": 5,
       "reviewAvg": 4.6,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001205/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "ih-25-04",
       "reviewHistory": {
         "2026-05-08": 4,
@@ -13287,7 +13411,8 @@
         "2026-08-01": 5,
         "2026-08-02": 5,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001207": {
@@ -13300,7 +13425,7 @@
       "reviewCount": 330,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001207/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-22-10",
       "onScreenCount": 246,
       "reviewHistory": {
@@ -13390,7 +13515,8 @@
         "2026-08-01": 329,
         "2026-08-02": 329,
         "2026-08-03": 330,
-        "2026-08-04": 330
+        "2026-08-04": 330,
+        "2026-08-05": 330
       }
     },
     "10001208": {
@@ -13403,7 +13529,7 @@
       "reviewCount": 239,
       "reviewAvg": 4.65,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001208/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "ih-22-10-0set",
       "onScreenCount": 102,
       "tags": {},
@@ -13494,7 +13620,8 @@
         "2026-08-01": 238,
         "2026-08-02": 239,
         "2026-08-03": 239,
-        "2026-08-04": 239
+        "2026-08-04": 239,
+        "2026-08-05": 239
       }
     },
     "10001209": {
@@ -13507,7 +13634,7 @@
       "reviewCount": 78,
       "reviewAvg": 4.51,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001209/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "si-24-04-key",
       "reviewHistory": {
         "2026-05-08": 75,
@@ -13596,7 +13723,8 @@
         "2026-08-01": 78,
         "2026-08-02": 78,
         "2026-08-03": 78,
-        "2026-08-04": 78
+        "2026-08-04": 78,
+        "2026-08-05": 78
       }
     },
     "10001210": {
@@ -13609,7 +13737,7 @@
       "reviewCount": 123,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001210/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "ss-22-01",
       "onScreenCount": 107,
       "reviewHistory": {
@@ -13699,7 +13827,8 @@
         "2026-08-01": 123,
         "2026-08-02": 123,
         "2026-08-03": 123,
-        "2026-08-04": 123
+        "2026-08-04": 123,
+        "2026-08-05": 123
       }
     },
     "10001212": {
@@ -13712,7 +13841,7 @@
       "reviewCount": 75,
       "reviewAvg": 4.31,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001212/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "ss-22-02-leather",
       "onScreenCount": 73,
       "reviewHistory": {
@@ -13802,7 +13931,8 @@
         "2026-08-01": 75,
         "2026-08-02": 75,
         "2026-08-03": 75,
-        "2026-08-04": 75
+        "2026-08-04": 75,
+        "2026-08-05": 75
       }
     },
     "10001213": {
@@ -13815,7 +13945,7 @@
       "reviewCount": 209,
       "reviewAvg": 4.56,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001213/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "ss-22-03-cloth",
       "onScreenCount": 195,
       "reviewHistory": {
@@ -13905,7 +14035,8 @@
         "2026-08-01": 209,
         "2026-08-02": 209,
         "2026-08-03": 209,
-        "2026-08-04": 209
+        "2026-08-04": 209,
+        "2026-08-05": 209
       }
     },
     "10001214": {
@@ -13918,7 +14049,7 @@
       "reviewCount": 47,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001214/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "si-22-06-brush",
       "onScreenCount": 39,
       "reviewHistory": {
@@ -14008,7 +14139,8 @@
         "2026-08-01": 47,
         "2026-08-02": 47,
         "2026-08-03": 47,
-        "2026-08-04": 47
+        "2026-08-04": 47,
+        "2026-08-05": 47
       }
     },
     "10001215": {
@@ -14018,10 +14150,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/yoga/yoga-24-a-01c.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/yoga/yoga-24-a-02.jpg"
       ],
-      "reviewCount": 532,
+      "reviewCount": 533,
       "reviewAvg": 4.6,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001215/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "yoga-24-01",
       "onScreenCount": 392,
       "reviewHistory": {
@@ -14111,7 +14243,8 @@
         "2026-08-01": 532,
         "2026-08-02": 532,
         "2026-08-03": 532,
-        "2026-08-04": 532
+        "2026-08-04": 532,
+        "2026-08-05": 533
       }
     },
     "10001217": {
@@ -14124,7 +14257,7 @@
       "reviewCount": 249,
       "reviewAvg": 4.63,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001217/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "yoga-23-02-set",
       "onScreenCount": 108,
       "reviewHistory": {
@@ -14214,7 +14347,8 @@
         "2026-08-01": 249,
         "2026-08-02": 249,
         "2026-08-03": 249,
-        "2026-08-04": 249
+        "2026-08-04": 249,
+        "2026-08-05": 249
       }
     },
     "10001218": {
@@ -14227,7 +14361,7 @@
       "reviewCount": 142,
       "reviewAvg": 4.66,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001218/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ih-23-01-00set",
       "onScreenCount": 100,
       "reviewHistory": {
@@ -14317,7 +14451,8 @@
         "2026-08-01": 142,
         "2026-08-02": 142,
         "2026-08-03": 142,
-        "2026-08-04": 142
+        "2026-08-04": 142,
+        "2026-08-05": 142
       }
     },
     "10001220": {
@@ -14330,7 +14465,7 @@
       "reviewCount": 66,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001220/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ih-21-03",
       "onScreenCount": 48,
       "reviewHistory": {
@@ -14420,7 +14555,8 @@
         "2026-08-01": 66,
         "2026-08-02": 66,
         "2026-08-03": 66,
-        "2026-08-04": 66
+        "2026-08-04": 66,
+        "2026-08-05": 66
       }
     },
     "10001221": {
@@ -14433,7 +14569,7 @@
       "reviewCount": 116,
       "reviewAvg": 4.41,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001221/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ih-21-04",
       "tags": {},
       "reviewHistory": {
@@ -14523,7 +14659,8 @@
         "2026-08-01": 116,
         "2026-08-02": 116,
         "2026-08-03": 116,
-        "2026-08-04": 116
+        "2026-08-04": 116,
+        "2026-08-05": 116
       }
     },
     "10001222": {
@@ -14533,10 +14670,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-25-04-a-01.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-25-04-a-02.jpg"
       ],
-      "reviewCount": 210,
-      "reviewAvg": 4.66,
+      "reviewCount": 209,
+      "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001222/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-25-04-hook",
       "status": "focus",
       "tags": {
@@ -14629,7 +14766,8 @@
         "2026-08-01": 210,
         "2026-08-02": 210,
         "2026-08-03": 210,
-        "2026-08-04": 210
+        "2026-08-04": 210,
+        "2026-08-05": 209
       }
     },
     "10001223": {
@@ -14642,7 +14780,7 @@
       "reviewCount": 114,
       "reviewAvg": 4.56,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001223/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "si-25-03",
       "onScreenCount": 89,
       "reviewHistory": {
@@ -14732,7 +14870,8 @@
         "2026-08-01": 114,
         "2026-08-02": 114,
         "2026-08-03": 114,
-        "2026-08-04": 114
+        "2026-08-04": 114,
+        "2026-08-05": 114
       }
     },
     "10001226": {
@@ -14745,7 +14884,7 @@
       "reviewCount": 55,
       "reviewAvg": 4.65,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001226/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "si-23-01-00set",
       "onScreenCount": 47,
       "reviewHistory": {
@@ -14835,7 +14974,8 @@
         "2026-08-01": 55,
         "2026-08-02": 55,
         "2026-08-03": 55,
-        "2026-08-04": 55
+        "2026-08-04": 55,
+        "2026-08-05": 55
       },
       "tags": {
         "renewal": true
@@ -14851,7 +14991,7 @@
       "reviewCount": 19,
       "reviewAvg": 4.42,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001227/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-23-02-00set",
       "onScreenCount": 16,
       "reviewHistory": {
@@ -14941,7 +15081,8 @@
         "2026-08-01": 19,
         "2026-08-02": 19,
         "2026-08-03": 19,
-        "2026-08-04": 19
+        "2026-08-04": 19,
+        "2026-08-05": 19
       },
       "tags": {
         "renewal": true
@@ -14955,9 +15096,9 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/scarf/sc-mori-03.jpg"
       ],
       "reviewCount": 695,
-      "reviewAvg": 4.39,
+      "reviewAvg": 4.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001236/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "scarf-23-01a",
       "onScreenCount": 283,
       "reviewHistory": {
@@ -15047,7 +15188,8 @@
         "2026-08-01": 694,
         "2026-08-02": 694,
         "2026-08-03": 695,
-        "2026-08-04": 695
+        "2026-08-04": 695,
+        "2026-08-05": 695
       }
     },
     "10001237": {
@@ -15060,7 +15202,7 @@
       "reviewCount": 236,
       "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001237/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-23-03-00set",
       "onScreenCount": 170,
       "reviewHistory": {
@@ -15150,7 +15292,8 @@
         "2026-08-01": 236,
         "2026-08-02": 236,
         "2026-08-03": 236,
-        "2026-08-04": 236
+        "2026-08-04": 236,
+        "2026-08-05": 236
       }
     },
     "10001240": {
@@ -15163,7 +15306,7 @@
       "reviewCount": 736,
       "reviewAvg": 4.61,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001240/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "tb-23-01",
       "onScreenCount": 403,
       "reviewHistory": {
@@ -15253,7 +15396,8 @@
         "2026-08-01": 738,
         "2026-08-02": 736,
         "2026-08-03": 736,
-        "2026-08-04": 736
+        "2026-08-04": 736,
+        "2026-08-05": 736
       }
     },
     "10001242": {
@@ -15266,7 +15410,7 @@
       "reviewCount": 8,
       "reviewAvg": 4.88,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001242/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "ih-21-04-spare-2set",
       "reviewHistory": {
         "2026-05-08": 7,
@@ -15355,7 +15499,8 @@
         "2026-08-01": 8,
         "2026-08-02": 8,
         "2026-08-03": 8,
-        "2026-08-04": 8
+        "2026-08-04": 8,
+        "2026-08-05": 8
       }
     },
     "10001243": {
@@ -15368,7 +15513,7 @@
       "reviewCount": 183,
       "reviewAvg": 4.62,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001243/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "tb-23-02",
       "onScreenCount": 133,
       "reviewHistory": {
@@ -15458,7 +15603,8 @@
         "2026-08-01": 183,
         "2026-08-02": 183,
         "2026-08-03": 183,
-        "2026-08-04": 183
+        "2026-08-04": 183,
+        "2026-08-05": 183
       }
     },
     "10001244": {
@@ -15471,7 +15617,7 @@
       "reviewCount": 5,
       "reviewAvg": 4.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001244/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "tb-23-03",
       "reviewHistory": {
         "2026-05-08": 4,
@@ -15560,7 +15706,8 @@
         "2026-08-01": 5,
         "2026-08-02": 5,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001245": {
@@ -15573,7 +15720,7 @@
       "reviewCount": 31,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001245/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "si-23-07",
       "reviewHistory": {
         "2026-05-08": 31,
@@ -15662,7 +15809,8 @@
         "2026-08-01": 31,
         "2026-08-02": 31,
         "2026-08-03": 31,
-        "2026-08-04": 31
+        "2026-08-04": 31,
+        "2026-08-05": 31
       },
       "tags": {
         "renewal": true
@@ -15678,7 +15826,7 @@
       "reviewCount": 138,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001246/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "si-23-06",
       "reviewHistory": {
         "2026-05-08": 138,
@@ -15767,7 +15915,8 @@
         "2026-08-01": 138,
         "2026-08-02": 138,
         "2026-08-03": 138,
-        "2026-08-04": 138
+        "2026-08-04": 138,
+        "2026-08-05": 138
       },
       "tags": {
         "renewal": true
@@ -15783,7 +15932,7 @@
       "reviewCount": 41,
       "reviewAvg": 4.76,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001250/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "si-23-04-00set",
       "reviewHistory": {
         "2026-05-08": 41,
@@ -15872,7 +16021,8 @@
         "2026-08-01": 41,
         "2026-08-02": 41,
         "2026-08-03": 41,
-        "2026-08-04": 41
+        "2026-08-04": 41,
+        "2026-08-05": 41
       }
     },
     "10001251": {
@@ -15882,10 +16032,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-23-13-a-01.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-23-13-a-02.jpg"
       ],
-      "reviewCount": 389,
-      "reviewAvg": 4.67,
+      "reviewCount": 391,
+      "reviewAvg": 4.66,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001251/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-23-13",
       "onScreenCount": 122,
       "reviewHistory": {
@@ -15975,7 +16125,8 @@
         "2026-08-01": 388,
         "2026-08-02": 388,
         "2026-08-03": 388,
-        "2026-08-04": 389
+        "2026-08-04": 389,
+        "2026-08-05": 391
       }
     },
     "10001252": {
@@ -15988,7 +16139,7 @@
       "reviewCount": 292,
       "reviewAvg": 4.72,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001252/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "baby-24-01",
       "onScreenCount": 266,
       "reviewHistory": {
@@ -16075,7 +16226,8 @@
         "2026-08-01": 292,
         "2026-08-02": 292,
         "2026-08-03": 292,
-        "2026-08-04": 292
+        "2026-08-04": 292,
+        "2026-08-05": 292
       }
     },
     "10001253": {
@@ -16088,7 +16240,7 @@
       "reviewCount": 2,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001253/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "foot-23-01-4set",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -16177,7 +16329,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001254": {
@@ -16190,7 +16343,7 @@
       "reviewCount": 125,
       "reviewAvg": 4.35,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001254/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "foot-23-02-4set",
       "onScreenCount": 55,
       "reviewHistory": {
@@ -16280,7 +16433,8 @@
         "2026-08-01": 124,
         "2026-08-02": 125,
         "2026-08-03": 125,
-        "2026-08-04": 125
+        "2026-08-04": 125,
+        "2026-08-05": 125
       }
     },
     "10001255": {
@@ -16290,10 +16444,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/foot/foot-23-03-mori-02d.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/foot/foot-23-03-mori-03.jpg"
       ],
-      "reviewCount": 666,
+      "reviewCount": 667,
       "reviewAvg": 4.49,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001255/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "foot-23-03-4set",
       "onScreenCount": 219,
       "reviewHistory": {
@@ -16383,7 +16537,8 @@
         "2026-08-01": 665,
         "2026-08-02": 665,
         "2026-08-03": 666,
-        "2026-08-04": 666
+        "2026-08-04": 666,
+        "2026-08-05": 667
       }
     },
     "10001256": {
@@ -16396,7 +16551,7 @@
       "reviewCount": 172,
       "reviewAvg": 4.54,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001256/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-23-09",
       "onScreenCount": 140,
       "reviewHistory": {
@@ -16486,7 +16641,8 @@
         "2026-08-01": 172,
         "2026-08-02": 172,
         "2026-08-03": 172,
-        "2026-08-04": 172
+        "2026-08-04": 172,
+        "2026-08-05": 172
       }
     },
     "10001261": {
@@ -16499,7 +16655,7 @@
       "reviewCount": 4,
       "reviewAvg": 4.25,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001261/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ih-22-02-mat",
       "reviewHistory": {
         "2026-05-08": 4,
@@ -16588,7 +16744,8 @@
         "2026-08-01": 4,
         "2026-08-02": 4,
         "2026-08-03": 4,
-        "2026-08-04": 4
+        "2026-08-04": 4,
+        "2026-08-05": 4
       }
     },
     "10001263": {
@@ -16601,7 +16758,7 @@
       "reviewCount": 80,
       "reviewAvg": 4.39,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001263/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "si-23-10",
       "reviewHistory": {
         "2026-05-08": 80,
@@ -16690,7 +16847,8 @@
         "2026-08-01": 80,
         "2026-08-02": 80,
         "2026-08-03": 80,
-        "2026-08-04": 80
+        "2026-08-04": 80,
+        "2026-08-05": 80
       }
     },
     "10001264": {
@@ -16703,7 +16861,7 @@
       "reviewCount": 156,
       "reviewAvg": 4.47,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001264/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "yoga-24-02-3set-winter",
       "tags": {
         "renewal": true
@@ -16795,7 +16953,8 @@
         "2026-08-01": 156,
         "2026-08-02": 156,
         "2026-08-03": 156,
-        "2026-08-04": 156
+        "2026-08-04": 156,
+        "2026-08-05": 156
       }
     },
     "10001265": {
@@ -16808,7 +16967,7 @@
       "reviewCount": 95,
       "reviewAvg": 4.31,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001265/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-23-11",
       "onScreenCount": 29,
       "reviewHistory": {
@@ -16898,7 +17057,8 @@
         "2026-08-01": 94,
         "2026-08-02": 94,
         "2026-08-03": 95,
-        "2026-08-04": 95
+        "2026-08-04": 95,
+        "2026-08-05": 95
       }
     },
     "10001266": {
@@ -16911,7 +17071,7 @@
       "reviewCount": 247,
       "reviewAvg": 4.59,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001266/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ih-23-11",
       "onScreenCount": 115,
       "reviewHistory": {
@@ -17001,7 +17161,8 @@
         "2026-08-01": 247,
         "2026-08-02": 247,
         "2026-08-03": 247,
-        "2026-08-04": 247
+        "2026-08-04": 247,
+        "2026-08-05": 247
       }
     },
     "10001267": {
@@ -17014,7 +17175,7 @@
       "reviewCount": 384,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001267/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "eq-22-05-toilet",
       "onScreenCount": 200,
       "reviewHistory": {
@@ -17104,7 +17265,8 @@
         "2026-08-01": 381,
         "2026-08-02": 382,
         "2026-08-03": 383,
-        "2026-08-04": 384
+        "2026-08-04": 384,
+        "2026-08-05": 384
       }
     },
     "10001270": {
@@ -17117,7 +17279,7 @@
       "reviewCount": 100,
       "reviewAvg": 4.52,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001270/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "foot-23-04",
       "onScreenCount": 64,
       "reviewHistory": {
@@ -17207,7 +17369,8 @@
         "2026-08-01": 100,
         "2026-08-02": 100,
         "2026-08-03": 100,
-        "2026-08-04": 100
+        "2026-08-04": 100,
+        "2026-08-05": 100
       }
     },
     "10001271": {
@@ -17220,7 +17383,7 @@
       "reviewCount": 19,
       "reviewAvg": 4.53,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001271/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "si-23-12",
       "onScreenCount": 14,
       "reviewHistory": {
@@ -17305,7 +17468,8 @@
         "2026-08-01": 19,
         "2026-08-02": 19,
         "2026-08-03": 19,
-        "2026-08-04": 19
+        "2026-08-04": 19,
+        "2026-08-05": 19
       }
     },
     "10001274": {
@@ -17318,7 +17482,7 @@
       "reviewCount": 115,
       "reviewAvg": 4.64,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001274/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "ih-23-13",
       "onScreenCount": 47,
       "reviewHistory": {
@@ -17408,7 +17572,8 @@
         "2026-08-01": 115,
         "2026-08-02": 115,
         "2026-08-03": 115,
-        "2026-08-04": 115
+        "2026-08-04": 115,
+        "2026-08-05": 115
       }
     },
     "10001275": {
@@ -17421,7 +17586,7 @@
       "reviewCount": 43,
       "reviewAvg": 4.53,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001275/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "si-24-01-0set1",
       "reviewHistory": {
         "2026-05-08": 42,
@@ -17510,7 +17675,8 @@
         "2026-08-01": 42,
         "2026-08-02": 42,
         "2026-08-03": 43,
-        "2026-08-04": 43
+        "2026-08-04": 43,
+        "2026-08-05": 43
       }
     },
     "10001278": {
@@ -17523,7 +17689,7 @@
       "reviewCount": 47,
       "reviewAvg": 4.3,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001278/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "si-24-02",
       "reviewHistory": {
         "2026-05-08": 47,
@@ -17612,7 +17778,8 @@
         "2026-08-01": 47,
         "2026-08-02": 47,
         "2026-08-03": 47,
-        "2026-08-04": 47
+        "2026-08-04": 47,
+        "2026-08-05": 47
       }
     },
     "10001279": {
@@ -17625,7 +17792,7 @@
       "reviewCount": 89,
       "reviewAvg": 4.61,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001279/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "si-22-08",
       "onScreenCount": 42,
       "reviewHistory": {
@@ -17715,7 +17882,8 @@
         "2026-08-01": 89,
         "2026-08-02": 89,
         "2026-08-03": 89,
-        "2026-08-04": 89
+        "2026-08-04": 89,
+        "2026-08-05": 89
       },
       "tags": {
         "renewal": true
@@ -17728,10 +17896,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/tape1/tape-24-01-mori-01a.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/tape1/tape-24-01-mori-03.jpg"
       ],
-      "reviewCount": 934,
-      "reviewAvg": 4.43,
+      "reviewCount": 935,
+      "reviewAvg": 4.42,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001280/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "tape-24-01",
       "status": "focus",
       "tags": {},
@@ -17822,7 +17990,8 @@
         "2026-08-01": 934,
         "2026-08-02": 936,
         "2026-08-03": 935,
-        "2026-08-04": 934
+        "2026-08-04": 934,
+        "2026-08-05": 935
       }
     },
     "10001285": {
@@ -17835,7 +18004,7 @@
       "reviewCount": 12,
       "reviewAvg": 4.42,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001285/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "ih-24-05",
       "reviewHistory": {
         "2026-05-08": 10,
@@ -17924,7 +18093,8 @@
         "2026-08-01": 12,
         "2026-08-02": 12,
         "2026-08-03": 12,
-        "2026-08-04": 12
+        "2026-08-04": 12,
+        "2026-08-05": 12
       }
     },
     "10001286": {
@@ -17937,7 +18107,7 @@
       "reviewCount": 15,
       "reviewAvg": 4.53,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001286/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "foot-23-06",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -18027,7 +18197,8 @@
         "2026-08-01": 15,
         "2026-08-02": 15,
         "2026-08-03": 15,
-        "2026-08-04": 15
+        "2026-08-04": 15,
+        "2026-08-05": 15
       }
     },
     "10001287": {
@@ -18040,7 +18211,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001287/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "si-24-03",
       "status": "focus",
       "tags": {
@@ -18133,7 +18304,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001288": {
@@ -18146,7 +18318,7 @@
       "reviewCount": 69,
       "reviewAvg": 4.78,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001288/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "wat-os-01",
       "onScreenCount": 32,
       "reviewHistory": {
@@ -18236,7 +18408,8 @@
         "2026-08-01": 69,
         "2026-08-02": 69,
         "2026-08-03": 69,
-        "2026-08-04": 69
+        "2026-08-04": 69,
+        "2026-08-05": 69
       }
     },
     "10001289": {
@@ -18249,7 +18422,7 @@
       "reviewCount": 44,
       "reviewAvg": 4.61,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001289/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "yoga-24-01-band1",
       "onScreenCount": 11,
       "reviewHistory": {
@@ -18339,7 +18512,8 @@
         "2026-08-01": 44,
         "2026-08-02": 44,
         "2026-08-03": 44,
-        "2026-08-04": 44
+        "2026-08-04": 44,
+        "2026-08-05": 44
       }
     },
     "10001290": {
@@ -18352,7 +18526,7 @@
       "reviewCount": 97,
       "reviewAvg": 4.54,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001290/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "eq-24-03-lock",
       "onScreenCount": 33,
       "reviewHistory": {
@@ -18442,7 +18616,8 @@
         "2026-08-01": 96,
         "2026-08-02": 96,
         "2026-08-03": 97,
-        "2026-08-04": 97
+        "2026-08-04": 97,
+        "2026-08-05": 97
       }
     },
     "10001291": {
@@ -18455,7 +18630,7 @@
       "reviewCount": 265,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001291/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "tape-24-04",
       "onScreenCount": 52,
       "reviewHistory": {
@@ -18542,7 +18717,8 @@
         "2026-08-01": 264,
         "2026-08-02": 265,
         "2026-08-03": 265,
-        "2026-08-04": 265
+        "2026-08-04": 265,
+        "2026-08-05": 265
       }
     },
     "10001292": {
@@ -18555,7 +18731,7 @@
       "reviewCount": 190,
       "reviewAvg": 4.52,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001292/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "bi-25-01",
       "onScreenCount": 145,
       "reviewHistory": {
@@ -18645,7 +18821,8 @@
         "2026-08-01": 190,
         "2026-08-02": 190,
         "2026-08-03": 190,
-        "2026-08-04": 190
+        "2026-08-04": 190,
+        "2026-08-05": 190
       },
       "tags": {}
     },
@@ -18659,7 +18836,7 @@
       "reviewCount": 128,
       "reviewAvg": 4.48,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001293/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "foot-25-01-0set",
       "onScreenCount": 114,
       "tags": {},
@@ -18750,7 +18927,8 @@
         "2026-08-01": 128,
         "2026-08-02": 128,
         "2026-08-03": 128,
-        "2026-08-04": 128
+        "2026-08-04": 128,
+        "2026-08-05": 128
       }
     },
     "10001294": {
@@ -18763,7 +18941,7 @@
       "reviewCount": 21,
       "reviewAvg": 3.86,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001294/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "si-24-04-sin",
       "tags": {
         "renewal": true
@@ -18855,7 +19033,8 @@
         "2026-08-01": 21,
         "2026-08-02": 21,
         "2026-08-03": 21,
-        "2026-08-04": 21
+        "2026-08-04": 21,
+        "2026-08-05": 21
       }
     },
     "10001296": {
@@ -18868,7 +19047,7 @@
       "reviewCount": 206,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001296/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "si-25-01",
       "onScreenCount": 162,
       "tags": {},
@@ -18959,7 +19138,8 @@
         "2026-08-01": 206,
         "2026-08-02": 206,
         "2026-08-03": 206,
-        "2026-08-04": 206
+        "2026-08-04": 206,
+        "2026-08-05": 206
       }
     },
     "10001297": {
@@ -18972,7 +19152,7 @@
       "reviewCount": 22,
       "reviewAvg": 4.45,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001297/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "foot-25-03",
       "onScreenCount": 3,
       "reviewHistory": {
@@ -19062,7 +19242,8 @@
         "2026-08-01": 22,
         "2026-08-02": 22,
         "2026-08-03": 22,
-        "2026-08-04": 22
+        "2026-08-04": 22,
+        "2026-08-05": 22
       }
     },
     "10001298": {
@@ -19075,7 +19256,7 @@
       "reviewCount": 54,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001298/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "tape-24-02a",
       "onScreenCount": 13,
       "reviewHistory": {
@@ -19165,7 +19346,8 @@
         "2026-08-01": 54,
         "2026-08-02": 54,
         "2026-08-03": 54,
-        "2026-08-04": 54
+        "2026-08-04": 54,
+        "2026-08-05": 54
       }
     },
     "10001299": {
@@ -19178,7 +19360,7 @@
       "reviewCount": 23,
       "reviewAvg": 4.22,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001299/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "foot-25-04",
       "onScreenCount": 21,
       "tags": {},
@@ -19269,7 +19451,8 @@
         "2026-08-01": 23,
         "2026-08-02": 23,
         "2026-08-03": 23,
-        "2026-08-04": 23
+        "2026-08-04": 23,
+        "2026-08-05": 23
       }
     },
     "10001300": {
@@ -19282,7 +19465,7 @@
       "reviewCount": 28,
       "reviewAvg": 4.46,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001300/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "fing-25-01",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -19372,7 +19555,8 @@
         "2026-08-01": 28,
         "2026-08-02": 28,
         "2026-08-03": 28,
-        "2026-08-04": 28
+        "2026-08-04": 28,
+        "2026-08-05": 28
       }
     },
     "10001301": {
@@ -19385,7 +19569,7 @@
       "reviewCount": 14,
       "reviewAvg": 4.29,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001301/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "fing-25-02",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -19469,7 +19653,8 @@
         "2026-08-01": 14,
         "2026-08-02": 14,
         "2026-08-03": 14,
-        "2026-08-04": 14
+        "2026-08-04": 14,
+        "2026-08-05": 14
       }
     },
     "10001302": {
@@ -19482,7 +19667,7 @@
       "reviewCount": 6,
       "reviewAvg": 4.33,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001302/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "ih-25-01",
       "tags": {
         "renewal": true
@@ -19574,7 +19759,8 @@
         "2026-08-01": 6,
         "2026-08-02": 6,
         "2026-08-03": 6,
-        "2026-08-04": 6
+        "2026-08-04": 6,
+        "2026-08-05": 6
       }
     },
     "10001303": {
@@ -19587,7 +19773,7 @@
       "reviewCount": 10,
       "reviewAvg": 4.8,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001303/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ih-25-02",
       "onScreenCount": 5,
       "tags": {},
@@ -19678,7 +19864,8 @@
         "2026-08-01": 10,
         "2026-08-02": 10,
         "2026-08-03": 10,
-        "2026-08-04": 10
+        "2026-08-04": 10,
+        "2026-08-05": 10
       }
     },
     "10001304": {
@@ -19691,7 +19878,7 @@
       "reviewCount": 35,
       "reviewAvg": 4.66,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001304/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "scarf-24-01-0set",
       "onScreenCount": 7,
       "reviewHistory": {
@@ -19781,7 +19968,8 @@
         "2026-08-01": 35,
         "2026-08-02": 35,
         "2026-08-03": 35,
-        "2026-08-04": 35
+        "2026-08-04": 35,
+        "2026-08-05": 35
       }
     },
     "10001305": {
@@ -19794,7 +19982,7 @@
       "reviewCount": 142,
       "reviewAvg": 4.47,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001305/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "ih-25-03",
       "onScreenCount": 119,
       "tags": {},
@@ -19885,7 +20073,8 @@
         "2026-08-01": 140,
         "2026-08-02": 140,
         "2026-08-03": 141,
-        "2026-08-04": 142
+        "2026-08-04": 142,
+        "2026-08-05": 142
       }
     },
     "10001306": {
@@ -19898,7 +20087,7 @@
       "reviewCount": 13,
       "reviewAvg": 4.15,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001306/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "foot-25-05",
       "status": "normal",
       "tags": {},
@@ -19990,7 +20179,8 @@
         "2026-08-01": 12,
         "2026-08-02": 13,
         "2026-08-03": 13,
-        "2026-08-04": 13
+        "2026-08-04": 13,
+        "2026-08-05": 13
       }
     },
     "10001307": {
@@ -20003,7 +20193,7 @@
       "reviewCount": 20,
       "reviewAvg": 4.7,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001307/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "tb-25-01",
       "onScreenCount": 15,
       "tags": {},
@@ -20094,7 +20284,8 @@
         "2026-08-01": 20,
         "2026-08-02": 20,
         "2026-08-03": 20,
-        "2026-08-04": 20
+        "2026-08-04": 20,
+        "2026-08-05": 20
       }
     },
     "10001308": {
@@ -20107,7 +20298,7 @@
       "reviewCount": 43,
       "reviewAvg": 4.02,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001308/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "foot-25-06",
       "onScreenCount": 34,
       "tags": {},
@@ -20198,7 +20389,8 @@
         "2026-08-01": 43,
         "2026-08-02": 43,
         "2026-08-03": 43,
-        "2026-08-04": 43
+        "2026-08-04": 43,
+        "2026-08-05": 43
       }
     },
     "10001309": {
@@ -20211,7 +20403,7 @@
       "reviewCount": 37,
       "reviewAvg": 4.65,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001309/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "cab-25-01",
       "onScreenCount": 28,
       "tags": {},
@@ -20301,7 +20493,8 @@
         "2026-08-01": 37,
         "2026-08-02": 37,
         "2026-08-03": 37,
-        "2026-08-04": 37
+        "2026-08-04": 37,
+        "2026-08-05": 37
       }
     },
     "10001310": {
@@ -20314,7 +20507,7 @@
       "reviewCount": 30,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001310/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "cab-25-02a",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -20404,7 +20597,8 @@
         "2026-08-01": 30,
         "2026-08-02": 30,
         "2026-08-03": 30,
-        "2026-08-04": 30
+        "2026-08-04": 30,
+        "2026-08-05": 30
       }
     },
     "10001311": {
@@ -20414,10 +20608,10 @@
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-21-05-mori-01.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ih/ih-21-05-mori-02a.jpg"
       ],
-      "reviewCount": 26,
-      "reviewAvg": 4.73,
+      "reviewCount": 27,
+      "reviewAvg": 4.74,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001311/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "ih-21-05",
       "onScreenCount": 21,
       "tags": {},
@@ -20508,7 +20702,8 @@
         "2026-08-01": 26,
         "2026-08-02": 26,
         "2026-08-03": 26,
-        "2026-08-04": 26
+        "2026-08-04": 26,
+        "2026-08-05": 27
       }
     },
     "10001312": {
@@ -20521,7 +20716,7 @@
       "reviewCount": 107,
       "reviewAvg": 4.75,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001312/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "et-a-25-01",
       "onScreenCount": 63,
       "tags": {},
@@ -20612,7 +20807,8 @@
         "2026-08-01": 106,
         "2026-08-02": 106,
         "2026-08-03": 107,
-        "2026-08-04": 107
+        "2026-08-04": 107,
+        "2026-08-05": 107
       }
     },
     "10001313": {
@@ -20625,7 +20821,7 @@
       "reviewCount": 11,
       "reviewAvg": 4.64,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001313/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "ih-21-06",
       "onScreenCount": 3,
       "reviewHistory": {
@@ -20714,7 +20910,8 @@
         "2026-08-01": 11,
         "2026-08-02": 11,
         "2026-08-03": 11,
-        "2026-08-04": 11
+        "2026-08-04": 11,
+        "2026-08-05": 11
       },
       "tags": {
         "renewal": true
@@ -20730,7 +20927,7 @@
       "reviewCount": 1,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001314/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ep-anker-25-01",
       "reviewHistory": {
         "2026-05-08": 0,
@@ -20817,7 +21014,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10001315": {
@@ -20830,7 +21028,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001315/",
-      "lastFetched": "2026-08-03T21:57:36.776Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "ep-bose-25-02",
       "reviewHistory": {
         "2026-05-08": 0,
@@ -20918,7 +21116,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001317": {
@@ -20931,7 +21130,7 @@
       "reviewCount": 1,
       "reviewAvg": 3,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001317/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ep-etc-25-01-ath-m50x",
       "reviewHistory": {
         "2026-05-08": 1,
@@ -21019,7 +21218,8 @@
         "2026-08-01": 1,
         "2026-08-02": 1,
         "2026-08-03": 1,
-        "2026-08-04": 1
+        "2026-08-04": 1,
+        "2026-08-05": 1
       }
     },
     "10001318": {
@@ -21032,7 +21232,7 @@
       "reviewCount": 7,
       "reviewAvg": 4.43,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001318/",
-      "lastFetched": "2026-08-03T21:57:33.822Z",
+      "lastFetched": "2026-08-04T22:02:33.219Z",
       "itemNumber": "ep-sony-25-01",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -21120,7 +21320,8 @@
         "2026-08-01": 7,
         "2026-08-02": 7,
         "2026-08-03": 7,
-        "2026-08-04": 7
+        "2026-08-04": 7,
+        "2026-08-05": 7
       }
     },
     "10001319": {
@@ -21133,7 +21334,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001319/",
-      "lastFetched": "2026-08-03T21:57:30.846Z",
+      "lastFetched": "2026-08-04T22:02:27.572Z",
       "itemNumber": "ep-sony-25-02",
       "reviewHistory": {
         "2026-05-08": 0,
@@ -21221,7 +21422,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001320": {
@@ -21234,7 +21436,7 @@
       "reviewCount": 2,
       "reviewAvg": 4.5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001320/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": "ep-etc-25-02-g663",
       "reviewHistory": {
         "2026-05-08": 2,
@@ -21322,7 +21524,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001321": {
@@ -21335,7 +21538,7 @@
       "reviewCount": 3,
       "reviewAvg": 4.67,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001321/",
-      "lastFetched": "2026-08-03T21:57:33.823Z",
+      "lastFetched": "2026-08-04T22:02:30.428Z",
       "itemNumber": "ep-bose-25-01",
       "reviewHistory": {
         "2026-05-08": 3,
@@ -21423,7 +21626,8 @@
         "2026-08-01": 3,
         "2026-08-02": 3,
         "2026-08-03": 3,
-        "2026-08-04": 3
+        "2026-08-04": 3,
+        "2026-08-05": 3
       }
     },
     "10001322": {
@@ -21436,7 +21640,7 @@
       "reviewCount": 31,
       "reviewAvg": 4.71,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001322/",
-      "lastFetched": "2026-08-03T21:57:27.833Z",
+      "lastFetched": "2026-08-04T22:02:24.195Z",
       "itemNumber": "si-25-05a",
       "onScreenCount": 3,
       "reviewHistory": {
@@ -21526,7 +21730,8 @@
         "2026-08-01": 31,
         "2026-08-02": 31,
         "2026-08-03": 31,
-        "2026-08-04": 31
+        "2026-08-04": 31,
+        "2026-08-05": 31
       }
     },
     "10001323": {
@@ -21539,7 +21744,7 @@
       "reviewCount": 15,
       "reviewAvg": 4.8,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001323/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "et-sony-26-01",
       "onScreenCount": 5,
       "reviewHistory": {
@@ -21627,7 +21832,8 @@
         "2026-08-01": 14,
         "2026-08-02": 15,
         "2026-08-03": 15,
-        "2026-08-04": 15
+        "2026-08-04": 15,
+        "2026-08-05": 15
       }
     },
     "10001324": {
@@ -21640,7 +21846,7 @@
       "reviewCount": 8,
       "reviewAvg": 4.88,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001324/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "et-etc-26-01",
       "onScreenCount": 4,
       "reviewHistory": {
@@ -21730,7 +21936,8 @@
         "2026-08-01": 8,
         "2026-08-02": 8,
         "2026-08-03": 8,
-        "2026-08-04": 8
+        "2026-08-04": 8,
+        "2026-08-05": 8
       }
     },
     "10001325": {
@@ -21743,7 +21950,7 @@
       "reviewCount": 7,
       "reviewAvg": 4.57,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001325/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": "si-26-01",
       "onScreenCount": 3,
       "reviewHistory": {
@@ -21833,7 +22040,8 @@
         "2026-08-01": 7,
         "2026-08-02": 7,
         "2026-08-03": 7,
-        "2026-08-04": 7
+        "2026-08-04": 7,
+        "2026-08-05": 7
       }
     },
     "10001326": {
@@ -21846,7 +22054,7 @@
       "reviewCount": 33,
       "reviewAvg": 4.85,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001326/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "si-26-02",
       "onScreenCount": 9,
       "reviewHistory": {
@@ -21936,7 +22144,8 @@
         "2026-08-01": 33,
         "2026-08-02": 33,
         "2026-08-03": 33,
-        "2026-08-04": 33
+        "2026-08-04": 33,
+        "2026-08-05": 33
       }
     },
     "10001327": {
@@ -21949,7 +22158,7 @@
       "reviewCount": 18,
       "reviewAvg": 4.39,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001327/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "et-apple-25-02",
       "status": "focus",
       "reviewHistory": {
@@ -22039,7 +22248,8 @@
         "2026-08-01": 18,
         "2026-08-02": 18,
         "2026-08-03": 18,
-        "2026-08-04": 18
+        "2026-08-04": 18,
+        "2026-08-05": 18
       }
     },
     "10001328": {
@@ -22052,7 +22262,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001328/",
-      "lastFetched": "2026-08-03T21:57:32.363Z",
+      "lastFetched": "2026-08-04T22:02:28.996Z",
       "itemNumber": "tape-24-01c",
       "status": "focus",
       "tags": {
@@ -22145,7 +22355,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001329": {
@@ -22158,7 +22369,7 @@
       "reviewCount": 2,
       "reviewAvg": 5,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001329/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": "si-26-03",
       "status": "focus",
       "tags": {
@@ -22251,7 +22462,8 @@
         "2026-08-01": 2,
         "2026-08-02": 2,
         "2026-08-03": 2,
-        "2026-08-04": 2
+        "2026-08-04": 2,
+        "2026-08-05": 2
       }
     },
     "10001330": {
@@ -22329,13 +22541,13 @@
       "name": "スマートウォッチ ベルト 20mm 22mm マグネット式 シリコン 時計バンド 交換ベルト Galaxy Watch 対応 防水 耐汗 洗える 軽量 レディース メンズ おしゃれ",
       "images": [
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/watch/wb-26-01a-01a.jpg",
-        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/watch/wb-26-01a-02a.jpg",
-        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/watch/wb-26-01a-03a.jpg"
+        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/watch/wb-mori-01.jpg",
+        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/watch/wb-mori-02.jpg"
       ],
       "reviewCount": 5,
       "reviewAvg": 4.4,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001331/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": null,
       "reviewHistory": {
         "2026-06-27": 0,
@@ -22376,7 +22588,8 @@
         "2026-08-01": 3,
         "2026-08-02": 4,
         "2026-08-03": 5,
-        "2026-08-04": 5
+        "2026-08-04": 5,
+        "2026-08-05": 5
       }
     },
     "10001332": {
@@ -22389,7 +22602,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001332/",
-      "lastFetched": "2026-08-03T21:57:29.348Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": null,
       "reviewHistory": {
         "2026-07-01": 0,
@@ -22426,7 +22639,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001333": {
@@ -22439,7 +22653,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001333/",
-      "lastFetched": "2026-08-03T21:57:29.349Z",
+      "lastFetched": "2026-08-04T22:02:25.617Z",
       "itemNumber": null,
       "reviewHistory": {
         "2026-07-16": 0,
@@ -22461,7 +22675,8 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001334": {
@@ -22474,7 +22689,7 @@
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001334/",
-      "lastFetched": "2026-08-03T21:57:26.315Z",
+      "lastFetched": "2026-08-04T22:02:22.754Z",
       "itemNumber": null,
       "reviewHistory": {
         "2026-07-18": 0,
@@ -22494,27 +22709,29 @@
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     },
     "10001335": {
       "name": "【お得なクーポンで★最大20％OFF】＼レビュー特典付／かみかみネックレス 噛み噛みネックレス 子ども用 自閉症 おもちゃ 自閉症 グッズ かみかみグッズ シリコン 歯固め 爪噛み防止 指しゃぶり 感覚過敏 感覚遊び 洗える キッズ 幼児 プレゼント RPR RP1",
       "images": [
-        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-26-08-b-01.jpg",
+        "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-26-08-b-01a.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-26-08-b-02.jpg",
         "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-26-08-b-03.jpg"
       ],
       "reviewCount": 0,
       "reviewAvg": 0,
       "itemUrl": "https://item.rakuten.co.jp/yukaiya/10001335/",
-      "lastFetched": "2026-08-03T21:57:35.333Z",
+      "lastFetched": "2026-08-04T22:02:31.840Z",
       "itemNumber": null,
       "reviewHistory": {
         "2026-07-31": 0,
         "2026-08-01": 0,
         "2026-08-02": 0,
         "2026-08-03": 0,
-        "2026-08-04": 0
+        "2026-08-04": 0,
+        "2026-08-05": 0
       }
     }
   },
@@ -37592,7 +37809,7 @@
       }
     }
   },
-  "savedAt": "2026-08-03T21:57:36.776Z",
+  "savedAt": "2026-08-04T22:02:33.219Z",
   "version": "v6.6.2",
-  "lastAutoFetch": "2026-08-03T21:57:36.776Z"
+  "lastAutoFetch": "2026-08-04T22:02:33.219Z"
 }
