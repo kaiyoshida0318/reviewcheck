@@ -124,6 +124,26 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .ranking-export-btn { font-size: 12px; padding: 6px 14px; border: 1px solid #1d9e75; border-radius: var(--radius-sm); background: #1d9e75; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
 .ranking-export-btn:hover { background: #17805d; border-color: #17805d; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(29,158,117,0.3); }
 .ranking-export-btn:active { transform: translateY(0); }
+/* v6.29: 選択分ダウンロードボタン(白+緑ボーダー) */
+.ranking-export-btn-outline { background: #fff !important; color: #1d9e75 !important; }
+.ranking-export-btn-outline:hover { background: #f0fbf6 !important; color: #17805d !important; box-shadow: 0 2px 6px rgba(29,158,117,0.2); }
+/* v6.29: 選択件数バッジ */
+.selected-count-badge { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 10px; background: #1d9e75; color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; text-align: center; }
+.ranking-export-btn-outline .selected-count-badge { background: #1d9e75; color: #fff; }
+/* 選択0件時のボタン無効化スタイル */
+.ranking-export-btn-outline.disabled { opacity: 0.5; cursor: not-allowed; }
+.ranking-export-btn-outline.disabled:hover { background: #fff !important; box-shadow: none; }
+/* v6.29: 選択解除ボタン */
+.ranking-clear-btn { font-size: 12px; padding: 6px 12px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: #fff; color: var(--text2); font-family: inherit; font-weight: 500; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.ranking-clear-btn:hover { background: #f5f4ee; color: var(--text); border-color: #b4b2a9; }
+/* v6.29: チェックボックス列(ランキング証拠用モード時のみ表示) */
+.product-table .col-select { width: 32px; text-align: center; padding: 0; }
+.row-select-cb, .header-select-cb { cursor: pointer; width: 15px; height: 15px; margin: 0; }
+/* 選択済み行のハイライト */
+.product-table tr.row-selected { background: #e6f9f1 !important; }
+/* col-select は基本モード/件数再確認モードでは非表示、ランキング証拠用モードでのみ表示 */
+body.mode-basic .col-select,
+body.mode-diff .col-select { display: none; }
 
 /* ── Empty state ── */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -652,7 +672,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.28</span>
+    <span class="build-date">v6.29</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -761,9 +781,11 @@ body.mode-ranking .product-table .col-ranking {
           <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 登録前</button>
           <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 登録済</button>
         </div>
-        <!-- v6.28: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポートボタン -->
+        <!-- v6.28/v6.29: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポートボタン群 -->
         <div class="toolbar-group" id="rankingExportGroup" style="display:none">
           <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="登録前のランキング商品一覧をExcelでダウンロード">⬇ 登録前をExcelでダウンロード</button>
+          <button class="ranking-export-btn ranking-export-btn-outline" onclick="exportSelectedRankingXlsx()" title="チェックした商品だけをExcelでダウンロード">✓ 選択分だけExcelでダウンロード <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
+          <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
         </div>
         <div class="toolbar-group pending-edits-group" id="pendingEditsGroup" style="display:none">
           <span class="pending-count">⚠ <strong id="pendingCount">0</strong>件 未保存</span>
@@ -796,6 +818,8 @@ body.mode-ranking .product-table .col-ranking {
         <table class="product-table">
           <thead>
             <tr>
+              <!-- v6.29: 全選択チェックボックス(ランキング証拠用モード時のみ表示、CSSで制御) -->
+              <th class="col-select"><input type="checkbox" class="header-select-cb" id="headerSelectCb" onchange="toggleSelectAllVisible(this)" title="表示中の全商品を選択/解除"></th>
               <th class="col-kanri sortable" onclick="setSortKey('code')" id="sortHeader-code">商品管理番号 <span class="sort-indicator" id="sortInd-code"></span></th>
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
@@ -1250,7 +1274,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.28
+// reviewcheck v6.29
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1324,6 +1348,8 @@ let currentSalesMonth = null; // 選択中の表示月 (例: '2026-03')
 let currentRankingFilter = 'all';
 // v6.20: ランキング配置状況フィルタ ('all' | 'unplaced' | 'placed') ※ランキング証拠用モード時のみ有効
 let currentRankingPlacedFilter = 'all';
+// v6.29: ランキング証拠用モードでのExcelエクスポート選択(セッション限定、リロードでリセット)
+let _selectedCodes = new Set();
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
@@ -1436,7 +1462,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.28' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.29' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2254,6 +2280,9 @@ function renderProducts() {
   _updateSortIndicators();
   // ペンディング保存バーも常に同期
   _refreshPendingEditsBar();
+  // v6.29: 選択件数バッジ + ヘッダーチェックボックス状態を同期
+  if (typeof _updateSelectedCountBadge === 'function') _updateSelectedCountBadge();
+  if (typeof _updateHeaderSelectCbState === 'function') _updateHeaderSelectCbState();
 }
 
 // ── 列ヘッダーソート ──
@@ -2875,7 +2904,12 @@ function _renderTableRow(code) {
     cellYearMonth  = _escape(p.yearMonth || '');
   }
 
-  return `<tr id="row-${_escape(code)}">
+  // v6.29: チェック状態(セッション限定) + 選択行のハイライト用クラス
+  const isSelected = _selectedCodes.has(code);
+  const rowClasses = isSelected ? ' class="row-selected"' : '';
+
+  return `<tr id="row-${_escape(code)}"${rowClasses}>
+    <td class="col-select"><input type="checkbox" class="row-select-cb" data-code="${_escape(code)}" onchange="toggleRowSelection('${_escape(code)}', this.checked)"${isSelected ? ' checked' : ''}></td>
     <td class="col-kanri">${_escape(code)}</td>
     <td class="col-bangou">${cellItemNumber}</td>
     <td class="col-name">${cellName}</td>
@@ -3347,7 +3381,164 @@ function exportProductMappingCSV() {
   console.log(`[reviewcheck] CSV エクスポート完了: ${filename} (${rows.length - 1}商品)`);
 }
 
-// ── v6.28: 登録前ランキング商品を Excel でダウンロード ──
+// ── v6.29: ランキング証拠用モードでの行選択管理(セッション限定) ──
+// _selectedCodes に選択中の商品管理番号を保持。
+// - toggleRowSelection: 単一行のトグル
+// - toggleSelectAllVisible: ヘッダーチェックで表示中の全商品を選択/解除
+// - clearRankingSelection: すべての選択を解除
+// - _updateSelectedCountBadge: バッジ数字を更新
+
+function toggleRowSelection(code, checked) {
+  if (checked) _selectedCodes.add(code);
+  else _selectedCodes.delete(code);
+  // 該当行の row-selected クラス切替(全再描画は不要、DOM 直接更新)
+  const tr = document.getElementById('row-' + code);
+  if (tr) tr.classList.toggle('row-selected', checked);
+  _updateSelectedCountBadge();
+  _updateHeaderSelectCbState();
+}
+
+function toggleSelectAllVisible(headerCb) {
+  const rowCbs = document.querySelectorAll('.row-select-cb');
+  const desired = headerCb.checked;
+  rowCbs.forEach(cb => {
+    const code = cb.dataset.code;
+    if (!code) return;
+    cb.checked = desired;
+    if (desired) _selectedCodes.add(code);
+    else _selectedCodes.delete(code);
+    const tr = document.getElementById('row-' + code);
+    if (tr) tr.classList.toggle('row-selected', desired);
+  });
+  _updateSelectedCountBadge();
+}
+
+function clearRankingSelection() {
+  _selectedCodes.clear();
+  document.querySelectorAll('.row-select-cb').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('#productTableBody tr.row-selected').forEach(tr => tr.classList.remove('row-selected'));
+  const headerCb = document.getElementById('headerSelectCb');
+  if (headerCb) { headerCb.checked = false; headerCb.indeterminate = false; }
+  _updateSelectedCountBadge();
+  _showToast('選択をすべて解除しました', 'info');
+}
+
+function _updateSelectedCountBadge() {
+  const badge = document.getElementById('selectedCountBadge');
+  const count = _selectedCodes.size;
+  if (badge) badge.textContent = count;
+  // 選択0件のときは「選択分ダウンロード」ボタンを無効化風に
+  const selBtn = document.querySelector('.ranking-export-btn-outline');
+  if (selBtn) selBtn.classList.toggle('disabled', count === 0);
+}
+
+// 表示中の行のチェック状況からヘッダーチェックボックスの状態を更新(全選択/半選択/未選択)
+function _updateHeaderSelectCbState() {
+  const headerCb = document.getElementById('headerSelectCb');
+  if (!headerCb) return;
+  const rowCbs = document.querySelectorAll('.row-select-cb');
+  if (rowCbs.length === 0) {
+    headerCb.checked = false;
+    headerCb.indeterminate = false;
+    return;
+  }
+  const checkedCount = document.querySelectorAll('.row-select-cb:checked').length;
+  if (checkedCount === 0) {
+    headerCb.checked = false;
+    headerCb.indeterminate = false;
+  } else if (checkedCount === rowCbs.length) {
+    headerCb.checked = true;
+    headerCb.indeterminate = false;
+  } else {
+    headerCb.checked = false;
+    headerCb.indeterminate = true;
+  }
+}
+
+// ── v6.29: チェックした商品だけを Excel でダウンロード ──
+// exportRankingUnregisteredXlsx と同じ形式(4列)。チェック済かつ登録前かつタイプがdaily/realtimeのみ対象。
+function exportSelectedRankingXlsx() {
+  if (typeof XLSX === 'undefined') {
+    alert('⚠ Excel生成ライブラリの読み込みに失敗しています。ネットワーク接続を確認してリロードしてください。');
+    return;
+  }
+  if (_selectedCodes.size === 0) {
+    alert('⚠ 商品が選択されていません。\n\nチェックボックスにチェックを入れてから「選択分だけExcelでダウンロード」を押してください。');
+    return;
+  }
+  const outRows = [['商品管理番号', '商品番号', '1行目(ランキング名)', '2行目(更新年月日)']];
+  const warnings = [];
+  const skippedTypeMismatch = [];
+  let daily = 0, realtime = 0;
+  const selectedCodes = Array.from(_selectedCodes).sort();
+  for (const code of selectedCodes) {
+    const p = productCache[code] || {};
+    // タイプが対象外
+    if (p.rankingType !== 'daily' && p.rankingType !== 'realtime') {
+      skippedTypeMismatch.push({ code, itemNumber: p.itemNumber || '', reason: 'タイプがデイリー/リアルタイムではない' });
+      continue;
+    }
+    const rankingName = p.rankingType === 'daily' ? 'デイリーランキング' : 'リアルタイムランキング';
+    // 年を yearMonth から
+    const ym = String(p.yearMonth || '').trim();
+    const yearMatch = ym.match(/^(\d{4})/);
+    if (!yearMatch) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: '年月(yearMonth)が未設定' });
+      continue;
+    }
+    const year = yearMatch[1];
+    // ranking テキストから (M/D H:MM) を抽出
+    const rankingText = String(p.ranking || '');
+    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})[\)\)]/);
+    if (!dtMatch) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
+      continue;
+    }
+    const [, mo, da, hh, mm] = dtMatch;
+    const updated = `${year}/${parseInt(mo, 10)}/${parseInt(da, 10)} ${parseInt(hh, 10)}:${mm}更新`;
+    outRows.push([code, p.itemNumber || '', rankingName, updated]);
+    if (p.rankingType === 'daily') daily++;
+    else realtime++;
+  }
+  if (outRows.length <= 1) {
+    let msg = '⚠ 選択された商品にエクスポート可能なものがありませんでした。';
+    if (skippedTypeMismatch.length > 0) msg += `\n\n${skippedTypeMismatch.length}件はタイプがデイリー/リアルタイムではありませんでした。`;
+    if (warnings.length > 0) {
+      const lines = warnings.slice(0, 10).map(w => `・${w.code}${w.itemNumber ? ` (${w.itemNumber})` : ''}: ${w.reason}`);
+      msg += `\n\n${warnings.length}件は情報不足でスキップされました:\n${lines.join('\n')}`;
+    }
+    alert(msg);
+    return;
+  }
+  const ws = XLSX.utils.aoa_to_sheet(outRows);
+  ws['!cols'] = [{ wch: 14 }, { wch: 18 }, { wch: 22 }, { wch: 22 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '選択分ランキング');
+  const shopId = _getCurrentShopId() || 'shop';
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const filename = `reviewcheck_${shopId}_選択分ランキング_${yyyy}${mm}${dd}_${hh}${mi}.xlsx`;
+  XLSX.writeFile(wb, filename);
+  console.log(`[reviewcheck] Excel エクスポート完了(選択分): ${filename} (デイリー${daily}件 / リアルタイム${realtime}件)`);
+
+  // 警告があればアラート
+  const warnMsgs = [];
+  if (skippedTypeMismatch.length > 0) warnMsgs.push(`${skippedTypeMismatch.length}件: タイプがデイリー/リアルタイムではない`);
+  if (warnings.length > 0) {
+    const lines = warnings.slice(0, 20).map(w => `・${w.code}${w.itemNumber ? ` (${w.itemNumber})` : ''}: ${w.reason}`);
+    const more = warnings.length > 20 ? `\n... 他 ${warnings.length - 20}件` : '';
+    warnMsgs.push(`${warnings.length}件は情報不足でスキップ:\n${lines.join('\n')}${more}`);
+  }
+  if (warnMsgs.length > 0) {
+    alert(`✓ Excel をダウンロードしました。\n(デイリー ${daily}件 / リアルタイム ${realtime}件)\n\n⚠ 一部スキップ:\n\n${warnMsgs.join('\n\n')}`);
+  }
+}
+
+
 // 対象: rankingType が 'daily' or 'realtime' で、rankingRegistered !== true の商品
 // 列: 商品管理番号 / 商品番号 / 1行目(ランキング名) / 2行目(更新年月日)
 // - 1行目: 「デイリーランキング」or「リアルタイムランキング」
@@ -5375,7 +5566,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.28 initialized');
+  console.log('[reviewcheck] v6.29 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
