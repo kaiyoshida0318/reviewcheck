@@ -187,19 +187,27 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table tbody tr.checked { background: #fafff8; }
 .product-table tbody tr.checked:hover { background: #f0f8ec; }
 .product-table .col-check { width: 90px; }
-.product-table .col-kanri { width: 110px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
-.product-table .col-bangou { width: 130px; font-family: 'DM Mono', monospace; font-size: 11px; }
-.product-table .col-name { min-width: 160px; max-width: 200px; width: 200px; font-weight: 500; }
+.product-table .col-kanri { width: var(--col-code-w, 110px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
+.product-table .col-bangou { width: var(--col-itemNumber-w, 130px); font-family: 'DM Mono', monospace; font-size: 11px; }
+.product-table .col-name { min-width: 100px; width: var(--col-name-w, 200px); font-weight: 500; }
 .product-table .col-name a { color: var(--text); text-decoration: none; }
 .product-table .col-name a:hover { color: var(--accent); text-decoration: underline; }
 /* v6.12: ランキング/年月 新列 + 状態・確認 列幅縮小 */
-.product-table .col-ranking { min-width: 160px; max-width: 220px; width: 200px; font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.product-table .col-yearmonth { width: 80px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
-.product-table .col-review { width: 120px; }
-.product-table .col-image { width: 100px; }
-.product-table .col-action { width: 90px; text-align: center; }
-.product-table .col-status { width: 100px; }
-.product-table .col-tags { width: 160px; }
+/* v6.13: 全列幅をCSS変数化(JSから動的に変更可能) */
+.product-table .col-ranking { min-width: 80px; width: var(--col-ranking-w, 200px); font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-table .col-yearmonth { width: var(--col-yearMonth-w, 80px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
+.product-table .col-review { width: var(--col-review-w, 120px); }
+.product-table .col-image { width: var(--col-image-w, 100px); }
+.product-table .col-action { width: var(--col-action-w, 90px); text-align: center; }
+.product-table .col-status { width: var(--col-status-w, 100px); }
+.product-table .col-tags { width: var(--col-tags-w, 160px); }
+/* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
+.product-table thead th { position: relative; }
+.col-resize-handle { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; background: transparent; z-index: 10; }
+.col-resize-handle:hover { background: rgba(191, 0, 0, 0.15); }
+.col-resize-handle.dragging { background: rgba(191, 0, 0, 0.35); }
+body.col-resizing { cursor: col-resize !important; user-select: none !important; }
+body.col-resizing * { cursor: col-resize !important; }
 
 /* ── 状態 ドロップダウン ── */
 .inline-status-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
@@ -232,9 +240,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .rc-toast.error { background: var(--danger); }
 
 /* ── 差異確認モード ── */
-.product-table .col-diff-onscreen { width: 110px; }
-.product-table .col-diff-result { width: 90px; text-align: center; }
-.product-table .col-diff-growth { width: 90px; text-align: center; }
+.product-table .col-diff-onscreen { width: var(--col-onscreen-w, 110px); }
+.product-table .col-diff-result { width: var(--col-diffResult-w, 90px); text-align: center; }
+.product-table .col-diff-growth { width: var(--col-growth-w, 90px); text-align: center; }
 .product-table .diff-onscreen-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: 'DM Mono', monospace; font-size: 13px; text-align: right; outline: none; transition: border-color 0.15s; }
 .product-table .diff-onscreen-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(191, 0, 0, 0.1); }
 .product-table .diff-onscreen-input::-webkit-inner-spin-button { opacity: 0.5; }
@@ -300,7 +308,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .sales-month-row .month-delete-btn:hover { border-color: var(--danger); color: var(--danger); }
 
 /* ── Sales column in table ── */
-.product-table .col-sales { width: 120px; text-align: right; }
+.product-table .col-sales { width: var(--col-sales-w, 120px); text-align: right; }
 .product-table .col-sales-amount { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
 .product-table .col-sales-amount.zero { color: var(--text3); font-weight: 400; }
 .product-table .col-sales-sub { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
@@ -517,7 +525,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.12</span>
+    <span class="build-date">v6.13</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -697,6 +705,11 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         <div class="action-title"><span class="action-title-icon">🔑</span><span>楽天データ入力</span></div>
         <div class="action-desc">楽天アプリID・アクセスキー・店舗コード(shopCode)を入力します。GitHub PATを設定すると、複数PCでデータを共有できます。初回起動時は必ず設定してください。</div>
       </button>
+      <!-- v6.13: 列幅設定 -->
+      <button class="menu-action-btn" onclick="closeSetupMenuModal();openColWidthsModal()">
+        <div class="action-title"><span class="action-title-icon">📐</span><span>列幅設定</span></div>
+        <div class="action-desc">商品テーブルの各列の幅を調整できます。ヘッダー右端の細い枠をドラッグしてもリアルタイムに変更可能です。設定はGitHubに保存され、全PCで共有されます(店舗別)。</div>
+      </button>
       <button class="menu-action-btn" onclick="closeSetupMenuModal();diagnoseFetch()">
         <div class="action-title"><span class="action-title-icon">🔍</span><span>取得状況の診断</span></div>
         <div class="action-desc">楽天APIの取得結果と現在のproductCacheを比較して、取りこぼしがないか診断します。特定商品(例: 10001252)の存在チェックや、件数の不一致をチェックできます。</div>
@@ -866,6 +879,26 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
       <div class="edit-section-title" style="margin-top:14px">📋 日別合計レビュー件数</div>
       <div class="sales-history-table-wrap" style="max-height:320px">
         <table class="sales-history-table" id="allReviewsHistoryTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- v6.13: 列幅設定モーダル -->
+<div class="modal-overlay" id="colWidthsModal">
+  <div class="modal" style="max-width:520px">
+    <h3>📐 列幅設定</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">
+      各列のピクセル幅を入力してください。ヘッダー右端の細い枠をドラッグしても調整できます。<br>
+      保存すると全PCで共有されます(店舗別)。
+    </p>
+    <div id="colWidthsForm" style="max-height:60vh;overflow-y:auto"></div>
+    <div id="colWidthsStatus" class="modal-status"></div>
+    <div class="modal-actions" style="justify-content:space-between">
+      <button class="modal-btn" onclick="resetColumnWidths()" style="background:#fff3cd;color:#6d4c00;border-color:#ffe082" title="全ての列幅をデフォルト値に戻します">🔄 デフォルトに戻す</button>
+      <div style="display:flex;gap:8px">
+        <button class="modal-btn" onclick="closeColWidthsModal()">キャンセル</button>
+        <button class="modal-btn save" onclick="saveColumnWidths()">保存</button>
       </div>
     </div>
   </div>
@@ -1057,7 +1090,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.12
+// reviewcheck v6.13
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1245,7 +1278,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.12' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.13' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2896,6 +2929,10 @@ function _updateTableColumns() {
   }
   // ソートインジケーターを再描画
   _updateSortIndicators();
+  // v6.13: 差異列を追加/削除したのでリサイズハンドルも付け直す
+  if (typeof attachColumnResizeHandles === 'function') {
+    attachColumnResizeHandles();
+  }
 }
 
 function _renderCard(code) {
@@ -4235,6 +4272,302 @@ function _renderAllReviewsTable(totals) {
   table.innerHTML = html;
 }
 
+// ============================================
+// v6.13: 列幅カスタマイズ機能
+// - CSS変数(--col-{key}-w)経由で全列幅を動的制御
+// - ヘッダー右端のドラッグハンドルでリアルタイム変更
+// - 「⚙ 初期設定 → 列幅設定」モーダルで数値入力
+// - GitHub上の data/{shopId}/column_widths.json に永続化(店舗別)
+// ============================================
+
+// 列定義(id, label, デフォルト幅, 最小幅)
+const COLUMN_DEFS = [
+  { id: 'code',        label: '商品管理番号', defaultW: 110, min: 60 },
+  { id: 'itemNumber',  label: '商品番号',     defaultW: 130, min: 60 },
+  { id: 'name',        label: '商品名',       defaultW: 200, min: 80 },
+  { id: 'ranking',     label: 'ランキング',   defaultW: 200, min: 80 },
+  { id: 'yearMonth',   label: '年月',         defaultW:  80, min: 50 },
+  { id: 'sales',       label: '売上',         defaultW: 120, min: 60 },
+  { id: 'review',      label: 'レビュー',     defaultW: 120, min: 80 },
+  { id: 'image',       label: '画像(各)',     defaultW: 100, min: 60 },
+  { id: 'status',      label: '状態',         defaultW: 100, min: 60 },
+  { id: 'tags',        label: '制作予定',     defaultW: 160, min: 80 },
+  { id: 'action',      label: '確認(詳細)',   defaultW:  90, min: 60 },
+  // 差異モードの列
+  { id: 'onscreen',    label: '画面上件数(差異)', defaultW: 110, min: 60 },
+  { id: 'diffResult',  label: '件数差異(差異)',   defaultW:  90, min: 60 },
+  { id: 'growth',      label: '上昇率(差異)',     defaultW:  90, min: 60 },
+];
+
+// テーブルヘッダーの class 名 → colId 対応(ドラッグハンドル取り付け用)
+const TH_CLASS_TO_COLID = {
+  'col-kanri': 'code',
+  'col-bangou': 'itemNumber',
+  'col-name': 'name',
+  'col-ranking': 'ranking',
+  'col-yearmonth': 'yearMonth',
+  'col-sales': 'sales',
+  'col-review': 'review',
+  'col-image': 'image',
+  'col-status': 'status',
+  'col-tags': 'tags',
+  'col-action': 'action',
+  'col-diff-onscreen': 'onscreen',
+  'col-diff-result': 'diffResult',
+  'col-diff-growth': 'growth',
+};
+
+// 現在の幅(memory cache)。読み込み前はデフォルト値。
+let _columnWidths = null;
+
+// ── デフォルト幅を返す ──
+function _defaultColumnWidths() {
+  const w = {};
+  COLUMN_DEFS.forEach(c => { w[c.id] = c.defaultW; });
+  return w;
+}
+
+// ── 幅を CSS 変数に反映(即時適用) ──
+function _applyColumnWidths(widths) {
+  const root = document.documentElement;
+  COLUMN_DEFS.forEach(c => {
+    const v = (widths && typeof widths[c.id] === 'number' && widths[c.id] >= c.min) ? widths[c.id] : c.defaultW;
+    root.style.setProperty(`--col-${c.id}-w`, `${v}px`);
+  });
+}
+
+// ── ローカル初期化(GitHub取得前にデフォルトを適用) ──
+function initColumnWidths() {
+  if (!_columnWidths) _columnWidths = _defaultColumnWidths();
+  _applyColumnWidths(_columnWidths);
+}
+
+// ── GitHubから列幅設定を取得 ──
+async function loadColumnWidthsFromGitHub() {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) {
+    console.log('[colWidths] PAT未設定、GitHub取得スキップ');
+    return;
+  }
+  const shopId = _getCurrentShopId() || 'yukaiya';
+  const file = `data/${shopId}/column_widths.json`;
+  const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
+  try {
+    const res = await fetch(apiUrl, {
+      headers: { Authorization: `token ${pat}`, Accept: 'application/vnd.github+json' }
+    });
+    if (res.status === 404) {
+      console.log('[colWidths] GitHub上に設定なし(初回)、デフォルトを使用');
+      return;
+    }
+    if (!res.ok) {
+      console.warn('[colWidths] GET失敗:', res.status);
+      return;
+    }
+    const json = await res.json();
+    const decoded = decodeURIComponent(escape(atob(json.content.replace(/\n/g, ''))));
+    const parsed = JSON.parse(decoded);
+    if (parsed && typeof parsed === 'object') {
+      // 既知列だけ取り込み(サニタイズ)
+      const clean = _defaultColumnWidths();
+      COLUMN_DEFS.forEach(c => {
+        if (typeof parsed[c.id] === 'number' && parsed[c.id] >= c.min && parsed[c.id] <= 2000) {
+          clean[c.id] = Math.round(parsed[c.id]);
+        }
+      });
+      _columnWidths = clean;
+      _applyColumnWidths(_columnWidths);
+      console.log('[colWidths] GitHubから読み込み完了');
+    }
+  } catch (e) {
+    console.warn('[colWidths] 読み込みエラー:', e.message);
+  }
+}
+
+// ── GitHubに列幅設定を保存 ──
+async function _saveColumnWidthsToGitHub() {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) {
+    console.log('[colWidths] PAT未設定、GitHub保存スキップ(このブラウザのみ)');
+    return { ok: false, reason: 'no_pat' };
+  }
+  const shopId = _getCurrentShopId() || 'yukaiya';
+  const file = `data/${shopId}/column_widths.json`;
+  const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${file}`;
+  const headers = { Authorization: `token ${pat}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+  try {
+    // 既存SHA取得
+    let sha = null;
+    try {
+      const getRes = await fetch(apiUrl, { headers });
+      if (getRes.ok) sha = (await getRes.json()).sha;
+    } catch(e) {}
+    // Base64 (UTF-8対応)
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(_columnWidths, null, 2))));
+    const body = { message: `column widths update (${shopId})`, content };
+    if (sha) body.sha = sha;
+    const putRes = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!putRes.ok) {
+      const txt = await putRes.text();
+      console.error('[colWidths] 保存失敗:', putRes.status, txt);
+      return { ok: false, reason: 'put_failed', detail: txt };
+    }
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, reason: 'exception', detail: e.message };
+  }
+}
+
+// ── モーダル開閉 ──
+function openColWidthsModal() {
+  // フォームを構築
+  const form = document.getElementById('colWidthsForm');
+  if (!form) return;
+  const cur = _columnWidths || _defaultColumnWidths();
+  let html = '<table style="width:100%;font-size:13px"><thead><tr><th style="text-align:left;padding:6px 4px;border-bottom:1px solid var(--border)">列</th><th style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border);width:110px">幅(px)</th><th style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border);width:70px;color:var(--text3);font-weight:400">既定</th></tr></thead><tbody>';
+  COLUMN_DEFS.forEach(c => {
+    html += `<tr>
+      <td style="padding:6px 4px">${_escape(c.label)}</td>
+      <td style="padding:6px 4px;text-align:right">
+        <input type="number" class="modal-input" id="colw-${c.id}" value="${cur[c.id]}" min="${c.min}" max="2000" step="1" style="width:80px;text-align:right;padding:4px 6px">
+      </td>
+      <td style="padding:6px 4px;text-align:right;color:var(--text3);font-size:11px;font-family:'DM Mono',monospace">${c.defaultW}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  form.innerHTML = html;
+  const st = document.getElementById('colWidthsStatus');
+  if (st) { st.className = 'modal-status'; st.textContent = ''; }
+  document.getElementById('colWidthsModal').classList.add('open');
+}
+
+function closeColWidthsModal() {
+  document.getElementById('colWidthsModal').classList.remove('open');
+}
+
+// ── モーダル: 保存 ──
+async function saveColumnWidths() {
+  const newWidths = {};
+  let hasError = false;
+  COLUMN_DEFS.forEach(c => {
+    const el = document.getElementById(`colw-${c.id}`);
+    if (!el) return;
+    const v = parseInt(el.value, 10);
+    if (isNaN(v) || v < c.min || v > 2000) {
+      hasError = true;
+      el.style.borderColor = '#a32d2d';
+    } else {
+      el.style.borderColor = '';
+      newWidths[c.id] = v;
+    }
+  });
+  const st = document.getElementById('colWidthsStatus');
+  if (hasError) {
+    if (st) { st.className = 'modal-status error'; st.textContent = '⚠ 一部の値が範囲外です(最小幅チェック)'; }
+    return;
+  }
+  _columnWidths = newWidths;
+  _applyColumnWidths(_columnWidths);
+  if (st) { st.className = 'modal-status'; st.textContent = '保存中...'; }
+  const result = await _saveColumnWidthsToGitHub();
+  if (result.ok) {
+    if (st) { st.className = 'modal-status success'; st.textContent = '✓ 保存しました(全PC共有)'; }
+    setTimeout(() => closeColWidthsModal(), 800);
+  } else if (result.reason === 'no_pat') {
+    if (st) { st.className = 'modal-status success'; st.textContent = '✓ このブラウザに適用(PAT未設定のためGitHub共有なし)'; }
+    setTimeout(() => closeColWidthsModal(), 1200);
+  } else {
+    if (st) { st.className = 'modal-status error'; st.textContent = '✗ GitHub保存失敗(適用は完了、次回起動時に戻る可能性あり)'; }
+  }
+}
+
+// ── モーダル: デフォルトに戻す ──
+function resetColumnWidths() {
+  if (!confirm('全ての列幅をデフォルトに戻しますか?\n(保存ボタンを押すまで確定しません)')) return;
+  const def = _defaultColumnWidths();
+  COLUMN_DEFS.forEach(c => {
+    const el = document.getElementById(`colw-${c.id}`);
+    if (el) { el.value = def[c.id]; el.style.borderColor = ''; }
+  });
+  const st = document.getElementById('colWidthsStatus');
+  if (st) { st.className = 'modal-status'; st.textContent = 'デフォルトに戻しました。「保存」を押して確定してください。'; }
+}
+
+// ── ドラッグリサイズ機構: テーブルヘッダーにハンドルを取り付ける ──
+function attachColumnResizeHandles() {
+  const thead = document.querySelector('#productTableWrap thead tr');
+  if (!thead) return;
+  const ths = thead.querySelectorAll('th');
+  ths.forEach(th => {
+    // 既存ハンドルは削除(再アタッチ時)
+    th.querySelectorAll('.col-resize-handle').forEach(h => h.remove());
+    // どの colId に対応するか(class名から特定)
+    let colId = null;
+    for (const cls of th.classList) {
+      if (TH_CLASS_TO_COLID[cls]) { colId = TH_CLASS_TO_COLID[cls]; break; }
+    }
+    if (!colId) return;
+    // 画像列は3つあるが同じ幅を共有するため、まとめて扱う(image1/2/3 の区別なし)
+    const handle = document.createElement('span');
+    handle.className = 'col-resize-handle';
+    handle.dataset.colId = colId;
+    handle.title = 'ドラッグで幅調整';
+    handle.addEventListener('mousedown', _onResizeMouseDown);
+    th.appendChild(handle);
+  });
+}
+
+let _resizeState = null; // { colId, startX, startW, handle }
+
+function _onResizeMouseDown(e) {
+  e.preventDefault();
+  e.stopPropagation(); // ソートクリックを発火させない
+  const handle = e.currentTarget;
+  const colId = handle.dataset.colId;
+  const def = COLUMN_DEFS.find(c => c.id === colId);
+  if (!def) return;
+  const curW = (_columnWidths && _columnWidths[colId]) || def.defaultW;
+  _resizeState = { colId, startX: e.clientX, startW: curW, handle };
+  handle.classList.add('dragging');
+  document.body.classList.add('col-resizing');
+  document.addEventListener('mousemove', _onResizeMouseMove);
+  document.addEventListener('mouseup', _onResizeMouseUp);
+}
+
+function _onResizeMouseMove(e) {
+  if (!_resizeState) return;
+  const def = COLUMN_DEFS.find(c => c.id === _resizeState.colId);
+  const min = def ? def.min : 40;
+  const dx = e.clientX - _resizeState.startX;
+  let newW = _resizeState.startW + dx;
+  if (newW < min) newW = min;
+  if (newW > 2000) newW = 2000;
+  if (!_columnWidths) _columnWidths = _defaultColumnWidths();
+  _columnWidths[_resizeState.colId] = newW;
+  document.documentElement.style.setProperty(`--col-${_resizeState.colId}-w`, `${newW}px`);
+}
+
+let _colWidthSaveTimer = null;
+async function _onResizeMouseUp(e) {
+  if (!_resizeState) return;
+  const handle = _resizeState.handle;
+  if (handle) handle.classList.remove('dragging');
+  document.body.classList.remove('col-resizing');
+  document.removeEventListener('mousemove', _onResizeMouseMove);
+  document.removeEventListener('mouseup', _onResizeMouseUp);
+  _resizeState = null;
+  // 保存はデバウンス(連続リサイズ時にGitHub連打しない)
+  if (_colWidthSaveTimer) clearTimeout(_colWidthSaveTimer);
+  _colWidthSaveTimer = setTimeout(async () => {
+    _colWidthSaveTimer = null;
+    const result = await _saveColumnWidthsToGitHub();
+    if (result.ok) console.log('[colWidths] ドラッグ後の保存完了');
+    else if (result.reason === 'no_pat') console.log('[colWidths] PAT未設定のためローカルのみ');
+    else console.warn('[colWidths] ドラッグ後の保存失敗:', result.reason);
+  }, 700);
+}
+
+
 function _renderSalesChart(code) {
   const canvas = document.getElementById('salesChart');
   const emptyEl = document.getElementById('salesChartEmpty');
@@ -4451,14 +4784,20 @@ async function init() {
   updateApiStatus();
   loadCache();
   loadMonthlySalesCache();
+  // v6.13: 列幅をローカルデフォルトで即適用(GitHub取得は非同期で上書き)
+  initColumnWidths();
   if (localStorage.getItem('github_pat')) {
     _setSaveStatus('saving', '📥 GitHubから読込中...');
     await loadFromGitHub();
+    // v6.13: 列幅設定もGitHubから読み込み
+    await loadColumnWidthsFromGitHub();
     _setSaveStatus('saved');
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.12 initialized');
+  // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
+  attachColumnResizeHandles();
+  console.log('[reviewcheck] v6.13 initialized');
 }
 
 init();
