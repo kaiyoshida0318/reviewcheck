@@ -202,12 +202,21 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-status { width: var(--col-status-w, 100px); }
 .product-table .col-tags { width: var(--col-tags-w, 160px); }
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
-.product-table thead th { position: relative; }
-.col-resize-handle { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; background: transparent; z-index: 10; }
-.col-resize-handle:hover { background: rgba(191, 0, 0, 0.15); }
-.col-resize-handle.dragging { background: rgba(191, 0, 0, 0.35); }
+/* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
+/* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
+.col-resize-handle { position: absolute; top: 0; right: 0; width: 6px; height: 100%; user-select: none; background: transparent; z-index: 10; pointer-events: none; cursor: default; }
+/* 幅調整モード ON のときだけハンドルが機能する */
+body.resize-mode .col-resize-handle { pointer-events: auto; cursor: col-resize; background: rgba(191, 0, 0, 0.12); }
+body.resize-mode .col-resize-handle:hover { background: rgba(191, 0, 0, 0.30); }
+body.resize-mode .col-resize-handle.dragging { background: rgba(191, 0, 0, 0.45); }
 body.col-resizing { cursor: col-resize !important; user-select: none !important; }
 body.col-resizing * { cursor: col-resize !important; }
+/* 「↔ 幅調整」ボタンの ON 状態 */
+.header-btn.resize-mode-on { background: var(--red); color: #fff; border-color: var(--red); }
+.header-btn.resize-mode-on:hover { background: var(--red-dark); }
+/* モード ON のときテーブル全体に薄い枠を出して視覚的にフィードバック */
+body.resize-mode .product-table { outline: 2px dashed rgba(191, 0, 0, 0.35); outline-offset: -1px; }
+body.resize-mode .product-table thead th { background: #fdf3f3; }
 
 /* ── 状態 ドロップダウン ── */
 .inline-status-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
@@ -525,7 +534,7 @@ body.col-resizing * { cursor: col-resize !important; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.13</span>
+    <span class="build-date">v6.14</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -542,6 +551,8 @@ body.col-resizing * { cursor: col-resize !important; }
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
+    <!-- v6.14: 列幅調整モード切替(セッション限定) -->
+    <button class="header-btn" id="resizeModeBtn" onclick="toggleColumnResizeMode()" title="列幅の調整モードをON/OFF。ONのときだけヘッダー右端をドラッグして幅を変更できます。">↔ 幅調整</button>
     <button class="header-btn" onclick="openSetupMenuModal()">⚙ 初期設定</button>
     <button class="header-btn primary" onclick="fetchAllProductData()" id="fetchProductDataBtn" title="楽天APIから商品データを全件取得しレビュー件数を記録">📥 商品データ取得</button>
   </div>
@@ -1090,7 +1101,7 @@ body.col-resizing * { cursor: col-resize !important; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.13
+// reviewcheck v6.14
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1278,7 +1289,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.13' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.14' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -4511,15 +4522,34 @@ function attachColumnResizeHandles() {
     const handle = document.createElement('span');
     handle.className = 'col-resize-handle';
     handle.dataset.colId = colId;
-    handle.title = 'ドラッグで幅調整';
+    handle.title = '幅調整モードONの時にドラッグで幅調整';
     handle.addEventListener('mousedown', _onResizeMouseDown);
     th.appendChild(handle);
+  });
+}
+
+// ── v6.14: 幅調整モードの切替(セッション限定) ──
+// ONの間だけリサイズハンドルが機能する。ヘッダーの「↔ 幅調整」ボタンを押してトグル。
+let _resizeModeOn = false;
+function toggleColumnResizeMode() {
+  _resizeModeOn = !_resizeModeOn;
+  document.body.classList.toggle('resize-mode', _resizeModeOn);
+  const btn = document.getElementById('resizeModeBtn');
+  if (btn) {
+    btn.classList.toggle('resize-mode-on', _resizeModeOn);
+    btn.textContent = _resizeModeOn ? '✓ 幅調整中' : '↔ 幅調整';
+  }
+  // ハンドル tooltip も切り替え
+  document.querySelectorAll('.col-resize-handle').forEach(h => {
+    h.title = _resizeModeOn ? 'ドラッグで幅を変更' : '幅調整モードOFF';
   });
 }
 
 let _resizeState = null; // { colId, startX, startW, handle }
 
 function _onResizeMouseDown(e) {
+  // v6.14: 幅調整モードOFFなら無視(CSSでpointer-events:noneなので通常ここには来ないが念のため)
+  if (!_resizeModeOn) return;
   e.preventDefault();
   e.stopPropagation(); // ソートクリックを発火させない
   const handle = e.currentTarget;
@@ -4797,7 +4827,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.13 initialized');
+  console.log('[reviewcheck] v6.14 initialized');
 }
 
 init();
