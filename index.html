@@ -247,7 +247,7 @@ body.bulk-edit-mode .product-table thead th { background: #eef4fb; }
 .bulk-ranking-type-select:focus { outline: none; border-color: #1976d2; }
 .bulk-ranking-type-select.ranking-type-daily { background: #e3f2fd; color: #1565c0; border-color: rgba(25,118,210,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-realtime { background: #fff0f0; color: #c62828; border-color: rgba(198,40,40,0.4); font-weight: 600; }
-.bulk-ranking-type-select.ranking-type-unnecessary { background: #f5f5f5; color: var(--text3); border-color: var(--border2); font-weight: 600; text-decoration: line-through; }
+.bulk-ranking-type-select.ranking-type-unnecessary { background: #ffe0b2; color: #bf360c; border-color: rgba(191,54,12,0.4); font-weight: 600; text-decoration: line-through; }
 /* v6.24: 過去のまま放置(紫系) */
 .bulk-ranking-type-select.ranking-type-past { background: #f3e8ff; color: #6a1b9a; border-color: rgba(106,27,154,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-unset { background: #fff; color: var(--text3); }
@@ -261,7 +261,7 @@ body.bulk-edit-mode .product-table thead th { background: #eef4fb; }
 .ranking-type-badge { display: inline-block; margin-bottom: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
 .ranking-type-badge.daily { background: #e3f2fd; color: #1565c0; border: 1px solid rgba(25,118,210,0.3); }
 .ranking-type-badge.realtime { background: #fff0f0; color: #c62828; border: 1px solid rgba(198,40,40,0.3); }
-.ranking-type-badge.unnecessary { background: #f5f5f5; color: var(--text3); border: 1px solid var(--border2); text-decoration: line-through; }
+.ranking-type-badge.unnecessary { background: #ffe0b2; color: #bf360c; border: 1px solid rgba(191,54,12,0.3); text-decoration: line-through; }
 /* v6.24: 過去のまま放置バッジ(紫) */
 .ranking-type-badge.past { background: #f3e8ff; color: #6a1b9a; border: 1px solid rgba(106,27,154,0.3); }
 /* v6.20: 通常表示モードでの rankingRegistered バッジ(旧 rankingPlaced のクラス名を流用) */
@@ -630,7 +630,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.24</span>
+    <span class="build-date">v6.24.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1408,7 +1408,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.24' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.24.1' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -5227,7 +5227,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.24 initialized');
+  console.log('[reviewcheck] v6.24.1 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
