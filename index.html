@@ -144,6 +144,28 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* col-select は基本モード/件数再確認モードでは非表示、ランキング証拠用モードでのみ表示 */
 body.mode-basic .col-select,
 body.mode-diff .col-select { display: none; }
+/* v6.31: 2ブロック構成のエクスポート群 */
+.export-blocks { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+.export-block { border-radius: 8px; padding: 8px 12px 10px; border: 1px solid transparent; }
+.export-block-info { background: #f0fbf6; border-color: rgba(29,158,117,0.3); }
+.export-block-images { background: #f3ecff; border-color: rgba(106,27,154,0.3); }
+.export-block-title { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; font-size: 11px; font-weight: 600; }
+.export-block-info .export-block-title { color: #1d9e75; }
+.export-block-images .export-block-title { color: #6a1b9a; }
+.export-block-body { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+/* v6.31: 画像ZIPダウンロードボタン(紫系) */
+.image-zip-btn { font-size: 12px; padding: 6px 12px; border: 1px solid #6a1b9a; border-radius: var(--radius-sm); background: #6a1b9a; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.image-zip-btn:hover { background: #4a1370; border-color: #4a1370; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(106,27,154,0.3); }
+.image-zip-btn:active { transform: translateY(0); }
+.image-zip-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+.image-zip-btn.disabled:hover { background: #6a1b9a; box-shadow: none; transform: none; }
+.image-count-badge { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 10px; background: #fff; color: #6a1b9a; font-size: 10px; font-weight: 700; min-width: 16px; text-align: center; }
+/* v6.31: 画像下の選択帯(画像と同じ幅、ランキング証拠用モードのみ表示、CSSで制御) */
+.img-select-band { display: none; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 4px 0; font-size: 10px; text-align: center; background: #fff; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s; color: var(--text2); font-weight: 500; }
+body.mode-ranking .img-select-band { display: block; }
+.img-select-band:hover { background: #f7f5f0; border-color: #b4b2a9; }
+.img-select-band.img-selected { background: #f3ecff; border-color: #6a1b9a; color: #6a1b9a; font-weight: 700; }
+.img-select-band.img-selected:hover { background: #ebdff9; }
 
 /* ── Empty state ── */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -620,6 +642,8 @@ body.mode-ranking .product-table .col-ranking {
 </style>
 <!-- v6.28: SheetJS (xlsx) をエクセル出力用に読み込み -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- v6.31: JSZip を画像ZIP出力用に読み込み -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
 
@@ -672,7 +696,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.30</span>
+    <span class="build-date">v6.31</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -781,11 +805,25 @@ body.mode-ranking .product-table .col-ranking {
           <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 登録前</button>
           <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 登録済</button>
         </div>
-        <!-- v6.28/v6.29: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポートボタン群 -->
-        <div class="toolbar-group" id="rankingExportGroup" style="display:none">
-          <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="登録前のランキング商品一覧をExcelでダウンロード">⬇ 登録前をExcelでダウンロード</button>
-          <button class="ranking-export-btn ranking-export-btn-outline" onclick="exportSelectedRankingXlsx()" title="チェックした商品だけをExcelでダウンロード">✓ 選択分だけExcelでダウンロード <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
-          <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
+        <!-- v6.28/v6.29/v6.31: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポート群 -->
+        <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
+          <!-- 商品情報ブロック(緑系) -->
+          <div class="export-block export-block-info">
+            <div class="export-block-title">📄 商品情報 (Excel)</div>
+            <div class="export-block-body">
+              <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="登録前のランキング商品一覧をExcelでダウンロード">⬇ 登録前をExcelで</button>
+              <button class="ranking-export-btn ranking-export-btn-outline" onclick="exportSelectedRankingXlsx()" title="チェックした商品だけをExcelでダウンロード">✓ 選択分だけExcelで <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
+              <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
+            </div>
+          </div>
+          <!-- 獲得画像ブロック(紫系) -->
+          <div class="export-block export-block-images">
+            <div class="export-block-title">🖼 獲得画像 (ZIP)</div>
+            <div class="export-block-body">
+              <button class="image-zip-btn" id="imageZipDownloadBtn" onclick="downloadSelectedImagesZip()" title="選択した画像をZIPでダウンロード">⬇ 選択画像をZIPで <span class="image-count-badge" id="imageSelectionCountBadge">0</span></button>
+              <button class="ranking-clear-btn" onclick="clearImageSelection()" title="すべての画像選択を外す">☐ 画像選択解除</button>
+            </div>
+          </div>
         </div>
         <div class="toolbar-group pending-edits-group" id="pendingEditsGroup" style="display:none">
           <span class="pending-count">⚠ <strong id="pendingCount">0</strong>件 未保存</span>
@@ -1274,7 +1312,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.30
+// reviewcheck v6.31
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1350,6 +1388,8 @@ let currentRankingFilter = 'all';
 let currentRankingPlacedFilter = 'all';
 // v6.29: ランキング証拠用モードでのExcelエクスポート選択(セッション限定、リロードでリセット)
 let _selectedCodes = new Set();
+// v6.31: 画像選択(セッション限定)。キー形式: "商品管理番号:画像番号(1-3)"、値: {code, idx, url}
+let _selectedImages = new Map();
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
@@ -1462,7 +1502,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.30' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.31' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2791,10 +2831,19 @@ function _renderTableRow(code) {
     if (!img) {
       return `<td class="col-image"><div class="table-img-cell empty">なし</div></td>`;
     }
+    // v6.31: 各画像下に選択帯(ランキング証拠用モード時のみ表示、CSSで制御)
+    const imgIdx = i + 1;
+    const selKey = code + ':' + imgIdx;
+    const isImgSelected = _selectedImages.has(selKey);
+    const selectedCls = isImgSelected ? ' img-selected' : '';
+    const labelText = isImgSelected ? '✓ 選択済' : '選択';
     return `<td class="col-image">
       <div class="table-img-cell" onclick="openLightbox('${_escape(img)}')">
-        <img src="${_escape(img)}" alt="画像${i+1}" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML='なし'">
+        <img src="${_escape(img)}" alt="画像${imgIdx}" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML='なし'">
       </div>
+      <label class="img-select-band${selectedCls}" data-code="${_escape(code)}" data-idx="${imgIdx}" data-url="${_escape(img)}" onclick="toggleImageSelection('${_escape(code)}', ${imgIdx}, '${_escape(img)}', event)">
+        <span class="img-select-band-text">${labelText}</span>
+      </label>
     </td>`;
   }).join('');
 
@@ -3452,6 +3501,174 @@ function _updateHeaderSelectCbState() {
   } else {
     headerCb.checked = false;
     headerCb.indeterminate = true;
+  }
+}
+
+// ── v6.31: 画像選択(No.1画像等)とZIPダウンロード ──
+// _selectedImages に選択中の画像を保持(セッション限定、Map で code:idx をキーに url を保存)
+function toggleImageSelection(code, idx, url, evt) {
+  if (evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
+  const key = code + ':' + idx;
+  const label = document.querySelector(`.img-select-band[data-code="${CSS.escape(code)}"][data-idx="${idx}"]`);
+  if (_selectedImages.has(key)) {
+    _selectedImages.delete(key);
+    if (label) {
+      label.classList.remove('img-selected');
+      const t = label.querySelector('.img-select-band-text');
+      if (t) t.textContent = '選択';
+    }
+  } else {
+    _selectedImages.set(key, { code, idx, url });
+    if (label) {
+      label.classList.add('img-selected');
+      const t = label.querySelector('.img-select-band-text');
+      if (t) t.textContent = '✓ 選択済';
+    }
+  }
+  _updateImageSelectionCountBadge();
+}
+
+function clearImageSelection() {
+  if (_selectedImages.size === 0) return;
+  _selectedImages.clear();
+  document.querySelectorAll('.img-select-band.img-selected').forEach(el => {
+    el.classList.remove('img-selected');
+    const t = el.querySelector('.img-select-band-text');
+    if (t) t.textContent = '選択';
+  });
+  _updateImageSelectionCountBadge();
+  _showToast('画像選択をすべて解除しました', 'info');
+}
+
+function _updateImageSelectionCountBadge() {
+  const badge = document.getElementById('imageSelectionCountBadge');
+  const n = _selectedImages.size;
+  if (badge) badge.textContent = n;
+  const btn = document.getElementById('imageZipDownloadBtn');
+  if (btn) btn.classList.toggle('disabled', n === 0);
+}
+
+// 選択画像を ZIP でダウンロード
+// - ファイル名: {商品番号(itemNumber)}.{拡張子} ※商品番号のみ(要望)
+// - 同じ商品で複数選ぶと後の画像で上書きされる仕様(ユーザー了承済)
+// - itemNumber 未設定の商品は 商品管理番号 でフォールバック + 警告
+async function downloadSelectedImagesZip() {
+  if (_selectedImages.size === 0) {
+    alert('⚠ 画像が選択されていません。\n\n画像下の帯を押して選択してから、もう一度お試しください。');
+    return;
+  }
+  if (typeof JSZip === 'undefined') {
+    alert('⚠ ZIP生成ライブラリの読み込みに失敗しています。ネットワーク接続を確認してリロードしてください。');
+    return;
+  }
+  const btn = document.getElementById('imageZipDownloadBtn');
+  const originalText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.classList.add('disabled');
+    btn.innerHTML = '⏳ ZIP作成中... (0/' + _selectedImages.size + ')';
+  }
+
+  const zip = new JSZip();
+  const warnings = []; // 取得失敗など
+  const noItemNumber = []; // itemNumber 未設定
+  let processed = 0;
+  const items = Array.from(_selectedImages.values());
+  // 並列3で fetch
+  const concurrency = 3;
+  const worker = async (item) => {
+    const p = productCache[item.code] || {};
+    let filenameBase = p.itemNumber && p.itemNumber.trim() ? p.itemNumber.trim() : null;
+    if (!filenameBase) {
+      filenameBase = item.code; // フォールバック
+      noItemNumber.push({ code: item.code, idx: item.idx });
+    }
+    // 拡張子を URL から推測(なければ .jpg)
+    let ext = 'jpg';
+    const extMatch = item.url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i);
+    if (extMatch) ext = extMatch[1].toLowerCase();
+    // fetch して blob 化
+    try {
+      const res = await fetch(item.url, { mode: 'cors' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const blob = await res.blob();
+      // ファイル名は商品番号のみ(同一商品で複数枚選ぶと上書きされる仕様、要望通り)
+      const filename = `${filenameBase}.${ext}`;
+      zip.file(filename, blob);
+    } catch (e) {
+      warnings.push({ code: item.code, idx: item.idx, url: item.url, error: e.message || String(e) });
+    }
+    processed++;
+    if (btn) btn.innerHTML = `⏳ ZIP作成中... (${processed}/${_selectedImages.size})`;
+  };
+  // ワーカープール
+  const pool = [];
+  const queue = items.slice();
+  const spawn = async () => {
+    while (queue.length > 0) {
+      const item = queue.shift();
+      await worker(item);
+    }
+  };
+  for (let i = 0; i < concurrency; i++) pool.push(spawn());
+  await Promise.all(pool);
+
+  if (Object.keys(zip.files).length === 0) {
+    if (btn) {
+      btn.classList.remove('disabled');
+      btn.innerHTML = originalText;
+      _updateImageSelectionCountBadge();
+    }
+    const lines = warnings.slice(0, 10).map(w => `・${w.code} 画像${w.idx}: ${w.error}`);
+    alert('⚠ すべての画像取得に失敗しました。\n\n' + lines.join('\n'));
+    return;
+  }
+
+  // ZIP 生成
+  try {
+    if (btn) btn.innerHTML = '📦 ZIP圧縮中...';
+    const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+    const shopId = _getCurrentShopId() || 'shop';
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const zipFilename = `reviewcheck_${shopId}_ranking_images_${yyyy}${mm}${dd}_${hh}${mi}.zip`;
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = zipFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    console.log(`[reviewcheck] 画像ZIP ダウンロード完了: ${zipFilename} (${Object.keys(zip.files).length}枚)`);
+  } catch (e) {
+    alert('⚠ ZIP生成に失敗しました: ' + (e.message || e));
+  } finally {
+    if (btn) {
+      btn.classList.remove('disabled');
+      btn.innerHTML = originalText;
+      _updateImageSelectionCountBadge();
+    }
+  }
+
+  // 警告があればアラート
+  const warnMsgs = [];
+  if (noItemNumber.length > 0) {
+    const lines = noItemNumber.slice(0, 10).map(w => `・${w.code} 画像${w.idx}`);
+    warnMsgs.push(`${noItemNumber.length}件は商品番号未設定のため管理番号でファイル名を作成:\n${lines.join('\n')}`);
+  }
+  if (warnings.length > 0) {
+    const lines = warnings.slice(0, 10).map(w => `・${w.code} 画像${w.idx}: ${w.error}`);
+    warnMsgs.push(`${warnings.length}件は画像取得に失敗:\n${lines.join('\n')}`);
+  }
+  if (warnMsgs.length > 0) {
+    alert(`✓ ZIPをダウンロードしました。\n\n⚠ 一部注意:\n\n${warnMsgs.join('\n\n')}`);
   }
 }
 
@@ -5592,7 +5809,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.30 initialized');
+  console.log('[reviewcheck] v6.31 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
