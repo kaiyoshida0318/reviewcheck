@@ -268,6 +268,14 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 .rc-toast.success { background: #1d9e75; }
 .rc-toast.info { background: var(--text2); }
 .rc-toast.error { background: var(--danger); }
+/* v6.18: 保存フィードバック用フラッシュ(セル背景を一瞬緑に) */
+@keyframes rc-flash-saved-anim {
+  0% { background-color: rgba(29, 158, 117, 0.35); }
+  100% { background-color: transparent; }
+}
+.rc-flash-saved { animation: rc-flash-saved-anim 0.7s ease-out; }
+/* pending-edits-group は v6.18 で不要になった。強制的に非表示に */
+.pending-edits-group { display: none !important; }
 
 /* ── 差異確認モード ── */
 .product-table .col-diff-onscreen { width: var(--col-onscreen-w, 110px); }
@@ -590,7 +598,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.17.3</span>
+    <span class="build-date">v6.18</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1164,7 +1172,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.17.1
+// reviewcheck v6.18
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1352,7 +1360,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17.3' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.18' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -1394,6 +1402,26 @@ function scheduleGitHubSave() {
     saveToGitHub({ showLock: false });
   }, 3000);
 }
+
+// ── v6.18: ページ離脱防止 ──
+// GitHub保存中(送信中 or デバウンスタイマー動作中)ならブラウザ標準の確認ダイアログを出す
+// これにより、リロード・タブ閉じ・戻る・進む・別サイト遷移 いずれの場合も警告される
+window.addEventListener('beforeunload', function(e) {
+  const pendingSave = (_saveTimer !== null) || (_saveInFlight !== null);
+  if (pendingSave) {
+    // デバウンス待ちの場合は今すぐ送る試み(非同期なので完了保証はないが、多くのケースで間に合う)
+    if (_saveTimer !== null) {
+      clearTimeout(_saveTimer);
+      _saveTimer = null;
+      saveToGitHub({ showLock: false });
+    }
+    // ブラウザ標準の確認ダイアログを出す(メッセージ本文はブラウザによって固定文言に置き換えられる)
+    const msg = '変更がまだGitHubに保存されていない可能性があります。このページを離れますか?';
+    e.preventDefault();
+    e.returnValue = msg;
+    return msg;
+  }
+});
 
 // ── GitHub load ──
 async function loadFromGitHub() {
@@ -2691,23 +2719,20 @@ function _renderTableRow(code) {
   }
 
   // v6.15: 一括編集モード時は各セルを編集可能な入力に置き換え
-  // pendingEdits[code] に既に変更がある場合はその値を初期値にする
-  const pend = pendingEdits[code] || {};
-  const _pv = (field, def) => pend[field] !== undefined ? pend[field] : def;
+  // v6.18: pending廃止、productCache から直接値を取る
   const isBulkEdit = _bulkEditModeOn;
 
   // 各セルの中身をモードで切り替え
   let cellItemNumber, cellName, cellRanking, cellYearMonth;
   if (isBulkEdit) {
-    const vItemNumber = _pv('itemNumber', p.itemNumber || '');
-    const vName       = _pv('name', p.name || '');
-    const vRanking    = _pv('ranking', p.ranking || '');
-    const vYearMonth  = _pv('yearMonth', p.yearMonth || '');
-    const pcls = (f) => (pend[f] !== undefined ? ' pending' : '');
-    cellItemNumber = `<input type="text" class="bulk-edit-input${pcls('itemNumber')}" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
-    cellName       = `<input type="text" class="bulk-edit-input${pcls('name')}" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">`;
-    cellRanking    = `<input type="text" class="bulk-edit-input${pcls('ranking')}" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="—">`;
-    cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth${pcls('yearMonth')}" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM">`;
+    const vItemNumber = p.itemNumber || '';
+    const vName       = p.name || '';
+    const vRanking    = p.ranking || '';
+    const vYearMonth  = p.yearMonth || '';
+    cellItemNumber = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellName       = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellRanking    = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM">`;
   } else {
     cellItemNumber = itemNumberCell;
     cellName       = `<a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a>`;
@@ -2743,18 +2768,16 @@ function _renderTableRow(code) {
   </tr>`;
 }
 
-// 状態ボタン群(注目/通常/無視) - 縦並び文字リスト
+// 状態ボタン群(注目/通常/無視) - v6.18: pending廃止、即saved値を使用
 function _renderStatusButtons(code, savedStatus) {
-  const saved = savedStatus || 'normal';
-  const current = (pendingEdits[code] && pendingEdits[code].status !== undefined) ? pendingEdits[code].status : saved;
-  const isPending = (pendingEdits[code] && pendingEdits[code].status !== undefined && pendingEdits[code].status !== saved);
+  const current = savedStatus || 'normal';
   const opts = [
     { key: 'normal',  label: '👁 通常' },
     { key: 'focus',   label: '⭐ 注目' },
     { key: 'ignore',  label: '🙈 無視' },
     { key: 'retired', label: '🏁 引退済' },
   ];
-  let html = `<select class="inline-status-select ${isPending ? 'pending' : ''} status-${current}" onchange="setInlineStatus('${_escape(code)}', this.value)">`;
+  let html = `<select class="inline-status-select status-${current}" onchange="setInlineStatus('${_escape(code)}', this.value)">`;
   for (const o of opts) {
     const sel = current === o.key ? 'selected' : '';
     html += `<option value="${o.key}" ${sel}>${_escape(o.label)}</option>`;
@@ -2775,19 +2798,15 @@ function _getActiveTagKey(savedTags) {
 
 function _renderTagsButtons(code, savedTags) {
   savedTags = savedTags || {};
-  const savedTagKey = _getActiveTagKey(savedTags);
-  // pendingEditsには文字列で保存(空文字=なし)
-  const pending = (pendingEdits[code] && pendingEdits[code].tagKey !== undefined) ? pendingEdits[code].tagKey : null;
-  const current = pending !== null ? pending : savedTagKey;
-  const isPending = pending !== null && pending !== savedTagKey;
-  // ドロップダウン
+  const current = _getActiveTagKey(savedTags);
+  // ドロップダウン - v6.18: pending廃止
   const opts = [
     { key: '',          label: '— なし —' },
     { key: 'renewal',   label: '🔄 リニューアル' },
     { key: 'boost',     label: '🚀 盛り上げ制作' },
     { key: 'boostPlan', label: '📅 盛り上げ予定' },
   ];
-  let html = `<select class="inline-tag-select ${isPending ? 'pending' : ''} tag-${current || 'none'}" onchange="setInlineTag('${_escape(code)}', this.value)">`;
+  let html = `<select class="inline-tag-select tag-${current || 'none'}" onchange="setInlineTag('${_escape(code)}', this.value)">`;
   for (const o of opts) {
     const sel = current === o.key ? 'selected' : '';
     html += `<option value="${o.key}" ${sel}>${_escape(o.label)}</option>`;
@@ -2796,52 +2815,56 @@ function _renderTagsButtons(code, savedTags) {
   return html;
 }
 
-// 状態をインラインで変更(保留)
+// v6.18: 状態を即保存(pending 廃止、変更したら productCache に直接反映 + GitHub保存予約)
 function setInlineStatus(code, status) {
-  const saved = (productCache[code] || {}).status || 'normal';
-  if (!pendingEdits[code]) pendingEdits[code] = {};
-  if (status === saved) {
-    // 元に戻された場合は pending から削除
-    delete pendingEdits[code].status;
-    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
-  } else {
-    pendingEdits[code].status = status;
-  }
-  // 該当セルだけ再描画
+  if (!productCache[code]) return;
+  const saved = productCache[code].status || 'normal';
+  if (status === saved) return; // 変化なし
+  productCache[code].status = status;
+  // 該当セルだけ再描画(緑フラッシュ付き)
   const cell = document.getElementById('statusCell-' + code);
-  if (cell) cell.innerHTML = _renderStatusButtons(code, saved);
-  _refreshPendingEditsBar();
+  if (cell) {
+    cell.innerHTML = _renderStatusButtons(code, status);
+    _flashCell(cell);
+  }
+  scheduleGitHubSave();
 }
 
-// 制作タグをインラインでトグル(保留)
+// v6.18: 制作タグを即保存(pending 廃止)
 function setInlineTag(code, tagKey) {
-  const savedTags = (productCache[code] || {}).tags || {};
+  if (!productCache[code]) return;
+  const savedTags = productCache[code].tags || {};
   const savedTagKey = _getActiveTagKey(savedTags);
-  if (!pendingEdits[code]) pendingEdits[code] = {};
-  if (tagKey === savedTagKey) {
-    // 元に戻された
-    delete pendingEdits[code].tagKey;
-    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
-  } else {
-    pendingEdits[code].tagKey = tagKey;
-  }
-  // 該当セルだけ再描画
+  if (tagKey === savedTagKey) return; // 変化なし
+  // 1つだけのタグキーをセット(空文字なら全部解除)
+  const newTags = {};
+  if (tagKey === 'renewal')        newTags.renewal = true;
+  else if (tagKey === 'boost')     newTags.boost = true;
+  else if (tagKey === 'boostPlan') newTags.boostPlan = true;
+  productCache[code].tags = newTags;
+  // 該当セルだけ再描画(緑フラッシュ付き)
   const cell = document.getElementById('tagsCell-' + code);
-  if (cell) cell.innerHTML = _renderTagsButtons(code, savedTags);
-  _refreshPendingEditsBar();
+  if (cell) {
+    cell.innerHTML = _renderTagsButtons(code, newTags);
+    _flashCell(cell);
+  }
+  scheduleGitHubSave();
 }
 
-// 保存バー更新
+// v6.18: セルに緑フラッシュを一瞬付ける(保存フィードバック)
+function _flashCell(cell) {
+  if (!cell) return;
+  cell.classList.remove('rc-flash-saved');
+  // 再フローで再アニメーション
+  void cell.offsetWidth;
+  cell.classList.add('rc-flash-saved');
+  setTimeout(() => cell.classList.remove('rc-flash-saved'), 700);
+}
+
+// v6.18: 保存バーは削除。互換のため空スタブを残す(他所からの呼び出しがあっても no-op)
 function _refreshPendingEditsBar() {
-  const count = Object.keys(pendingEdits).length;
   const group = document.getElementById('pendingEditsGroup');
-  if (!group) return;
-  if (count === 0) {
-    group.style.display = 'none';
-  } else {
-    group.style.display = '';
-    document.getElementById('pendingCount').textContent = count;
-  }
+  if (group) group.style.display = 'none';
 }
 
 // トースト通知(画面下部に一時的に出る)
@@ -2859,49 +2882,9 @@ function _showToast(msg, type) {
   toast._hideTimer = setTimeout(() => { toast.className = 'rc-toast'; }, 2000);
 }
 
-// 保留中の変更をすべて保存
-function commitPendingEdits() {
-  const count = Object.keys(pendingEdits).length;
-  if (count === 0) return;
-  for (const [code, change] of Object.entries(pendingEdits)) {
-    if (!productCache[code]) continue;
-    if (change.status !== undefined) {
-      productCache[code].status = change.status;
-    }
-    if (change.tagKey !== undefined) {
-      // 1つだけのタグキーをセット(空文字なら全部解除)
-      const newTags = {};
-      if (change.tagKey === 'renewal')   newTags.renewal = true;
-      else if (change.tagKey === 'boost')     newTags.boost = true;
-      else if (change.tagKey === 'boostPlan') newTags.boostPlan = true;
-      productCache[code].tags = newTags;
-    }
-    // v6.15: 一括編集モード由来のフィールド
-    if (change.itemNumber !== undefined) productCache[code].itemNumber = change.itemNumber;
-    if (change.name       !== undefined) productCache[code].name       = change.name;
-    if (change.ranking    !== undefined) productCache[code].ranking    = change.ranking;
-    if (change.yearMonth  !== undefined) productCache[code].yearMonth  = change.yearMonth;
-  }
-  pendingEdits = {};
-  saveCache();
-  scheduleGitHubSave();
-  _refreshPendingEditsBar(); // バーを必ず非表示に
-  renderProducts();
-  // 一括編集モード中は再描画されたセルにリサイズハンドルも付け直す
-  attachColumnResizeHandles();
-  _showToast(`✓ ${count}件の変更を保存しました`, 'success');
-}
-
-// 保留中の変更を破棄
-function cancelPendingEdits() {
-  const count = Object.keys(pendingEdits).length;
-  if (count === 0) return;
-  pendingEdits = {};
-  _refreshPendingEditsBar(); // バーを必ず非表示に
-  renderProducts();
-  attachColumnResizeHandles();
-  _showToast(`↩ ${count}件の変更を取り消しました`, 'info');
-}
+// v6.18: pending バーは廃止(即保存に統一)。互換のため空スタブとして残す。
+function commitPendingEdits() { /* moved to instant save in v6.18 */ }
+function cancelPendingEdits() { /* moved to instant save in v6.18 */ }
 
 // 画面上件数の入力ハンドラ(行全体を再描画せず、差異セルだけ部分更新してフォーカスを失わせない)
 function setOnScreenCount(code, value) {
@@ -4637,10 +4620,7 @@ function toggleBulkEditMode() {
     _showToast('幅調整モードをOFFにしてから一括編集モードにしてください', 'info');
     return;
   }
-  // 未保存の pending がある状態でOFFにしようとしたら確認
-  if (_bulkEditModeOn && Object.keys(pendingEdits).length > 0) {
-    if (!confirm(`保留中の変更が ${Object.keys(pendingEdits).length}件あります。\n一括編集モードを終了しますか?\n(変更内容は保持されるので、後で「保存」ボタンで確定できます)`)) return;
-  }
+  // v6.18: 即保存になったので pending 確認は不要
   _bulkEditModeOn = !_bulkEditModeOn;
   document.body.classList.toggle('bulk-edit-mode', _bulkEditModeOn);
   const btn = document.getElementById('bulkEditModeBtn');
@@ -4656,6 +4636,7 @@ function toggleBulkEditMode() {
 
 // ── v6.15: 一括編集モードでのセル変更ハンドラ ──
 // input要素の onchange から呼ばれる。data-code / data-field 属性を使って pendingEdits に書き込む。
+// v6.18: セル入力を即保存(pending 廃止、productCache に直接反映)
 function onBulkEditChange(input) {
   const code = input.dataset.code;
   const field = input.dataset.field;
@@ -4672,17 +4653,14 @@ function onBulkEditChange(input) {
   // 空文字は null 扱い
   const finalVal = newVal === '' ? null : newVal;
   const oldVal = productCache[code][field] || null;
-  if (!pendingEdits[code]) pendingEdits[code] = {};
-  if (finalVal === oldVal) {
-    // 元の値と同じなら pending から削除
-    delete pendingEdits[code][field];
-    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
-    input.classList.remove('pending');
-  } else {
-    pendingEdits[code][field] = finalVal;
-    input.classList.add('pending');
-  }
-  _refreshPendingEditsBar();
+  if (finalVal === oldVal) return; // 変化なし
+  // 直接反映
+  productCache[code][field] = finalVal;
+  // 視覚フィードバック(緑フラッシュ)
+  input.classList.remove('pending');
+  const cell = input.closest('td');
+  _flashCell(cell);
+  scheduleGitHubSave();
 }
 
 let _resizeState = null; // { colId, startX, startW, handle }
@@ -4997,7 +4975,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.17.3 initialized');
+  console.log('[reviewcheck] v6.18 initialized');
 }
 
 init();
