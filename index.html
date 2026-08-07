@@ -273,6 +273,25 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 .product-table .col-diff-onscreen { width: var(--col-onscreen-w, 110px); }
 .product-table .col-diff-result { width: var(--col-diffResult-w, 90px); text-align: center; }
 .product-table .col-diff-growth { width: var(--col-growth-w, 90px); text-align: center; }
+
+/* v6.17: 3モード(基本 / 件数再確認 / ランキング証拠用)の列表示切替 */
+/* デフォルト(=body class 無し)は「基本」相当 */
+/* 基本モード: ランキング・年月・差異用3列 を非表示 */
+body.mode-basic .col-ranking,
+body.mode-basic .col-yearmonth,
+body.mode-basic .col-diff-onscreen,
+body.mode-basic .col-diff-result,
+body.mode-basic .col-diff-growth { display: none; }
+/* 件数再確認モード: ランキング・年月を非表示、差異用3列は表示 */
+body.mode-diff .col-ranking,
+body.mode-diff .col-yearmonth { display: none; }
+/* ランキング証拠用モード: 差異用3列・状態・制作予定・確認 を非表示、ランキング/年月は表示 */
+body.mode-ranking .col-diff-onscreen,
+body.mode-ranking .col-diff-result,
+body.mode-ranking .col-diff-growth,
+body.mode-ranking .col-status,
+body.mode-ranking .col-tags,
+body.mode-ranking .col-action { display: none; }
 .product-table .diff-onscreen-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: 'DM Mono', monospace; font-size: 13px; text-align: right; outline: none; transition: border-color 0.15s; }
 .product-table .diff-onscreen-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(191, 0, 0, 0.1); }
 .product-table .diff-onscreen-input::-webkit-inner-spin-button { opacity: 0.5; }
@@ -555,10 +574,11 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.16</span>
+    <span class="build-date">v6.17</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
-      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
+      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
+      <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="ランキング証拠用モード(ランキング・年月を含む列レイアウト)">🏆 ランキング証拠用</button>
     </div>
     <div class="zoom-control">
       <button class="zoom-btn" style="font-size:13px" onclick="adjustZoom(-0.02)" title="文字を小さく">A-</button>
@@ -688,6 +708,10 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
                   </span>
                 </div>
               </th>
+              <!-- v6.17: 件数再確認モード用の3列(静的に配置、モードで表示切替) -->
+              <th class="col-diff-onscreen sortable" onclick="setSortKey('onscreen')" id="sortHeader-onscreen" title="実画面で確認した件数を入力(楽天ページ等)">画面上件数 <span class="sort-indicator" id="sortInd-onscreen"></span></th>
+              <th class="col-diff-result sortable" onclick="setSortKey('diff')" id="sortHeader-diff" title="API取得値 - 画面上件数。クリックでソート">件数差異 <span class="sort-indicator" id="sortInd-diff"></span></th>
+              <th class="col-diff-growth sortable" onclick="setSortKey('growth')" id="sortHeader-growth" title="画面上件数からの上昇率(%)。0件は1件として計算。クリックでソート">上昇率 <span class="sort-indicator" id="sortInd-growth"></span></th>
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
@@ -1124,7 +1148,7 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.16
+// reviewcheck v6.17
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1312,7 +1336,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.16' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2620,9 +2644,9 @@ function _renderTableRow(code) {
     ? `<span class="table-item-number" id="trnum-${_escape(code)}">${_escape(p.itemNumber)}</span>`
     : `<span class="table-item-number-empty" onclick="editItemNumberInTable('${_escape(code)}')">+ 入力</span>`;
 
-  // 差異確認モード用セル(基本モード時はnoop)
+  // v6.17: 件数再確認モード用セル(常に生成、CSSでモード別に表示切替)
   let diffCells = '';
-  if (tableMode === 'diff') {
+  {
     const onScreen = (typeof p.onScreenCount === 'number') ? p.onScreenCount : null;
     const apiCount = p.reviewCount || 0;
     let diffHtml, growthHtml;
@@ -2940,70 +2964,48 @@ const VIEW_MODE_KEY = 'reviewcheck_view_mode';
 function setViewMode(mode) { /* removed in v6.4 */ }
 function _loadViewMode() { /* removed in v6.4 */ }
 
-// ── テーブル表示モード(基本/差異確認) ──
+// ── テーブル表示モード(基本/件数再確認/ランキング証拠用) ──
+// v6.17: 3モード対応。列の表示/非表示は body の class で CSS 制御。
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
+const VALID_MODES = ['basic', 'diff', 'ranking'];
 function setTableMode(mode) {
+  if (!VALID_MODES.includes(mode)) mode = 'basic';
   tableMode = mode;
   localStorage.setItem(TABLE_MODE_KEY, mode);
-  document.getElementById('modeToggleBasic').classList.toggle('active', mode === 'basic');
-  document.getElementById('modeToggleDiff').classList.toggle('active', mode === 'diff');
-  // テーブルヘッダーのカラム差し替え + 行も再描画
-  _updateTableColumns();
+  // ボタン active 状態を更新
+  const b = document.getElementById('modeToggleBasic');
+  const d = document.getElementById('modeToggleDiff');
+  const r = document.getElementById('modeToggleRanking');
+  if (b) b.classList.toggle('active', mode === 'basic');
+  if (d) d.classList.toggle('active', mode === 'diff');
+  if (r) r.classList.toggle('active', mode === 'ranking');
+  // body class 切替(モードごとの列表示は CSS が担当)
+  document.body.classList.remove('mode-basic', 'mode-diff', 'mode-ranking');
+  document.body.classList.add('mode-' + mode);
+  // 売上列の表示は基本/件数再確認/ランキング証拠用 いずれでも「売上月選択中のみ」表示なので既存ロジックに任せる
   renderProducts();
+  // モード切替でヘッダー構造が変わるためソートインジケーターも再描画
+  _updateSortIndicators();
+  // リサイズハンドルはヘッダー要素そのものは変わらないので取り付け直し不要だが安全のため
+  if (typeof attachColumnResizeHandles === 'function') attachColumnResizeHandles();
 }
 function _loadTableMode() {
   const saved = localStorage.getItem(TABLE_MODE_KEY);
-  if (saved === 'basic' || saved === 'diff') {
-    tableMode = saved;
-    document.getElementById('modeToggleBasic').classList.toggle('active', tableMode === 'basic');
-    document.getElementById('modeToggleDiff').classList.toggle('active', tableMode === 'diff');
-    _updateTableColumns();
-  }
+  const mode = VALID_MODES.includes(saved) ? saved : 'basic';
+  tableMode = mode;
+  const b = document.getElementById('modeToggleBasic');
+  const d = document.getElementById('modeToggleDiff');
+  const r = document.getElementById('modeToggleRanking');
+  if (b) b.classList.toggle('active', mode === 'basic');
+  if (d) d.classList.toggle('active', mode === 'diff');
+  if (r) r.classList.toggle('active', mode === 'ranking');
+  document.body.classList.remove('mode-basic', 'mode-diff', 'mode-ranking');
+  document.body.classList.add('mode-' + mode);
 }
 
-// 差異確認モードの追加列(レビューの右側に挿入される)
-function _updateTableColumns() {
-  const thead = document.querySelector('#productTableWrap thead tr');
-  if (!thead) return;
-  // 既存の差異列を削除
-  thead.querySelectorAll('.col-diff-onscreen, .col-diff-result, .col-diff-growth').forEach(el => el.remove());
-  if (tableMode === 'diff') {
-    // 「レビュー」(col-review)の直後に3列追加
-    const reviewTh = thead.querySelector('.col-review');
-    if (reviewTh) {
-      const onscreenTh = document.createElement('th');
-      onscreenTh.className = 'col-diff-onscreen sortable';
-      onscreenTh.id = 'sortHeader-onscreen';
-      onscreenTh.innerHTML = '画面上件数 <span class="sort-indicator" id="sortInd-onscreen"></span>';
-      onscreenTh.title = '実画面で確認した件数を入力(楽天ページ等)';
-      onscreenTh.onclick = () => setSortKey('onscreen');
-
-      const diffTh = document.createElement('th');
-      diffTh.className = 'col-diff-result sortable';
-      diffTh.id = 'sortHeader-diff';
-      diffTh.innerHTML = '件数差異 <span class="sort-indicator" id="sortInd-diff"></span>';
-      diffTh.title = 'API取得値 - 画面上件数。クリックでソート';
-      diffTh.onclick = () => setSortKey('diff');
-
-      const growthTh = document.createElement('th');
-      growthTh.className = 'col-diff-growth sortable';
-      growthTh.id = 'sortHeader-growth';
-      growthTh.innerHTML = '上昇率 <span class="sort-indicator" id="sortInd-growth"></span>';
-      growthTh.title = '画面上件数からの上昇率(%)。0件は1件として計算。クリックでソート';
-      growthTh.onclick = () => setSortKey('growth');
-
-      reviewTh.after(onscreenTh);
-      onscreenTh.after(diffTh);
-      diffTh.after(growthTh);
-    }
-  }
-  // ソートインジケーターを再描画
-  _updateSortIndicators();
-  // v6.13: 差異列を追加/削除したのでリサイズハンドルも付け直す
-  if (typeof attachColumnResizeHandles === 'function') {
-    attachColumnResizeHandles();
-  }
-}
+// v6.17: 旧 _updateTableColumns は不要(モード切替はCSSで完結)
+// 互換性のため残しておくが何もしない
+function _updateTableColumns() { /* moved to CSS in v6.17 */ }
 
 function _renderCard(code) {
   const p = productCache[code];
@@ -4979,7 +4981,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.16 initialized');
+  console.log('[reviewcheck] v6.17 initialized');
 }
 
 init();
