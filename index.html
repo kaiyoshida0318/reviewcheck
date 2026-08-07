@@ -189,13 +189,16 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-check { width: 90px; }
 .product-table .col-kanri { width: 110px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
 .product-table .col-bangou { width: 130px; font-family: 'DM Mono', monospace; font-size: 11px; }
-.product-table .col-name { min-width: 180px; max-width: 220px; width: 220px; font-weight: 500; }
+.product-table .col-name { min-width: 160px; max-width: 200px; width: 200px; font-weight: 500; }
 .product-table .col-name a { color: var(--text); text-decoration: none; }
 .product-table .col-name a:hover { color: var(--accent); text-decoration: underline; }
+/* v6.12: ランキング/年月 新列 + 状態・確認 列幅縮小 */
+.product-table .col-ranking { min-width: 160px; max-width: 220px; width: 200px; font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-table .col-yearmonth { width: 80px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
 .product-table .col-review { width: 120px; }
 .product-table .col-image { width: 100px; }
-.product-table .col-action { width: 130px; text-align: center; }
-.product-table .col-status { width: 130px; }
+.product-table .col-action { width: 90px; text-align: center; }
+.product-table .col-status { width: 100px; }
 .product-table .col-tags { width: 160px; }
 
 /* ── 状態 ドロップダウン ── */
@@ -514,7 +517,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.11.1</span>
+    <span class="build-date">v6.12</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -557,10 +560,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
           </div>
           <div class="sidebar-list" id="sidebarStatusList"></div>
         </div>
-        <!-- 制作タグフィルタ -->
+        <!-- 制作予定タグフィルタ -->
         <div class="sidebar">
           <div class="sidebar-header">
-            <span>制作</span>
+            <span>制作予定</span>
           </div>
           <div class="sidebar-list" id="sidebarTagList"></div>
         </div>
@@ -632,6 +635,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-kanri sortable" onclick="setSortKey('code')" id="sortHeader-code">商品管理番号 <span class="sort-indicator" id="sortInd-code"></span></th>
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
+              <th class="col-ranking sortable" onclick="setSortKey('ranking')" id="sortHeader-ranking">ランキング <span class="sort-indicator" id="sortInd-ranking"></span></th>
+              <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
               <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
               <th class="col-review" id="sortHeader-review">
                 <div class="review-sort-head">
@@ -645,7 +650,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
               <th class="col-status">状態</th>
-              <th class="col-tags">制作タグ</th>
+              <th class="col-tags">制作予定</th>
               <th class="col-action">確認</th>
             </tr>
           </thead>
@@ -796,7 +801,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
         </div>
 
         <div class="modal-field">
-          <label class="modal-label">制作タグ <span style="font-weight:400;color:var(--text3);font-size:10px">(1つだけ選択)</span></label>
+          <label class="modal-label">制作予定 <span style="font-weight:400;color:var(--text3);font-size:10px">(1つだけ選択)</span></label>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="tag-btn" data-tag="renewal" onclick="toggleEditTag('renewal')" id="tagBtnRenewal">
               <span style="font-size:14px">🔄</span><span>リニューアル</span>
@@ -1052,7 +1057,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.11.1
+// reviewcheck v6.12
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1240,7 +1245,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.11.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.12' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -1960,6 +1965,14 @@ function renderProducts() {
       case 'code':       cmp = a.localeCompare(b, 'ja'); break;
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
+      case 'ranking':    cmp = (pa.ranking || '~~').localeCompare(pb.ranking || '~~', 'ja'); break;
+      case 'yearMonth': {
+        // v6.12: YYYY-MM 形式の文字列は辞書順=時系列順として扱える(空は末尾)
+        const ya = pa.yearMonth || '~~~~-~~';
+        const yb = pb.yearMonth || '~~~~-~~';
+        cmp = ya.localeCompare(yb);
+        break;
+      }
       case 'review':     cmp = (pa.reviewCount || 0) - (pb.reviewCount || 0); break; // 昇順比較(▲表示時に少→多)
       case 'reviewAvg': {
         // v6.10: 評価点(reviewAvg)による昇順比較。
@@ -2024,7 +2037,7 @@ function renderProducts() {
 }
 
 // ── 列ヘッダーソート ──
-let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'review' | 'reviewAvg'
+let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'ranking' | 'yearMonth' | 'review' | 'reviewAvg'
 let currentSortDir = 'asc';     // 'asc' | 'desc'
 function setSortKey(key) {
   if (currentSortKey === key) {
@@ -2040,7 +2053,7 @@ function setSortKey(key) {
 function _updateSortIndicators() {
   // v6.10: review/reviewAvg は <th> ではなく内側の <span class="review-sort-btn"> で制御
   // それ以外のキーは従来通り <th id="sortHeader-XX"> で制御
-  ['code', 'itemNumber', 'name', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
+  ['code', 'itemNumber', 'name', 'ranking', 'yearMonth', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
@@ -2571,6 +2584,8 @@ function _renderTableRow(code) {
     <td class="col-kanri">${_escape(code)}</td>
     <td class="col-bangou">${itemNumberCell}</td>
     <td class="col-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></td>
+    <td class="col-ranking" title="${_escape(p.ranking || '')}">${_escape(p.ranking || '')}</td>
+    <td class="col-yearmonth">${_escape(p.yearMonth || '')}</td>
     ${_renderSalesCell(code)}
     <td class="col-review">
       <div class="table-review">
@@ -2588,7 +2603,7 @@ function _renderTableRow(code) {
     <td class="col-status" id="statusCell-${_escape(code)}">${_renderStatusButtons(code, p.status)}</td>
     <td class="col-tags" id="tagsCell-${_escape(code)}">${_renderTagsButtons(code, p.tags)}</td>
     <td class="col-action">
-      <button class="modal-btn" style="font-size:11px;padding:6px 14px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 詳細</button>
+      <button class="modal-btn" style="font-size:11px;padding:6px 8px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 詳細</button>
     </td>
   </tr>`;
 }
@@ -3366,12 +3381,36 @@ function adjustZoom(delta) {
 
 // ── CSV インポート（商品管理番号 → 商品番号） ──
 // ── 選択データ一括更新（汎用CSVマッピング） ──
+// v6.12: 年月文字列を YYYY-MM 形式に正規化(パース失敗時は元の文字列をそのまま返す)
+// 対応する主なフォーマット:
+//   "2025-09" / "2025/09" / "2025.09" / "2025年9月" / "2025年09月" / "2025/9/1" / "2025-9"
+// 年だけ("2025"のみ)は日付ソートで期待通りにならないため、"2025-00" などにはせずそのまま返す
+function _normalizeYearMonth(v) {
+  if (v == null) return v;
+  const s = String(v).trim();
+  if (!s) return s;
+  // 全角数字 → 半角
+  const hankaku = s.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+  // "YYYY-MM" / "YYYY/MM" / "YYYY.MM" / "YYYY年MM月" / "YYYY-MM-DD" 系
+  const m = hankaku.match(/(\d{4})[\-\/\.年](\d{1,2})/);
+  if (m) {
+    const yyyy = m[1];
+    const mm = String(parseInt(m[2], 10)).padStart(2, '0');
+    // 月が 1-12 以外なら不正、元の値を返す
+    const mnum = parseInt(mm, 10);
+    if (mnum >= 1 && mnum <= 12) return `${yyyy}-${mm}`;
+  }
+  return s; // 正規化できなかったら元のまま
+}
 // マッピング可能なフィールド定義（将来的に追加可能）
 const MAPPING_TARGETS = [
   { value: '__skip__', label: '(使わない)' },
   { value: '__match_kanri__', label: '🔑 マッチング: 商品管理番号' },
   { value: 'name', label: '🏷 商品名 (name)' },
   { value: 'itemNumber', label: '✏ 商品番号 (itemNumber)' },
+  // v6.12: ランキング/年月マッピング追加
+  { value: 'ranking', label: '🏆 ランキング (ranking)' },
+  { value: 'yearMonth', label: '📅 年月 (yearMonth, YYYY-MM 推奨)' },
   // 将来の追加例:
   // { value: 'memo', label: 'メモ' },
   // { value: 'status', label: 'ステータス' },
@@ -3539,7 +3578,11 @@ function executeMapping() {
       matched++;
       let changed = false;
       for (const [csvCol, targetField] of Object.entries(fieldMap)) {
-        const newVal = (row[csvCol] || '').trim() || null;
+        let newVal = (row[csvCol] || '').trim() || null;
+        // v6.12: yearMonth は YYYY-MM 形式に正規化(できないものはそのまま保存)
+        if (targetField === 'yearMonth' && newVal) {
+          newVal = _normalizeYearMonth(newVal);
+        }
         const oldVal = productCache[kanri][targetField];
         if (newVal !== oldVal) {
           productCache[kanri][targetField] = newVal;
@@ -4415,7 +4458,7 @@ async function init() {
   }
   _loadSalesMonth();
   renderProducts();
-  console.log('[reviewcheck] v6.11.1 initialized');
+  console.log('[reviewcheck] v6.12 initialized');
 }
 
 init();
