@@ -626,7 +626,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.22</span>
+    <span class="build-date">v6.23</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -645,7 +645,7 @@ body.mode-ranking .product-table .col-ranking {
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
     <!-- v6.15: 一括編集モード切替(セッション限定) -->
-    <button class="header-btn" id="bulkEditModeBtn" onclick="toggleBulkEditMode()" title="全商品のセルを一括編集するモード。ONにするとテーブルのセルがフォームになります。">✏ 一括編集</button>
+    <button class="header-btn bulk-edit-mode-on" id="bulkEditModeBtn" onclick="toggleBulkEditMode()" title="クリックで閲覧モードに切り替え">✏ 編集中</button>
     <!-- v6.14: 列幅調整モード切替(セッション限定) -->
     <button class="header-btn" id="resizeModeBtn" onclick="toggleColumnResizeMode()" title="列幅の調整モードをON/OFF。ONのときだけヘッダー右端をドラッグして幅を変更できます。">↔ 幅調整</button>
     <button class="header-btn" onclick="openSetupMenuModal()">⚙ 初期設定</button>
@@ -1217,7 +1217,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.22
+// reviewcheck v6.23
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1343,14 +1343,8 @@ function _unlockUI() {
   document.getElementById('lockOverlay').classList.remove('show');
 }
 
-// beforeunload guard during save
-window.addEventListener('beforeunload', (e) => {
-  if (_saveInFlight) {
-    e.preventDefault();
-    e.returnValue = '';
-    return '';
-  }
-});
+// v6.23: beforeunload の確認ダイアログを廃止(即保存になったので不要)
+// 保存中に閉じられても非同期でGitHub送信は完走する
 
 // ── Save status indicator ──
 function _setSaveStatus(state, msg) {
@@ -1409,7 +1403,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.22' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.23' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -1452,23 +1446,15 @@ function scheduleGitHubSave() {
   }, 3000);
 }
 
-// ── v6.18: ページ離脱防止 ──
-// GitHub保存中(送信中 or デバウンスタイマー動作中)ならブラウザ標準の確認ダイアログを出す
-// これにより、リロード・タブ閉じ・戻る・進む・別サイト遷移 いずれの場合も警告される
-window.addEventListener('beforeunload', function(e) {
-  const pendingSave = (_saveTimer !== null) || (_saveInFlight !== null);
-  if (pendingSave) {
-    // デバウンス待ちの場合は今すぐ送る試み(非同期なので完了保証はないが、多くのケースで間に合う)
-    if (_saveTimer !== null) {
-      clearTimeout(_saveTimer);
-      _saveTimer = null;
-      saveToGitHub({ showLock: false });
-    }
-    // ブラウザ標準の確認ダイアログを出す(メッセージ本文はブラウザによって固定文言に置き換えられる)
-    const msg = '変更がまだGitHubに保存されていない可能性があります。このページを離れますか?';
-    e.preventDefault();
-    e.returnValue = msg;
-    return msg;
+// ── v6.23: ページ離脱時に保存だけ試みる(確認ダイアログは出さない) ──
+// 即保存化(v6.18)で pending が消えたので、確認は不要
+// ただしデバウンス待ち(3秒待機中)のものだけは、離脱前に強制送信を試みる
+window.addEventListener('beforeunload', function() {
+  if (_saveTimer !== null) {
+    clearTimeout(_saveTimer);
+    _saveTimer = null;
+    // fetch は非同期だがブラウザは pending リクエストを Best Effort で送ってくれる
+    saveToGitHub({ showLock: false });
   }
 });
 
@@ -4811,13 +4797,12 @@ function toggleColumnResizeMode() {
 }
 
 // ── v6.15: 一括編集モードの切替(セッション限定) ──
-// ONの間はテーブルのセルがフォーム化され、直接編集可能。
-// 変更内容は既存の pendingEdits に溜められ、「一括保存」バーで確定。
-let _bulkEditModeOn = false;
+// v6.23: デフォルトを true(編集モード)に変更、ボタンで閲覧モードに切り替え
+let _bulkEditModeOn = true;
 function toggleBulkEditMode() {
   // 幅調整モードとは排他
   if (_resizeModeOn) {
-    _showToast('幅調整モードをOFFにしてから一括編集モードにしてください', 'info');
+    _showToast('幅調整モードをOFFにしてから編集モードにしてください', 'info');
     return;
   }
   // v6.18: 即保存になったので pending 確認は不要
@@ -4826,7 +4811,9 @@ function toggleBulkEditMode() {
   const btn = document.getElementById('bulkEditModeBtn');
   if (btn) {
     btn.classList.toggle('bulk-edit-mode-on', _bulkEditModeOn);
-    btn.textContent = _bulkEditModeOn ? '✓ 編集中' : '✏ 一括編集';
+    // v6.23: 編集中がデフォルトになったのでラベルを刷新
+    btn.textContent = _bulkEditModeOn ? '✏ 編集中' : '👁 閲覧モード';
+    btn.title = _bulkEditModeOn ? 'クリックで閲覧モードに切り替え' : 'クリックで編集モードに戻す';
   }
   // テーブルを再描画してセルを切り替え
   renderProducts();
@@ -5214,11 +5201,21 @@ async function init() {
   }
   // v6.22: 旧 rankingPlaced → 新 rankingRegistered に自動引き継ぎ
   _migrateRankingPlacedToRegistered();
+  // v6.23: デフォルトで編集モードON → body class とボタンラベルを合わせる
+  if (_bulkEditModeOn) {
+    document.body.classList.add('bulk-edit-mode');
+    const btn = document.getElementById('bulkEditModeBtn');
+    if (btn) {
+      btn.classList.add('bulk-edit-mode-on');
+      btn.textContent = '✏ 編集中';
+      btn.title = 'クリックで閲覧モードに切り替え';
+    }
+  }
   _loadSalesMonth();
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.22 initialized');
+  console.log('[reviewcheck] v6.23 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
