@@ -167,7 +167,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
 /* ── Table view ── */
 .product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-.product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
+.product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; table-layout: fixed; }
 .product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 110px; z-index: 25; box-shadow: 0 1px 0 var(--border2); }
 .product-table thead th.sortable { cursor: pointer; user-select: none; }
 .product-table thead th.sortable:hover { background: #ebe9e3; color: var(--text); }
@@ -189,15 +189,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .product-table .col-check { width: 90px; }
 .product-table .col-kanri { width: var(--col-code-w, 110px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
 .product-table .col-bangou { width: var(--col-itemNumber-w, 130px); font-family: 'DM Mono', monospace; font-size: 11px; }
-.product-table .col-name { min-width: 100px; width: var(--col-name-w, 200px); font-weight: 500; }
+.product-table .col-name { width: var(--col-name-w, 200px); font-weight: 500; }
 .product-table .col-name a { color: var(--text); text-decoration: none; }
 .product-table .col-name a:hover { color: var(--accent); text-decoration: underline; }
 /* v6.12: ランキング/年月 新列 + 状態・確認 列幅縮小 */
 /* v6.13: 全列幅をCSS変数化(JSから動的に変更可能) */
-.product-table .col-ranking { min-width: 80px; width: var(--col-ranking-w, 200px); font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-table .col-ranking { width: var(--col-ranking-w, 200px); font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .product-table .col-yearmonth { width: var(--col-yearMonth-w, 80px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
 .product-table .col-review { width: var(--col-review-w, 120px); }
-.product-table .col-image { width: var(--col-image-w, 100px); }
+.product-table .col-image { width: var(--col-image-w, 100px); overflow: hidden; }
 .product-table .col-action { width: var(--col-action-w, 90px); text-align: center; }
 .product-table .col-status { width: var(--col-status-w, 100px); }
 .product-table .col-tags { width: var(--col-tags-w, 160px); }
@@ -555,7 +555,7 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.15</span>
+    <span class="build-date">v6.16</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -1124,7 +1124,7 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.15
+// reviewcheck v6.16
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1312,7 +1312,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.15' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.16' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -4679,30 +4679,60 @@ function _onResizeMouseDown(e) {
   const def = COLUMN_DEFS.find(c => c.id === colId);
   if (!def) return;
   const curW = (_columnWidths && _columnWidths[colId]) || def.defaultW;
-  _resizeState = { colId, startX: e.clientX, startW: curW, handle };
+  // v6.16: パフォーマンス改善のためキャッシュ(mousemove毎の find/lookup 削減)
+  _resizeState = {
+    colId,
+    startX: e.clientX,
+    startW: curW,
+    handle,
+    min: def.min,
+    cssProp: `--col-${colId}-w`,
+    rootStyle: document.documentElement.style,
+    pendingW: curW,  // 現在の目標幅
+    rafId: null      // requestAnimationFrame の ID
+  };
   handle.classList.add('dragging');
   document.body.classList.add('col-resizing');
   document.addEventListener('mousemove', _onResizeMouseMove);
   document.addEventListener('mouseup', _onResizeMouseUp);
 }
 
+// v6.16: mousemove では計算だけして、実際のCSS変更は次のフレームで1回だけ実行(RAFでスロットル)
 function _onResizeMouseMove(e) {
-  if (!_resizeState) return;
-  const def = COLUMN_DEFS.find(c => c.id === _resizeState.colId);
-  const min = def ? def.min : 40;
-  const dx = e.clientX - _resizeState.startX;
-  let newW = _resizeState.startW + dx;
-  if (newW < min) newW = min;
+  const s = _resizeState;
+  if (!s) return;
+  const dx = e.clientX - s.startX;
+  let newW = s.startW + dx;
+  if (newW < s.min) newW = s.min;
   if (newW > 2000) newW = 2000;
-  if (!_columnWidths) _columnWidths = _defaultColumnWidths();
-  _columnWidths[_resizeState.colId] = newW;
-  document.documentElement.style.setProperty(`--col-${_resizeState.colId}-w`, `${newW}px`);
+  s.pendingW = newW;
+  // RAFで統合(120fpsで動くマウスでも描画は60fps上限に自然にスロットル)
+  if (s.rafId === null) {
+    s.rafId = requestAnimationFrame(_applyResizeFrame);
+  }
+}
+
+function _applyResizeFrame() {
+  const s = _resizeState;
+  if (!s) return;
+  s.rafId = null;
+  s.rootStyle.setProperty(s.cssProp, `${s.pendingW}px`);
 }
 
 let _colWidthSaveTimer = null;
 async function _onResizeMouseUp(e) {
   if (!_resizeState) return;
-  const handle = _resizeState.handle;
+  const s = _resizeState;
+  // 最後のフレームがまだRAF待ちなら即適用
+  if (s.rafId !== null) {
+    cancelAnimationFrame(s.rafId);
+    s.rootStyle.setProperty(s.cssProp, `${s.pendingW}px`);
+  }
+  // 最終幅を _columnWidths に反映(mousemove では毎回書き込まないためここでまとめて)
+  if (!_columnWidths) _columnWidths = _defaultColumnWidths();
+  _columnWidths[s.colId] = s.pendingW;
+
+  const handle = s.handle;
   if (handle) handle.classList.remove('dragging');
   document.body.classList.remove('col-resizing');
   document.removeEventListener('mousemove', _onResizeMouseMove);
@@ -4949,7 +4979,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.15 initialized');
+  console.log('[reviewcheck] v6.16 initialized');
 }
 
 init();
