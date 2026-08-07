@@ -294,6 +294,20 @@ body.mode-ranking .col-sales,
 body.mode-ranking .col-status,
 body.mode-ranking .col-tags,
 body.mode-ranking .col-action { display: none; }
+/* v6.17.2: ランキング証拠用モードではランキング列を折り返し表示(全文見えるように) */
+/* v6.17.3: 文字サイズを少し大きく(11px→13px) */
+body.mode-ranking .product-table .col-ranking {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+  line-height: 1.4;
+  vertical-align: top;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
 .product-table .diff-onscreen-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: 'DM Mono', monospace; font-size: 13px; text-align: right; outline: none; transition: border-color 0.15s; }
 .product-table .diff-onscreen-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(191, 0, 0, 0.1); }
 .product-table .diff-onscreen-input::-webkit-inner-spin-button { opacity: 0.5; }
@@ -576,7 +590,7 @@ body.mode-ranking .col-action { display: none; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.17.1</span>
+    <span class="build-date">v6.17.3</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1338,7 +1352,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17.1' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17.3' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -4983,7 +4997,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.17.1 initialized');
+  console.log('[reviewcheck] v6.17.3 initialized');
 }
 
 init();
