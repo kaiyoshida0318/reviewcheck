@@ -225,7 +225,7 @@ body.mode-diff .col-select { display: none; }
 /* v6.12: ランキング/年月 新列 + 状態・確認 列幅縮小 */
 /* v6.13: 全列幅をCSS変数化(JSから動的に変更可能) */
 .product-table .col-ranking { width: var(--col-ranking-w, 200px); font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.product-table .col-yearmonth { width: var(--col-yearMonth-w, 80px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
+.product-table .col-yearmonth { width: var(--col-yearMonth-w, 95px); font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: center; }
 .product-table .col-review { width: var(--col-review-w, 120px); }
 .product-table .col-image { width: var(--col-image-w, 100px); overflow: hidden; }
 .product-table .col-action { width: var(--col-action-w, 90px); text-align: center; }
@@ -672,7 +672,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.29</span>
+    <span class="build-date">v6.30</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -824,7 +824,7 @@ body.mode-ranking .product-table .col-ranking {
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
               <th class="col-ranking sortable" onclick="setSortKey('ranking')" id="sortHeader-ranking">ランキング <span class="sort-indicator" id="sortInd-ranking"></span></th>
-              <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
+              <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月日 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
               <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
               <th class="col-review" id="sortHeader-review">
                 <div class="review-sort-head">
@@ -1274,7 +1274,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.29
+// reviewcheck v6.30
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1462,7 +1462,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.29' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.30' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2878,7 +2878,7 @@ function _renderTableRow(code) {
           <option value="registered" ${regVal === 'registered' ? 'selected' : ''}>✓ 登録済</option>
         </select>
       </div>`;
-    cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM">`;
+    cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM-DD" title="年月日(2025-08-07 や 2025/8/7 など)、または年月まで(2025-08)">`;
   } else {
     cellItemNumber = itemNumberCell;
     // v6.26: 商品名リンク + 下に「商品ページを開く」ボタン
@@ -3974,16 +3974,42 @@ function _normalizeYearMonth(v) {
   if (!s) return s;
   // 全角数字 → 半角
   const hankaku = s.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
-  // "YYYY-MM" / "YYYY/MM" / "YYYY.MM" / "YYYY年MM月" / "YYYY-MM-DD" 系
-  const m = hankaku.match(/(\d{4})[\-\/\.年](\d{1,2})/);
-  if (m) {
-    const yyyy = m[1];
-    const mm = String(parseInt(m[2], 10)).padStart(2, '0');
-    // 月が 1-12 以外なら不正、元の値を返す
+  // v6.30: 年月日対応
+  // ① 「YYYYMMDD」8桁ベタ書き
+  const mNum8 = hankaku.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (mNum8) {
+    const [, y, mo, d] = mNum8;
+    if (_validYMD(y, mo, d)) return `${y}-${mo}-${d}`;
+  }
+  // ② YYYY-MM-DD / YYYY/M/D / YYYY.M.D / YYYY年M月D日 系
+  const mYMD = hankaku.match(/(\d{4})[\-\/\.年](\d{1,2})[\-\/\.月](\d{1,2})[日]?/);
+  if (mYMD) {
+    const yyyy = mYMD[1];
+    const mm = String(parseInt(mYMD[2], 10)).padStart(2, '0');
+    const dd = String(parseInt(mYMD[3], 10)).padStart(2, '0');
+    if (_validYMD(yyyy, mm, dd)) return `${yyyy}-${mm}-${dd}`;
+  }
+  // ③ YYYY-MM / YYYY/MM / YYYY.MM / YYYY年M月 (日なし) 系
+  const mYM = hankaku.match(/(\d{4})[\-\/\.年](\d{1,2})[月]?/);
+  if (mYM) {
+    const yyyy = mYM[1];
+    const mm = String(parseInt(mYM[2], 10)).padStart(2, '0');
     const mnum = parseInt(mm, 10);
     if (mnum >= 1 && mnum <= 12) return `${yyyy}-${mm}`;
   }
   return s; // 正規化できなかったら元のまま
+}
+
+// v6.30: 年月日の妥当性チェック(2月の日数などを厳密判定)
+function _validYMD(y, m, d) {
+  const yy = parseInt(y, 10);
+  const mm = parseInt(m, 10);
+  const dd = parseInt(d, 10);
+  if (yy < 1900 || yy > 2999) return false;
+  if (mm < 1 || mm > 12) return false;
+  if (dd < 1 || dd > 31) return false;
+  const dt = new Date(yy, mm - 1, dd);
+  return dt.getFullYear() === yy && dt.getMonth() === mm - 1 && dt.getDate() === dd;
 }
 
 // v6.20: rankingPlaced を CSV文字列から boolean/null に正規化
@@ -4031,7 +4057,7 @@ const MAPPING_TARGETS = [
   { value: 'itemNumber', label: '✏ 商品番号 (itemNumber)' },
   // v6.12: ランキング/年月マッピング追加
   { value: 'ranking', label: '🏆 ランキング詳細 (ranking)' },
-  { value: 'yearMonth', label: '📅 年月 (yearMonth, YYYY-MM 推奨)' },
+  { value: 'yearMonth', label: '📅 年月日 (yearMonth, YYYY-MM または YYYY-MM-DD)' },
   // v6.22: ランキングタイプ / 登録状況
   { value: 'rankingType', label: '⚡ ランキングタイプ (rankingType, デイリー/リアルタイム/不必要)' },
   { value: 'rankingRegistered', label: '📍 ランキング登録状況 (rankingRegistered, 登録済/登録前)' },
@@ -4891,7 +4917,7 @@ const COLUMN_DEFS = [
   { id: 'itemNumber',  label: '商品番号',     defaultW: 130, min: 60 },
   { id: 'name',        label: '商品名',       defaultW: 200, min: 80 },
   { id: 'ranking',     label: 'ランキング',   defaultW: 200, min: 80 },
-  { id: 'yearMonth',   label: '年月',         defaultW:  80, min: 50 },
+  { id: 'yearMonth',   label: '年月日',       defaultW:  95, min: 60 },
   { id: 'sales',       label: '売上',         defaultW: 120, min: 60 },
   { id: 'review',      label: 'レビュー',     defaultW: 120, min: 80 },
   { id: 'image',       label: '画像(各)',     defaultW: 100, min: 60 },
@@ -5177,7 +5203,7 @@ function onBulkEditChange(input) {
   const field = input.dataset.field;
   if (!code || !field || !productCache[code]) return;
   let newVal = (input.value || '').trim();
-  // yearMonth は入力時に YYYY-MM 形式へ正規化(可能な範囲で)
+  // v6.12/v6.30: yearMonth は入力時に YYYY-MM または YYYY-MM-DD に正規化(可能な範囲で)
   if (field === 'yearMonth' && newVal) {
     const normalized = _normalizeYearMonth(newVal);
     if (normalized !== newVal) {
@@ -5566,7 +5592,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.29 initialized');
+  console.log('[reviewcheck] v6.30 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
