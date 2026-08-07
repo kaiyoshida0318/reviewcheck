@@ -240,6 +240,17 @@ body.bulk-edit-mode .product-table thead th { background: #eef4fb; }
 .bulk-edit-select:focus { outline: none; border-color: #1976d2; }
 .bulk-edit-select.pending { background: #fff8e1; border-color: #ffb300; }
 .bulk-edit-yearmonth { font-family: 'DM Mono', monospace; text-align: center; }
+/* v6.20: ランキングセル内の縦並びレイアウト(入力欄 + 配置状態select) */
+.bulk-ranking-cell { display: flex; flex-direction: column; gap: 4px; }
+.bulk-ranking-placed-select { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 11px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; cursor: pointer; }
+.bulk-ranking-placed-select:focus { outline: none; border-color: #1976d2; }
+.bulk-ranking-placed-select.ranking-placed { background: #e6f9f1; color: #1d9e75; border-color: rgba(29,158,117,0.4); font-weight: 600; }
+.bulk-ranking-placed-select.ranking-unplaced { background: #fff3cd; color: #6d4c00; border-color: #ffe082; font-weight: 600; }
+.bulk-ranking-placed-select.ranking-unset { background: #fff; color: var(--text3); }
+/* v6.20: 通常表示モードでの rankingPlaced バッジ */
+.ranking-placed-badge { display: inline-block; margin-top: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
+.ranking-placed-badge.placed { background: #e6f9f1; color: #1d9e75; border: 1px solid rgba(29,158,117,0.3); }
+.ranking-placed-badge.unplaced { background: #fff3cd; color: #6d4c00; border: 1px solid #ffe082; }
 /* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
 body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
 
@@ -602,7 +613,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.19</span>
+    <span class="build-date">v6.21</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -693,10 +704,19 @@ body.mode-ranking .product-table .col-ranking {
         </div>
         <!-- v6.19: ランキング証拠用モード時のみ表示するランキング入力状況フィルタ -->
         <div class="toolbar-group ranking-filter-group" id="rankingFilterGroup" style="display:none">
-          <span class="toolbar-label">🏆 表示:</span>
+          <span class="toolbar-label">🏆 入力:</span>
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体</button>
-          <button class="ranking-filter-btn" data-filter="filled" onclick="setRankingFilter('filled')">ランキング入力済</button>
-          <button class="ranking-filter-btn" data-filter="empty" onclick="setRankingFilter('empty')">ランキング入力前</button>
+          <button class="ranking-filter-btn" data-filter="filled" onclick="setRankingFilter('filled')">入力済</button>
+          <button class="ranking-filter-btn" data-filter="empty" onclick="setRankingFilter('empty')">入力前</button>
+          <!-- v6.21: ランキング欄に「不必要」と書かれた商品だけ表示するフィルタ -->
+          <button class="ranking-filter-btn" data-filter="unnecessary" onclick="setRankingFilter('unnecessary')">不必要</button>
+        </div>
+        <!-- v6.20: ランキング配置状況フィルタ(ランキング証拠用モード時のみ) -->
+        <div class="toolbar-group ranking-filter-group" id="rankingPlacedFilterGroup" style="display:none">
+          <span class="toolbar-label">📍 配置:</span>
+          <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingPlacedFilter('all')">全体</button>
+          <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 配置前</button>
+          <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 配置済</button>
         </div>
         <div class="toolbar-group pending-edits-group" id="pendingEditsGroup" style="display:none">
           <span class="pending-count">⚠ <strong id="pendingCount">0</strong>件 未保存</span>
@@ -1183,7 +1203,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.19
+// reviewcheck v6.21
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1255,6 +1275,8 @@ let monthlySales = {}; // { '2026-03': { '10001280': { sales: 1882340, qty: 1102
 let currentSalesMonth = null; // 選択中の表示月 (例: '2026-03')
 // v6.19: ランキング入力状況フィルタ ('all' | 'filled' | 'empty') ※ランキング証拠用モード時のみ有効
 let currentRankingFilter = 'all';
+// v6.20: ランキング配置状況フィルタ ('all' | 'unplaced' | 'placed') ※ランキング証拠用モード時のみ有効
+let currentRankingPlacedFilter = 'all';
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
@@ -1373,7 +1395,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.19' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.21' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2103,10 +2125,20 @@ function renderProducts() {
       if (!hay.includes(search)) return false;
     }
     // v6.19: ランキング入力状況フィルタ(ランキング証拠用モード時のみ適用)
+    // v6.21: 「不必要」は ranking の値が正確に「不必要」の商品のみを表示
     if (tableMode === 'ranking' && currentRankingFilter !== 'all') {
-      const hasRanking = !!(p.ranking && String(p.ranking).trim());
+      const rankingText = p.ranking ? String(p.ranking).trim() : '';
+      const hasRanking = !!rankingText;
+      const isUnnecessary = rankingText === '不必要';
       if (currentRankingFilter === 'filled' && !hasRanking) return false;
       if (currentRankingFilter === 'empty'  &&  hasRanking) return false;
+      if (currentRankingFilter === 'unnecessary' && !isUnnecessary) return false;
+    }
+    // v6.20: ランキング配置状況フィルタ(ランキング証拠用モード時のみ適用)
+    if (tableMode === 'ranking' && currentRankingPlacedFilter !== 'all') {
+      const placed = p.rankingPlaced;
+      if (currentRankingPlacedFilter === 'placed'   && placed !== true) return false;
+      if (currentRankingPlacedFilter === 'unplaced' && placed !== false) return false;
     }
     return true;
   });
@@ -2748,14 +2780,30 @@ function _renderTableRow(code) {
     const vName       = p.name || '';
     const vRanking    = p.ranking || '';
     const vYearMonth  = p.yearMonth || '';
+    // v6.20: rankingPlaced (null=未設定 / false=配置前 / true=配置済)
+    const vPlaced = p.rankingPlaced;
+    const placedVal = vPlaced === true ? 'placed' : (vPlaced === false ? 'unplaced' : '');
+    const placedCls = vPlaced === true ? 'ranking-placed' : (vPlaced === false ? 'ranking-unplaced' : 'ranking-unset');
     cellItemNumber = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
     cellName       = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">`;
-    cellRanking    = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    // ランキングセル: input(上) + rankingPlaced select(下、縦並び)
+    cellRanking    = `<div class="bulk-ranking-cell">
+        <input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="—">
+        <select class="bulk-ranking-placed-select ${placedCls}" data-code="${_escape(code)}" onchange="onRankingPlacedChange(this)">
+          <option value="" ${placedVal === '' ? 'selected' : ''}>— 未設定 —</option>
+          <option value="unplaced" ${placedVal === 'unplaced' ? 'selected' : ''}>⏳ 配置前</option>
+          <option value="placed" ${placedVal === 'placed' ? 'selected' : ''}>✓ 配置済</option>
+        </select>
+      </div>`;
     cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM">`;
   } else {
     cellItemNumber = itemNumberCell;
     cellName       = `<a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a>`;
-    cellRanking    = _escape(p.ranking || '');
+    // v6.20: 通常表示モードでも rankingPlaced の状態を小さいバッジで表示
+    let placedBadge = '';
+    if (p.rankingPlaced === true) placedBadge = `<span class="ranking-placed-badge placed" title="配置済">✓ 配置済</span>`;
+    else if (p.rankingPlaced === false) placedBadge = `<span class="ranking-placed-badge unplaced" title="配置前">⏳ 配置前</span>`;
+    cellRanking    = `<div>${_escape(p.ranking || '')}</div>${placedBadge}`;
     cellYearMonth  = _escape(p.yearMonth || '');
   }
 
@@ -3026,27 +3074,46 @@ function _loadTableMode() {
 }
 
 // v6.19: ランキング入力状況フィルタ
+// v6.21: 'unnecessary' (ランキング欄に「不必要」と書かれた商品のみ) を追加
 function setRankingFilter(filter) {
-  const valid = ['all', 'filled', 'empty'];
+  const valid = ['all', 'filled', 'empty', 'unnecessary'];
   if (!valid.includes(filter)) filter = 'all';
   currentRankingFilter = filter;
   // ボタン active 状態
-  document.querySelectorAll('.ranking-filter-btn').forEach(btn => {
+  document.querySelectorAll('#rankingFilterGroup .ranking-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderProducts();
+}
+// v6.20: ランキング配置状況フィルタ
+function setRankingPlacedFilter(filter) {
+  const valid = ['all', 'placed', 'unplaced'];
+  if (!valid.includes(filter)) filter = 'all';
+  currentRankingPlacedFilter = filter;
+  document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.filter === filter);
   });
   renderProducts();
 }
 function _updateRankingFilterVisibility() {
-  const group = document.getElementById('rankingFilterGroup');
-  if (!group) return;
+  const group1 = document.getElementById('rankingFilterGroup');
+  const group2 = document.getElementById('rankingPlacedFilterGroup');
   if (tableMode === 'ranking') {
-    group.style.display = '';
+    if (group1) group1.style.display = '';
+    if (group2) group2.style.display = '';
   } else {
-    group.style.display = 'none';
+    if (group1) group1.style.display = 'none';
+    if (group2) group2.style.display = 'none';
     // モードから外れたときはフィルタも 'all' に戻す(混乱回避)
     if (currentRankingFilter !== 'all') {
       currentRankingFilter = 'all';
-      document.querySelectorAll('.ranking-filter-btn').forEach(btn => {
+      document.querySelectorAll('#rankingFilterGroup .ranking-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === 'all');
+      });
+    }
+    if (currentRankingPlacedFilter !== 'all') {
+      currentRankingPlacedFilter = 'all';
+      document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.filter === 'all');
       });
     }
@@ -3561,6 +3628,23 @@ function _normalizeYearMonth(v) {
   }
   return s; // 正規化できなかったら元のまま
 }
+
+// v6.20: rankingPlaced を CSV文字列から boolean/null に正規化
+// 対応文字列:
+//   配置済/済/OK/true/1/✓/done  → true
+//   配置前/未/未配置/false/0/pending → false
+//   空/null/不明/-           → null(未設定)
+function _normalizeRankingPlaced(v) {
+  if (v == null) return null;
+  const s = String(v).trim().toLowerCase();
+  if (!s || s === '-' || s === '—' || s === 'null' || s === '不明' || s === '未設定') return null;
+  // 配置済扱い
+  if (/^(true|1|yes|✓|✔|ok|done|配置済|済|完了|placed)$/i.test(s)) return true;
+  // 配置前扱い
+  if (/^(false|0|no|✗|未|未配置|配置前|未完|pending|todo|unplaced)$/i.test(s)) return false;
+  // その他の値は null (未設定扱い)
+  return null;
+}
 // マッピング可能なフィールド定義（将来的に追加可能）
 const MAPPING_TARGETS = [
   { value: '__skip__', label: '(使わない)' },
@@ -3570,6 +3654,8 @@ const MAPPING_TARGETS = [
   // v6.12: ランキング/年月マッピング追加
   { value: 'ranking', label: '🏆 ランキング (ranking)' },
   { value: 'yearMonth', label: '📅 年月 (yearMonth, YYYY-MM 推奨)' },
+  // v6.20: ランキング配置状況(配置前/配置済)マッピング
+  { value: 'rankingPlaced', label: '📍 ランキング配置状況 (rankingPlaced, "配置済"/"配置前"等)' },
   // 将来の追加例:
   // { value: 'memo', label: 'メモ' },
   // { value: 'status', label: 'ステータス' },
@@ -3741,6 +3827,10 @@ function executeMapping() {
         // v6.12: yearMonth は YYYY-MM 形式に正規化(できないものはそのまま保存)
         if (targetField === 'yearMonth' && newVal) {
           newVal = _normalizeYearMonth(newVal);
+        }
+        // v6.20: rankingPlaced は文字列を boolean/null に正規化
+        if (targetField === 'rankingPlaced') {
+          newVal = _normalizeRankingPlaced(newVal);
         }
         const oldVal = productCache[kanri][targetField];
         if (newVal !== oldVal) {
@@ -4714,6 +4804,26 @@ function onBulkEditChange(input) {
   scheduleGitHubSave();
 }
 
+// v6.20: rankingPlaced (配置前/配置済) の変更ハンドラ
+function onRankingPlacedChange(sel) {
+  const code = sel.dataset.code;
+  if (!code || !productCache[code]) return;
+  let newVal;
+  if (sel.value === 'placed') newVal = true;
+  else if (sel.value === 'unplaced') newVal = false;
+  else newVal = null;
+  const oldVal = productCache[code].rankingPlaced;
+  const oldNorm = (oldVal === true || oldVal === false) ? oldVal : null;
+  if (newVal === oldNorm) return;
+  productCache[code].rankingPlaced = newVal;
+  // セレクトのクラスも更新(色分け維持)
+  sel.classList.remove('ranking-placed', 'ranking-unplaced', 'ranking-unset');
+  sel.classList.add(newVal === true ? 'ranking-placed' : (newVal === false ? 'ranking-unplaced' : 'ranking-unset'));
+  const cell = sel.closest('td');
+  _flashCell(cell);
+  scheduleGitHubSave();
+}
+
 let _resizeState = null; // { colId, startX, startW, handle }
 
 function _onResizeMouseDown(e) {
@@ -5026,7 +5136,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.19 initialized');
+  console.log('[reviewcheck] v6.21 initialized');
 }
 
 init();
