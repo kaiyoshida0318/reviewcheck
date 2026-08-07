@@ -114,6 +114,10 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .filter-pill:hover { background: var(--surface2); }
 .filter-pill.active { background: var(--text); color: #fff; border-color: var(--text); }
 .sort-select { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; cursor: pointer; }
+/* v6.19: ランキング入力状況フィルタ */
+.ranking-filter-btn { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; cursor: pointer; color: var(--text2); font-weight: 500; transition: all 0.1s; }
+.ranking-filter-btn:hover { background: #ebe9e3; color: var(--text); }
+.ranking-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* ── Empty state ── */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -598,7 +602,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.18</span>
+    <span class="build-date">v6.19</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -686,6 +690,13 @@ body.mode-ranking .product-table .col-ranking {
         <div class="toolbar-group" id="salesMonthGroup" style="display:none">
           <span class="toolbar-label">📊 売上月:</span>
           <select class="sort-select" id="salesMonthSelect" onchange="setSalesMonth(this.value)"></select>
+        </div>
+        <!-- v6.19: ランキング証拠用モード時のみ表示するランキング入力状況フィルタ -->
+        <div class="toolbar-group ranking-filter-group" id="rankingFilterGroup" style="display:none">
+          <span class="toolbar-label">🏆 表示:</span>
+          <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体</button>
+          <button class="ranking-filter-btn" data-filter="filled" onclick="setRankingFilter('filled')">ランキング入力済</button>
+          <button class="ranking-filter-btn" data-filter="empty" onclick="setRankingFilter('empty')">ランキング入力前</button>
         </div>
         <div class="toolbar-group pending-edits-group" id="pendingEditsGroup" style="display:none">
           <span class="pending-count">⚠ <strong id="pendingCount">0</strong>件 未保存</span>
@@ -1172,7 +1183,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.18
+// reviewcheck v6.19
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1242,6 +1253,8 @@ let viewMode = 'card'; // 'card' | 'table' (legacy, no longer used)
 let tableMode = 'basic'; // 'basic' | 'diff' - テーブル表示モード
 let monthlySales = {}; // { '2026-03': { '10001280': { sales: 1882340, qty: 1102, count: 887 }, ... } }
 let currentSalesMonth = null; // 選択中の表示月 (例: '2026-03')
+// v6.19: ランキング入力状況フィルタ ('all' | 'filled' | 'empty') ※ランキング証拠用モード時のみ有効
+let currentRankingFilter = 'all';
 let sidebarSortMode = 'alpha'; // 'alpha' | 'count'
 let _saveTimer = null;
 let _fetchInProgress = false;
@@ -1360,7 +1373,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.18' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.19' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2088,6 +2101,12 @@ function renderProducts() {
     if (search) {
       const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
       if (!hay.includes(search)) return false;
+    }
+    // v6.19: ランキング入力状況フィルタ(ランキング証拠用モード時のみ適用)
+    if (tableMode === 'ranking' && currentRankingFilter !== 'all') {
+      const hasRanking = !!(p.ranking && String(p.ranking).trim());
+      if (currentRankingFilter === 'filled' && !hasRanking) return false;
+      if (currentRankingFilter === 'empty'  &&  hasRanking) return false;
     }
     return true;
   });
@@ -2981,6 +3000,8 @@ function setTableMode(mode) {
   // body class 切替(モードごとの列表示は CSS が担当)
   document.body.classList.remove('mode-basic', 'mode-diff', 'mode-ranking');
   document.body.classList.add('mode-' + mode);
+  // v6.19: ランキング証拠用モードのみランキング入力状況フィルタを表示
+  _updateRankingFilterVisibility();
   // 売上列の表示は基本/件数再確認/ランキング証拠用 いずれでも「売上月選択中のみ」表示なので既存ロジックに任せる
   renderProducts();
   // モード切替でヘッダー構造が変わるためソートインジケーターも再描画
@@ -3000,6 +3021,36 @@ function _loadTableMode() {
   if (r) r.classList.toggle('active', mode === 'ranking');
   document.body.classList.remove('mode-basic', 'mode-diff', 'mode-ranking');
   document.body.classList.add('mode-' + mode);
+  // v6.19: 起動時もフィルタバー表示制御を実施
+  _updateRankingFilterVisibility();
+}
+
+// v6.19: ランキング入力状況フィルタ
+function setRankingFilter(filter) {
+  const valid = ['all', 'filled', 'empty'];
+  if (!valid.includes(filter)) filter = 'all';
+  currentRankingFilter = filter;
+  // ボタン active 状態
+  document.querySelectorAll('.ranking-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderProducts();
+}
+function _updateRankingFilterVisibility() {
+  const group = document.getElementById('rankingFilterGroup');
+  if (!group) return;
+  if (tableMode === 'ranking') {
+    group.style.display = '';
+  } else {
+    group.style.display = 'none';
+    // モードから外れたときはフィルタも 'all' に戻す(混乱回避)
+    if (currentRankingFilter !== 'all') {
+      currentRankingFilter = 'all';
+      document.querySelectorAll('.ranking-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === 'all');
+      });
+    }
+  }
 }
 
 // v6.17: 旧 _updateTableColumns は不要(モード切替はCSSで完結)
@@ -4975,7 +5026,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.18 initialized');
+  console.log('[reviewcheck] v6.19 initialized');
 }
 
 init();
