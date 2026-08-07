@@ -217,6 +217,27 @@ body.col-resizing * { cursor: col-resize !important; }
 /* モード ON のときテーブル全体に薄い枠を出して視覚的にフィードバック */
 body.resize-mode .product-table { outline: 2px dashed rgba(191, 0, 0, 0.35); outline-offset: -1px; }
 body.resize-mode .product-table thead th { background: #fdf3f3; }
+/* v6.14/v6.15: 幅調整・一括編集モード中はソートカーソルを無効化 */
+body.resize-mode .product-table thead th.sortable,
+body.resize-mode .review-sort-btn,
+body.bulk-edit-mode .product-table thead th.sortable,
+body.bulk-edit-mode .review-sort-btn { cursor: default !important; }
+body.resize-mode .product-table thead th.sortable:hover,
+body.bulk-edit-mode .product-table thead th.sortable:hover { background: inherit; color: var(--text2); }
+/* v6.15: 一括編集モード */
+.header-btn.bulk-edit-mode-on { background: #1976d2; color: #fff; border-color: #1976d2; }
+.header-btn.bulk-edit-mode-on:hover { background: #1565c0; }
+body.bulk-edit-mode .product-table { outline: 2px dashed rgba(25, 118, 210, 0.4); outline-offset: -1px; }
+body.bulk-edit-mode .product-table thead th { background: #eef4fb; }
+.bulk-edit-input { width: 100%; box-sizing: border-box; padding: 4px 6px; font-size: 12px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; }
+.bulk-edit-input:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 2px rgba(25,118,210,0.15); }
+.bulk-edit-input.pending { background: #fff8e1; border-color: #ffb300; }
+.bulk-edit-select { width: 100%; box-sizing: border-box; padding: 4px 6px; font-size: 12px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; }
+.bulk-edit-select:focus { outline: none; border-color: #1976d2; }
+.bulk-edit-select.pending { background: #fff8e1; border-color: #ffb300; }
+.bulk-edit-yearmonth { font-family: 'DM Mono', monospace; text-align: center; }
+/* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
+body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
 
 /* ── 状態 ドロップダウン ── */
 .inline-status-select { width: 100%; padding: 6px 8px; font-size: 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
@@ -534,7 +555,7 @@ body.resize-mode .product-table thead th { background: #fdf3f3; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.14</span>
+    <span class="build-date">v6.15</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="差異確認モード(画面上件数を入力してレビュー差を確認)">🔍 差異確認</button>
@@ -551,6 +572,8 @@ body.resize-mode .product-table thead th { background: #fdf3f3; }
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <button class="header-btn" onclick="openSalesModal()" title="月別売上CSVをアップロード">📊 売上反映</button>
+    <!-- v6.15: 一括編集モード切替(セッション限定) -->
+    <button class="header-btn" id="bulkEditModeBtn" onclick="toggleBulkEditMode()" title="全商品のセルを一括編集するモード。ONにするとテーブルのセルがフォームになります。">✏ 一括編集</button>
     <!-- v6.14: 列幅調整モード切替(セッション限定) -->
     <button class="header-btn" id="resizeModeBtn" onclick="toggleColumnResizeMode()" title="列幅の調整モードをON/OFF。ONのときだけヘッダー右端をドラッグして幅を変更できます。">↔ 幅調整</button>
     <button class="header-btn" onclick="openSetupMenuModal()">⚙ 初期設定</button>
@@ -1101,7 +1124,7 @@ body.resize-mode .product-table thead th { background: #fdf3f3; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.14
+// reviewcheck v6.15
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1289,7 +1312,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.14' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.15' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2084,6 +2107,9 @@ function renderProducts() {
 let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'ranking' | 'yearMonth' | 'review' | 'reviewAvg'
 let currentSortDir = 'asc';     // 'asc' | 'desc'
 function setSortKey(key) {
+  // v6.14/v6.15: 幅調整モード or 一括編集モード中はソート無効化(誤操作防止)
+  if (_resizeModeOn) return;
+  if (_bulkEditModeOn) return;
   if (currentSortKey === key) {
     // 同じ列を再クリック → 方向反転
     currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
@@ -2624,12 +2650,37 @@ function _renderTableRow(code) {
       <td class="col-diff-growth" id="diffgrowth-${_escape(code)}">${growthHtml}</td>`;
   }
 
+  // v6.15: 一括編集モード時は各セルを編集可能な入力に置き換え
+  // pendingEdits[code] に既に変更がある場合はその値を初期値にする
+  const pend = pendingEdits[code] || {};
+  const _pv = (field, def) => pend[field] !== undefined ? pend[field] : def;
+  const isBulkEdit = _bulkEditModeOn;
+
+  // 各セルの中身をモードで切り替え
+  let cellItemNumber, cellName, cellRanking, cellYearMonth;
+  if (isBulkEdit) {
+    const vItemNumber = _pv('itemNumber', p.itemNumber || '');
+    const vName       = _pv('name', p.name || '');
+    const vRanking    = _pv('ranking', p.ranking || '');
+    const vYearMonth  = _pv('yearMonth', p.yearMonth || '');
+    const pcls = (f) => (pend[f] !== undefined ? ' pending' : '');
+    cellItemNumber = `<input type="text" class="bulk-edit-input${pcls('itemNumber')}" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellName       = `<input type="text" class="bulk-edit-input${pcls('name')}" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellRanking    = `<input type="text" class="bulk-edit-input${pcls('ranking')}" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="—">`;
+    cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth${pcls('yearMonth')}" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM">`;
+  } else {
+    cellItemNumber = itemNumberCell;
+    cellName       = `<a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a>`;
+    cellRanking    = _escape(p.ranking || '');
+    cellYearMonth  = _escape(p.yearMonth || '');
+  }
+
   return `<tr id="row-${_escape(code)}">
     <td class="col-kanri">${_escape(code)}</td>
-    <td class="col-bangou">${itemNumberCell}</td>
-    <td class="col-name"><a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a></td>
-    <td class="col-ranking" title="${_escape(p.ranking || '')}">${_escape(p.ranking || '')}</td>
-    <td class="col-yearmonth">${_escape(p.yearMonth || '')}</td>
+    <td class="col-bangou">${cellItemNumber}</td>
+    <td class="col-name">${cellName}</td>
+    <td class="col-ranking" title="${_escape(p.ranking || '')}">${cellRanking}</td>
+    <td class="col-yearmonth">${cellYearMonth}</td>
     ${_renderSalesCell(code)}
     <td class="col-review">
       <div class="table-review">
@@ -2785,12 +2836,19 @@ function commitPendingEdits() {
       else if (change.tagKey === 'boostPlan') newTags.boostPlan = true;
       productCache[code].tags = newTags;
     }
+    // v6.15: 一括編集モード由来のフィールド
+    if (change.itemNumber !== undefined) productCache[code].itemNumber = change.itemNumber;
+    if (change.name       !== undefined) productCache[code].name       = change.name;
+    if (change.ranking    !== undefined) productCache[code].ranking    = change.ranking;
+    if (change.yearMonth  !== undefined) productCache[code].yearMonth  = change.yearMonth;
   }
   pendingEdits = {};
   saveCache();
   scheduleGitHubSave();
   _refreshPendingEditsBar(); // バーを必ず非表示に
   renderProducts();
+  // 一括編集モード中は再描画されたセルにリサイズハンドルも付け直す
+  attachColumnResizeHandles();
   _showToast(`✓ ${count}件の変更を保存しました`, 'success');
 }
 
@@ -2801,6 +2859,7 @@ function cancelPendingEdits() {
   pendingEdits = {};
   _refreshPendingEditsBar(); // バーを必ず非表示に
   renderProducts();
+  attachColumnResizeHandles();
   _showToast(`↩ ${count}件の変更を取り消しました`, 'info');
 }
 
@@ -4532,6 +4591,11 @@ function attachColumnResizeHandles() {
 // ONの間だけリサイズハンドルが機能する。ヘッダーの「↔ 幅調整」ボタンを押してトグル。
 let _resizeModeOn = false;
 function toggleColumnResizeMode() {
+  // v6.15: 一括編集モードとは排他
+  if (_bulkEditModeOn) {
+    _showToast('一括編集モードをOFFにしてから幅調整モードにしてください', 'info');
+    return;
+  }
   _resizeModeOn = !_resizeModeOn;
   document.body.classList.toggle('resize-mode', _resizeModeOn);
   const btn = document.getElementById('resizeModeBtn');
@@ -4543,6 +4607,64 @@ function toggleColumnResizeMode() {
   document.querySelectorAll('.col-resize-handle').forEach(h => {
     h.title = _resizeModeOn ? 'ドラッグで幅を変更' : '幅調整モードOFF';
   });
+}
+
+// ── v6.15: 一括編集モードの切替(セッション限定) ──
+// ONの間はテーブルのセルがフォーム化され、直接編集可能。
+// 変更内容は既存の pendingEdits に溜められ、「一括保存」バーで確定。
+let _bulkEditModeOn = false;
+function toggleBulkEditMode() {
+  // 幅調整モードとは排他
+  if (_resizeModeOn) {
+    _showToast('幅調整モードをOFFにしてから一括編集モードにしてください', 'info');
+    return;
+  }
+  // 未保存の pending がある状態でOFFにしようとしたら確認
+  if (_bulkEditModeOn && Object.keys(pendingEdits).length > 0) {
+    if (!confirm(`保留中の変更が ${Object.keys(pendingEdits).length}件あります。\n一括編集モードを終了しますか?\n(変更内容は保持されるので、後で「保存」ボタンで確定できます)`)) return;
+  }
+  _bulkEditModeOn = !_bulkEditModeOn;
+  document.body.classList.toggle('bulk-edit-mode', _bulkEditModeOn);
+  const btn = document.getElementById('bulkEditModeBtn');
+  if (btn) {
+    btn.classList.toggle('bulk-edit-mode-on', _bulkEditModeOn);
+    btn.textContent = _bulkEditModeOn ? '✓ 編集中' : '✏ 一括編集';
+  }
+  // テーブルを再描画してセルを切り替え
+  renderProducts();
+  // 再描画で消えるリサイズハンドルを付け直す(モード切替時)
+  attachColumnResizeHandles();
+}
+
+// ── v6.15: 一括編集モードでのセル変更ハンドラ ──
+// input要素の onchange から呼ばれる。data-code / data-field 属性を使って pendingEdits に書き込む。
+function onBulkEditChange(input) {
+  const code = input.dataset.code;
+  const field = input.dataset.field;
+  if (!code || !field || !productCache[code]) return;
+  let newVal = (input.value || '').trim();
+  // yearMonth は入力時に YYYY-MM 形式へ正規化(可能な範囲で)
+  if (field === 'yearMonth' && newVal) {
+    const normalized = _normalizeYearMonth(newVal);
+    if (normalized !== newVal) {
+      newVal = normalized;
+      input.value = newVal;
+    }
+  }
+  // 空文字は null 扱い
+  const finalVal = newVal === '' ? null : newVal;
+  const oldVal = productCache[code][field] || null;
+  if (!pendingEdits[code]) pendingEdits[code] = {};
+  if (finalVal === oldVal) {
+    // 元の値と同じなら pending から削除
+    delete pendingEdits[code][field];
+    if (Object.keys(pendingEdits[code]).length === 0) delete pendingEdits[code];
+    input.classList.remove('pending');
+  } else {
+    pendingEdits[code][field] = finalVal;
+    input.classList.add('pending');
+  }
+  _refreshPendingEditsBar();
 }
 
 let _resizeState = null; // { colId, startX, startW, handle }
@@ -4827,7 +4949,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.14 initialized');
+  console.log('[reviewcheck] v6.15 initialized');
 }
 
 init();
