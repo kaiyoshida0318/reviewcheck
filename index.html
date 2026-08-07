@@ -286,9 +286,11 @@ body.mode-basic .col-diff-growth { display: none; }
 body.mode-diff .col-ranking,
 body.mode-diff .col-yearmonth { display: none; }
 /* ランキング証拠用モード: 差異用3列・状態・制作予定・確認 を非表示、ランキング/年月は表示 */
+/* v6.17.1: 売上列も非表示に */
 body.mode-ranking .col-diff-onscreen,
 body.mode-ranking .col-diff-result,
 body.mode-ranking .col-diff-growth,
+body.mode-ranking .col-sales,
 body.mode-ranking .col-status,
 body.mode-ranking .col-tags,
 body.mode-ranking .col-action { display: none; }
@@ -574,7 +576,7 @@ body.mode-ranking .col-action { display: none; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.17</span>
+    <span class="build-date">v6.17.1</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1148,7 +1150,7 @@ body.mode-ranking .col-action { display: none; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.17
+// reviewcheck v6.17.1
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1336,7 +1338,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.17.1' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -4981,7 +4983,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.17 initialized');
+  console.log('[reviewcheck] v6.17.1 initialized');
 }
 
 init();
