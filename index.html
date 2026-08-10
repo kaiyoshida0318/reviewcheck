@@ -254,7 +254,9 @@ body.mode-ranking .img-radio-band { display: flex; }
 /* ── Table view ── */
 .product-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .product-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; table-layout: fixed; }
-.product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: 110px; z-index: 25; box-shadow: 0 1px 0 var(--border2); }
+/* v6.42: 吸着位置は JS がツールバー実高から算出して --thead-top に設定(既定 110px)。
+   従来は固定 110px で、対応中など背の高いツールバー時にヘッダーが裏に隠れてソート等がクリックできなかった */
+.product-table thead th { background: #f3f2ef; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: var(--text2); border-bottom: 2px solid var(--border2); white-space: nowrap; position: sticky; top: var(--thead-top, 110px); z-index: 25; box-shadow: 0 1px 0 var(--border2); }
 .product-table thead th.sortable { cursor: pointer; user-select: none; }
 .product-table thead th.sortable:hover { background: #ebe9e3; color: var(--text); }
 .product-table thead th .sort-indicator { display: inline-block; margin-left: 4px; color: var(--text3); font-size: 10px; min-width: 10px; }
@@ -306,13 +308,11 @@ body.col-resizing * { cursor: col-resize !important; }
 /* モード ON のときテーブル全体に薄い枠を出して視覚的にフィードバック */
 body.resize-mode .product-table { outline: 2px dashed rgba(191, 0, 0, 0.35); outline-offset: -1px; }
 body.resize-mode .product-table thead th { background: #fdf3f3; }
-/* v6.14/v6.15: 幅調整・一括編集モード中はソートカーソルを無効化 */
+/* v6.14: 幅調整モード中はソートカーソルを無効化(ヘッダークリックは列幅変更に使う) */
+/* v6.42: 一括編集モードでもソート可能にしたため、bulk-edit-mode のカーソル無効化は解除 */
 body.resize-mode .product-table thead th.sortable,
-body.resize-mode .review-sort-btn,
-body.bulk-edit-mode .product-table thead th.sortable,
-body.bulk-edit-mode .review-sort-btn { cursor: default !important; }
-body.resize-mode .product-table thead th.sortable:hover,
-body.bulk-edit-mode .product-table thead th.sortable:hover { background: inherit; color: var(--text2); }
+body.resize-mode .review-sort-btn { cursor: default !important; }
+body.resize-mode .product-table thead th.sortable:hover { background: inherit; color: var(--text2); }
 /* v6.15: 一括編集モード */
 .header-btn.bulk-edit-mode-on { background: #1976d2; color: #fff; border-color: #1976d2; }
 .header-btn.bulk-edit-mode-on:hover { background: #1565c0; }
@@ -752,7 +752,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.41</span>
+    <span class="build-date">v6.42</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1375,7 +1375,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.41
+// reviewcheck v6.42
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1565,7 +1565,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.41' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.42' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2382,6 +2382,8 @@ function renderProducts() {
 
   // ソートインジケーター更新
   _updateSortIndicators();
+  // v6.42: 表ヘッダーの吸着位置をツールバー実高に合わせて再計算(裏に隠れてクリックできない問題の対策)
+  _syncStickyHeaderTop();
   // ペンディング保存バーも常に同期
   _refreshPendingEditsBar();
   // v6.29: 選択件数バッジ + ヘッダーチェックボックス状態を同期
@@ -2389,13 +2391,32 @@ function renderProducts() {
   if (typeof _updateHeaderSelectCbState === 'function') _updateHeaderSelectCbState();
 }
 
+// v6.42: 表ヘッダー(sticky)の吸着 top を、サイトヘッダー+ツールバーの実高に合わせて設定。
+// ツールバーは mode/フィルタ/画面幅で高さが変わる(折り返し)ため固定値だと裏に隠れてしまう。
+function _syncStickyHeaderTop() {
+  const toolbar = document.getElementById('toolbar');
+  if (!toolbar) return;
+  // ツールバーが非表示(データ0件など)のときは既定に戻す
+  if (toolbar.offsetParent === null) {
+    document.documentElement.style.setProperty('--thead-top', '110px');
+    return;
+  }
+  const siteHeader = document.querySelector('header');
+  const headerH = siteHeader ? siteHeader.offsetHeight : 52; // ツールバーの sticky top と一致
+  const top = headerH + toolbar.offsetHeight;
+  document.documentElement.style.setProperty('--thead-top', top + 'px');
+}
+// 画面幅変更でツールバーの折り返しが変わるので追従(描画は伴わない軽量処理)
+window.addEventListener('resize', _syncStickyHeaderTop);
+
 // ── 列ヘッダーソート ──
 let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'ranking' | 'yearMonth' | 'review' | 'reviewAvg'
 let currentSortDir = 'asc';     // 'asc' | 'desc'
 function setSortKey(key) {
-  // v6.14/v6.15: 幅調整モード or 一括編集モード中はソート無効化(誤操作防止)
+  // v6.14: 幅調整モード中はヘッダークリックを列幅変更に使うためソート無効。
+  // v6.42: 一括編集(編集中)モードでも並べ替えは許可(編集は即時保存されるため安全。
+  //        対応中の商品番号ソート等ができない不具合の修正)。
   if (_resizeModeOn) return;
-  if (_bulkEditModeOn) return;
   if (currentSortKey === key) {
     // 同じ列を再クリック → 方向反転
     currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
@@ -6207,7 +6228,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.41 initialized');
+  console.log('[reviewcheck] v6.42 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
