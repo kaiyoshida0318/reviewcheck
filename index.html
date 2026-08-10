@@ -752,7 +752,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.42</span>
+    <span class="build-date">v6.43</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1375,7 +1375,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.42
+// reviewcheck v6.43
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1565,7 +1565,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.42' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.43' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3554,12 +3554,13 @@ function exportProductMappingCSV() {
 function toggleRowSelection(code, checked) {
   if (checked) _selectedCodes.add(code);
   else _selectedCodes.delete(code);
-  // v6.37/v6.38: チェックと画像選択を連動させる。
-  //   チェックON  → 画像未選択なら画像2を既定選択。
-  //   チェックOFF → 画像選択(selectedImageIdx)も解除。
+  // v6.37/v6.38/v6.43: チェックと画像選択の連動は「把握前(false)」の商品だけに限定。
+  //   把握前: チェックON→画像未選択なら画像2を既定選択 / チェックOFF→画像選択も解除。
+  //   対応中以降(画像制作/反映確認/対応済): チェック操作では画像選択に一切触らない
+  //   (対応中で選んだ画像が、チェックの入切で外れてしまう不具合の修正)。
   const p = productCache[code];
   let imgChanged = false;
-  if (p) {
+  if (p && p.rankingRegistered === false) {
     if (checked) {
       if (p.selectedImageIdx == null) { p.selectedImageIdx = 2; imgChanged = true; }
     } else {
@@ -3636,16 +3637,19 @@ function toggleSelectAllVisible(headerCb) {
   // まず対象の商品コードを収集(再描画中に NodeList が変化しても安全なように)
   const codes = [];
   rowCbs.forEach(cb => { if (cb.dataset.code) codes.push(cb.dataset.code); });
-  // v6.38: チェックと画像選択を連動。ON→画像未選択なら画像2、OFF→画像選択も解除(単一チェックと同じ)
+  // v6.38/v6.43: チェックと画像選択の連動は「把握前(false)」だけに限定(単一チェックと同じ)。
+  //   対応中以降ではチェック操作で画像選択に触らない。
   let changedImg = false;
   for (const code of codes) {
     const p = productCache[code];
-    if (desired) {
-      _selectedCodes.add(code);
-      if (p && p.selectedImageIdx == null) { p.selectedImageIdx = 2; changedImg = true; }
-    } else {
-      _selectedCodes.delete(code);
-      if (p && p.selectedImageIdx != null) { p.selectedImageIdx = null; changedImg = true; }
+    if (desired) _selectedCodes.add(code);
+    else _selectedCodes.delete(code);
+    if (p && p.rankingRegistered === false) {
+      if (desired) {
+        if (p.selectedImageIdx == null) { p.selectedImageIdx = 2; changedImg = true; }
+      } else {
+        if (p.selectedImageIdx != null) { p.selectedImageIdx = null; changedImg = true; }
+      }
     }
   }
   if (changedImg) {
@@ -3668,12 +3672,13 @@ function toggleSelectAllVisible(headerCb) {
 }
 
 function clearRankingSelection() {
-  // v6.38: チェック解除に連動して、チェック済みだった行の画像選択も解除
+  // v6.38/v6.43: チェック解除に連動した画像選択の解除は「把握前(false)」だけに限定。
+  //   対応中以降で選んだ画像は保持する。
   const affected = Array.from(_selectedCodes);
   let imgChanged = false;
   for (const code of affected) {
     const p = productCache[code];
-    if (p && p.selectedImageIdx != null) { p.selectedImageIdx = null; imgChanged = true; }
+    if (p && p.rankingRegistered === false && p.selectedImageIdx != null) { p.selectedImageIdx = null; imgChanged = true; }
   }
   _selectedCodes.clear();
   document.querySelectorAll('.row-select-cb').forEach(cb => { cb.checked = false; });
@@ -6228,7 +6233,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.42 initialized');
+  console.log('[reviewcheck] v6.43 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
