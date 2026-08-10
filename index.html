@@ -316,6 +316,19 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .bulk-ranking-reg-select.ranking-registered { background: #e8f4fd; color: #0d47a1; border-color: rgba(13,71,161,0.4); font-weight: 600; }
 .bulk-ranking-reg-select.ranking-unregistered { background: #fff3cd; color: #6d4c00; border-color: #ffe082; font-weight: 600; }
 .bulk-ranking-reg-select.ranking-reg-unset { background: #fff; color: var(--text3); }
+/* v6.33: ドロップダウンを開いたときの各<option>の色分け(Chrome/Edge/Firefox対応、Safariは反映されない可能性あり) */
+/* rankingType の各選択肢 */
+.bulk-ranking-type-select option.opt-type-unset { background: #fff; color: var(--text3); }
+.bulk-ranking-type-select option.opt-type-daily { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-realtime { background: #fff0f0; color: #c62828; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-pending { background: #fff9c4; color: #827717; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-unnecessary { background: #ffe0b2; color: #bf360c; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-past { background: #f3e8ff; color: #6a1b9a; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-false-kept { background: #ffebee; color: #b71c1c; font-weight: 700; }
+/* rankingRegistered の各選択肢 */
+.bulk-ranking-reg-select option.opt-reg-unset { background: #fff; color: var(--text3); }
+.bulk-ranking-reg-select option.opt-reg-unregistered { background: #fff3cd; color: #6d4c00; font-weight: 600; }
+.bulk-ranking-reg-select option.opt-reg-registered { background: #e8f4fd; color: #0d47a1; font-weight: 600; }
 /* v6.22: 通常表示モードでの rankingType バッジ */
 .ranking-type-badge { display: inline-block; margin-bottom: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
 .ranking-type-badge.daily { background: #e3f2fd; color: #1565c0; border: 1px solid rgba(25,118,210,0.3); }
@@ -697,7 +710,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.32</span>
+    <span class="build-date">v6.33</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1313,7 +1326,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.32
+// reviewcheck v6.33
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1503,7 +1516,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.32' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.33' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2913,19 +2926,19 @@ function _renderTableRow(code) {
     // ランキングセル: type(上) + ranking詳細input(中) + rankingRegistered(下) の3段
     cellRanking    = `<div class="bulk-ranking-cell">
         <select class="bulk-ranking-type-select ${typeCls}" data-code="${_escape(code)}" onchange="onRankingTypeChange(this)">
-          <option value="" ${vType === '' ? 'selected' : ''}>— 未設定 —</option>
-          <option value="daily" ${vType === 'daily' ? 'selected' : ''}>⚡ デイリー</option>
-          <option value="realtime" ${vType === 'realtime' ? 'selected' : ''}>🔥 リアルタイム</option>
-          <option value="pending" ${vType === 'pending' ? 'selected' : ''}>🎯 獲得前</option>
-          <option value="unnecessary" ${vType === 'unnecessary' ? 'selected' : ''}>🚫 不必要</option>
-          <option value="past" ${vType === 'past' ? 'selected' : ''}>📦 過去のまま放置</option>
-          <option value="false_kept" ${vType === 'false_kept' ? 'selected' : ''}>⚠ 虚偽のまま放置</option>
+          <option value="" ${vType === '' ? 'selected' : ''} class="opt-type-unset">— 未設定 —</option>
+          <option value="daily" ${vType === 'daily' ? 'selected' : ''} class="opt-type-daily">⚡ デイリー</option>
+          <option value="realtime" ${vType === 'realtime' ? 'selected' : ''} class="opt-type-realtime">🔥 リアルタイム</option>
+          <option value="pending" ${vType === 'pending' ? 'selected' : ''} class="opt-type-pending">🎯 獲得前</option>
+          <option value="unnecessary" ${vType === 'unnecessary' ? 'selected' : ''} class="opt-type-unnecessary">🚫 不必要</option>
+          <option value="past" ${vType === 'past' ? 'selected' : ''} class="opt-type-past">📦 過去のまま放置</option>
+          <option value="false_kept" ${vType === 'false_kept' ? 'selected' : ''} class="opt-type-false-kept">⚠ 虚偽のまま放置</option>
         </select>
         <input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="ランキング詳細">
         <select class="bulk-ranking-reg-select ${regCls}" data-code="${_escape(code)}" onchange="onRankingRegisteredChange(this)">
-          <option value="" ${regVal === '' ? 'selected' : ''}>— 未設定 —</option>
-          <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''}>⏳ 把握前-正確な日時</option>
-          <option value="registered" ${regVal === 'registered' ? 'selected' : ''}>✓ 対応済-エビデンス付</option>
+          <option value="" ${regVal === '' ? 'selected' : ''} class="opt-reg-unset">— 未設定 —</option>
+          <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''} class="opt-reg-unregistered">⏳ 把握前-正確な日時</option>
+          <option value="registered" ${regVal === 'registered' ? 'selected' : ''} class="opt-reg-registered">✓ 対応済-エビデンス付</option>
         </select>
       </div>`;
     cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM-DD" title="年月日(2025-08-07 や 2025/8/7 など)、または年月まで(2025-08)">`;
@@ -5810,7 +5823,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.32 initialized');
+  console.log('[reviewcheck] v6.33 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
