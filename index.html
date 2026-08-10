@@ -319,6 +319,20 @@ body.filter-review .product-table .col-image { display: none; }
 .crop-box { width: 268px; height: 88px; border: 2px solid #0d47a1; border-radius: 6px; overflow: hidden; background: #000; }
 .crop-inner { width: 100%; height: 100%; background-repeat: no-repeat; background-size: 370% auto; background-position: right bottom; }
 .crop-hint { margin-top: 3px; font-size: 10px; font-weight: 600; color: var(--text3); }
+/* v6.47: 反映確認フィルタ — 年月日から右の3列(年月日/選択画像/右下拡大)は幅そのままで右端に寄せ、
+   空いた分をランキング列が吸収して伸びる。ランキング詳細(2行目)は1行で、
+   収まらなければ右寄せ・先頭「…」省略で末尾(日付)を優先表示する。 */
+body.filter-review .product-table { table-layout: fixed; width: 100%; }
+body.filter-review .product-table .col-ranking { width: auto; }
+body.filter-review .product-table .col-ranking .rank-detail {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;   /* 収まらないとき先頭(左)に「…」、末尾の日付を右端に残す。収まるときは通常の左寄せ表示 */
+  text-align: left;
+}
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
 /* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
 /* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
@@ -788,7 +802,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.46</span>
+    <span class="build-date">v6.47</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1424,7 +1438,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.46
+// reviewcheck v6.47
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1614,7 +1628,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.46' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.47' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3109,7 +3123,7 @@ function _renderTableRow(code) {
     // タイプバッジ / ランキング詳細 / 登録バッジ を縦に並べる
     const parts = [];
     if (typeBadge) parts.push(typeBadge);
-    parts.push(`<div>${_escape(p.ranking || '')}</div>`);
+    parts.push(`<div class="rank-detail">${_escape(p.ranking || '')}</div>`);
     if (regBadge) parts.push(regBadge);
     cellRanking    = parts.join('');
     cellYearMonth  = _escape(p.yearMonth || '');
@@ -6414,7 +6428,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.46 initialized');
+  console.log('[reviewcheck] v6.47 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
