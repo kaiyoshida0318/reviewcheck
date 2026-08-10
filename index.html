@@ -312,7 +312,8 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 /* v6.22: rankingRegistered selectのスタイル(下段) - 旧v6.20のCSSをリネーム */
 .bulk-ranking-reg-select { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 11px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; cursor: pointer; }
 .bulk-ranking-reg-select:focus { outline: none; border-color: #1976d2; }
-.bulk-ranking-reg-select.ranking-registered { background: #e6f9f1; color: #1d9e75; border-color: rgba(29,158,117,0.4); font-weight: 600; }
+/* v6.32: 対応済(旧登録済)を緑系→青系に変更、把握前(旧登録前)は黄のまま */
+.bulk-ranking-reg-select.ranking-registered { background: #e8f4fd; color: #0d47a1; border-color: rgba(13,71,161,0.4); font-weight: 600; }
 .bulk-ranking-reg-select.ranking-unregistered { background: #fff3cd; color: #6d4c00; border-color: #ffe082; font-weight: 600; }
 .bulk-ranking-reg-select.ranking-reg-unset { background: #fff; color: var(--text3); }
 /* v6.22: 通常表示モードでの rankingType バッジ */
@@ -328,7 +329,7 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .ranking-type-badge.false-kept { background: #ffebee; color: #b71c1c; border: 1.5px solid #b71c1c; font-weight: 700; }
 /* v6.20: 通常表示モードでの rankingRegistered バッジ(旧 rankingPlaced のクラス名を流用) */
 .ranking-placed-badge { display: inline-block; margin-top: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
-.ranking-placed-badge.placed { background: #e6f9f1; color: #1d9e75; border: 1px solid rgba(29,158,117,0.3); }
+.ranking-placed-badge.placed { background: #e8f4fd; color: #0d47a1; border: 1px solid rgba(13,71,161,0.3); }
 .ranking-placed-badge.unplaced { background: #fff3cd; color: #6d4c00; border: 1px solid #ffe082; }
 /* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
 body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
@@ -696,7 +697,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.31</span>
+    <span class="build-date">v6.32</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -802,8 +803,8 @@ body.mode-ranking .product-table .col-ranking {
         <div class="toolbar-group ranking-filter-group" id="rankingPlacedFilterGroup" style="display:none">
           <span class="toolbar-label">📍 登録:</span>
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingPlacedFilter('all')">全体</button>
-          <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 登録前</button>
-          <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 登録済</button>
+          <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 把握前-正確な日時</button>
+          <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 対応済-エビデンス付</button>
         </div>
         <!-- v6.28/v6.29/v6.31: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポート群 -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
@@ -811,7 +812,7 @@ body.mode-ranking .product-table .col-ranking {
           <div class="export-block export-block-info">
             <div class="export-block-title">📄 商品情報 (Excel)</div>
             <div class="export-block-body">
-              <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="登録前のランキング商品一覧をExcelでダウンロード">⬇ 登録前をExcelで</button>
+              <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="把握前(登録前)のランキング商品一覧をExcelでダウンロード">⬇ 把握前をExcelで</button>
               <button class="ranking-export-btn ranking-export-btn-outline" onclick="exportSelectedRankingXlsx()" title="チェックした商品だけをExcelでダウンロード">✓ 選択分だけExcelで <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
               <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
             </div>
@@ -1312,7 +1313,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.31
+// reviewcheck v6.32
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1502,7 +1503,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.31' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.32' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2923,8 +2924,8 @@ function _renderTableRow(code) {
         <input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="ranking" value="${_escape(vRanking)}" onchange="onBulkEditChange(this)" placeholder="ランキング詳細">
         <select class="bulk-ranking-reg-select ${regCls}" data-code="${_escape(code)}" onchange="onRankingRegisteredChange(this)">
           <option value="" ${regVal === '' ? 'selected' : ''}>— 未設定 —</option>
-          <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''}>⏳ 登録前</option>
-          <option value="registered" ${regVal === 'registered' ? 'selected' : ''}>✓ 登録済</option>
+          <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''}>⏳ 把握前-正確な日時</option>
+          <option value="registered" ${regVal === 'registered' ? 'selected' : ''}>✓ 対応済-エビデンス付</option>
         </select>
       </div>`;
     cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM-DD" title="年月日(2025-08-07 や 2025/8/7 など)、または年月まで(2025-08)">`;
@@ -2942,8 +2943,8 @@ function _renderTableRow(code) {
     else if (p.rankingType === 'past') typeBadge = `<span class="ranking-type-badge past" title="過去のまま放置">📦 過去のまま放置</span>`;
     else if (p.rankingType === 'false_kept') typeBadge = `<span class="ranking-type-badge false-kept" title="虚偽のまま放置">⚠ 虚偽のまま放置</span>`;
     let regBadge = '';
-    if (p.rankingRegistered === true) regBadge = `<span class="ranking-placed-badge placed" title="登録済">✓ 登録済</span>`;
-    else if (p.rankingRegistered === false) regBadge = `<span class="ranking-placed-badge unplaced" title="登録前">⏳ 登録前</span>`;
+    if (p.rankingRegistered === true) regBadge = `<span class="ranking-placed-badge placed" title="対応済-エビデンス付">✓ 対応済-エビデンス付</span>`;
+    else if (p.rankingRegistered === false) regBadge = `<span class="ranking-placed-badge unplaced" title="把握前-正確な日時">⏳ 把握前-正確な日時</span>`;
     // タイプバッジ / ランキング詳細 / 登録バッジ を縦に並べる
     const parts = [];
     if (typeBadge) parts.push(typeBadge);
@@ -5809,7 +5810,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.31 initialized');
+  console.log('[reviewcheck] v6.32 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
