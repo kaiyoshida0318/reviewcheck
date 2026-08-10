@@ -172,6 +172,15 @@ body.mode-diff .col-select { display: none; }
 .ranking-placed-move-btn.disabled { opacity: 0.5; cursor: not-allowed; }
 .ranking-placed-move-btn.disabled:hover { background: #0d47a1; box-shadow: none; transform: none; }
 .ranking-placed-move-btn .selected-count-badge { background: #fff; color: #0d47a1; }
+/* v6.44: 反映確認に移動ブロック(紫系、画像制作フィルタ時) */
+.export-block-review { background: #f3e5f5; border-color: rgba(123,31,162,0.3); }
+.export-block-review .export-block-title { color: #7b1fa2; }
+.ranking-review-move-btn { font-size: 12px; padding: 6px 12px; border: 1px solid #7b1fa2; border-radius: var(--radius-sm); background: #7b1fa2; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.ranking-review-move-btn:hover { background: #5c1580; border-color: #5c1580; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(123,31,162,0.3); }
+.ranking-review-move-btn:active { transform: translateY(0); }
+.ranking-review-move-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+.ranking-review-move-btn.disabled:hover { background: #7b1fa2; box-shadow: none; transform: none; }
+.ranking-review-move-btn .selected-count-badge { background: #fff; color: #7b1fa2; }
 .export-block-body { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 /* v6.31: 画像ZIPダウンロードボタン(紫系) */
 .image-zip-btn { font-size: 12px; padding: 6px 12px; border: 1px solid #6a1b9a; border-radius: var(--radius-sm); background: #6a1b9a; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
@@ -292,6 +301,21 @@ body.mode-ranking .img-radio-band { display: flex; }
 .product-table .col-action { width: var(--col-action-w, 90px); text-align: center; }
 .product-table .col-status { width: var(--col-status-w, 100px); }
 .product-table .col-tags { width: var(--col-tags-w, 160px); }
+/* v6.44: 反映確認フィルタ専用の列(選択画像・右下拡大)。既定は非表示、反映確認時のみ表示 */
+.product-table .col-selimg { width: 104px; display: none; }
+.product-table .col-crop { width: 288px; display: none; }
+body.filter-review .product-table .col-selimg,
+body.filter-review .product-table .col-crop { display: table-cell; }
+/* 反映確認フィルタ時はレビュー列・画像1〜3列を隠し、選択画像+右下拡大に置き換える */
+body.filter-review .product-table .col-review,
+body.filter-review .product-table .col-image { display: none; }
+.selimg-wrap { width: 84px; height: 84px; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #fff; cursor: pointer; }
+.selimg-name { margin-top: 3px; font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; user-select: all; }
+.selimg-empty { font-size: 11px; color: var(--text3); }
+/* 右下だけを拡大表示するクロップ(日付の目視確認用) */
+.crop-box { width: 268px; height: 88px; border: 2px solid #0d47a1; border-radius: 6px; overflow: hidden; background: #000; }
+.crop-inner { width: 100%; height: 100%; background-repeat: no-repeat; background-size: 370% auto; background-position: right bottom; }
+.crop-hint { margin-top: 3px; font-size: 10px; font-weight: 600; color: var(--text3); }
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
 /* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
 /* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
@@ -354,6 +378,8 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .bulk-ranking-reg-select.ranking-unregistered { background: #fff3cd; color: #6d4c00; border-color: #ffe082; font-weight: 600; }
 /* v6.37: 対応中-画像制作 (オレンジ系、作業中を示す) */
 .bulk-ranking-reg-select.ranking-in-progress { background: #ffe0b2; color: #e65100; border-color: rgba(230,81,0,0.4); font-weight: 600; }
+/* v6.44: 対応中-画像反映確認 (紫系) */
+.bulk-ranking-reg-select.ranking-review { background: #f3e5f5; color: #7b1fa2; border-color: rgba(123,31,162,0.4); font-weight: 600; }
 .bulk-ranking-reg-select.ranking-reg-unset { background: #fff; color: var(--text3); }
 /* v6.33: ドロップダウンを開いたときの各<option>の色分け(Chrome/Edge/Firefox対応、Safariは反映されない可能性あり) */
 /* rankingType の各選択肢 */
@@ -368,6 +394,7 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .bulk-ranking-reg-select option.opt-reg-unset { background: #fff; color: var(--text3); }
 .bulk-ranking-reg-select option.opt-reg-unregistered { background: #fff3cd; color: #6d4c00; font-weight: 600; }
 .bulk-ranking-reg-select option.opt-reg-in-progress { background: #ffe0b2; color: #e65100; font-weight: 600; }
+.bulk-ranking-reg-select option.opt-reg-review { background: #f3e5f5; color: #7b1fa2; font-weight: 600; }
 .bulk-ranking-reg-select option.opt-reg-registered { background: #e8f4fd; color: #0d47a1; font-weight: 600; }
 /* v6.22: 通常表示モードでの rankingType バッジ */
 .ranking-type-badge { display: inline-block; margin-bottom: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
@@ -386,6 +413,8 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .ranking-placed-badge.unplaced { background: #fff3cd; color: #6d4c00; border: 1px solid #ffe082; }
 /* v6.37: 対応中-画像制作 バッジ(オレンジ) */
 .ranking-placed-badge.in-progress { background: #ffe0b2; color: #e65100; border: 1px solid rgba(230,81,0,0.3); }
+/* v6.44: 対応中-画像反映確認 バッジ(紫) */
+.ranking-placed-badge.review { background: #f3e5f5; color: #7b1fa2; border: 1px solid rgba(123,31,162,0.3); }
 /* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
 body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
 
@@ -752,7 +781,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.43</span>
+    <span class="build-date">v6.44</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -860,6 +889,7 @@ body.mode-ranking .product-table .col-ranking {
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingPlacedFilter('all')">全体</button>
           <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 把握前-正確な日時</button>
           <button class="ranking-filter-btn" data-filter="in_progress" onclick="setRankingPlacedFilter('in_progress')">🎨 対応中-画像制作</button>
+          <button class="ranking-filter-btn" data-filter="review" onclick="setRankingPlacedFilter('review')">🔎 対応中-画像反映確認</button>
           <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 対応済-エビデンス付</button>
         </div>
         <!-- v6.28/v6.29/v6.31/v6.37: ランキング証拠用モード時に登録フィルタに応じて出るツール群 -->
@@ -872,19 +902,27 @@ body.mode-ranking .product-table .col-ranking {
               <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
             </div>
           </div>
-          <!-- v6.39: 対応中フィルタ時: 対応済に移動(青系) -->
+          <!-- v6.44: 画像制作フィルタ時: 反映確認に移動(紫系) -->
+          <div class="export-block export-block-review" id="exportBlockToReview" style="display:none">
+            <div class="export-block-title">🔎 反映確認に移動</div>
+            <div class="export-block-body">
+              <button class="ranking-review-move-btn" id="moveToReviewBtn" onclick="moveSelectedToReview()" title="チェックした商品を対応中-画像反映確認に移動">➜ 選択商品を反映確認に移動 <span class="selected-count-badge" id="selectedCountBadgeReview">0</span></button>
+              <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
+            </div>
+          </div>
+          <!-- 画像制作フィルタ時: 商品情報Excel(緑系) -->
+          <div class="export-block export-block-info" id="exportBlockInfo" style="display:none">
+            <div class="export-block-title">📄 商品情報 (Excel)</div>
+            <div class="export-block-body">
+              <button class="ranking-export-btn" onclick="exportInProgressXlsx()" title="対応中の全商品情報をExcelでダウンロード">⬇ 対応中をExcelで</button>
+            </div>
+          </div>
+          <!-- v6.39/v6.44: 反映確認フィルタ時: 対応済に移動(青系) -->
           <div class="export-block export-block-placed" id="exportBlockPlaced" style="display:none">
             <div class="export-block-title">✓ 対応済に移動</div>
             <div class="export-block-body">
               <button class="ranking-placed-move-btn" id="moveToPlacedBtn" onclick="moveSelectedToPlaced()" title="チェックした商品を対応済-エビデンス付に移動">➜ 選択商品を対応済に移動 <span class="selected-count-badge" id="selectedCountBadgePlaced">0</span></button>
               <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
-            </div>
-          </div>
-          <!-- 対応中フィルタ時: 商品情報Excel(緑系) -->
-          <div class="export-block export-block-info" id="exportBlockInfo" style="display:none">
-            <div class="export-block-title">📄 商品情報 (Excel)</div>
-            <div class="export-block-body">
-              <button class="ranking-export-btn" onclick="exportInProgressXlsx()" title="対応中の全商品情報をExcelでダウンロード">⬇ 対応中をExcelで</button>
             </div>
           </div>
         </div>
@@ -926,6 +964,9 @@ body.mode-ranking .product-table .col-ranking {
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
               <th class="col-ranking sortable" onclick="setSortKey('ranking')" id="sortHeader-ranking">ランキング <span class="sort-indicator" id="sortInd-ranking"></span></th>
               <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月日 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
+              <!-- v6.44: 対応中-画像反映確認フィルタ専用列(CSSでそのフィルタ時のみ表示) -->
+              <th class="col-selimg">選択した画像</th>
+              <th class="col-crop">選択画像の右下(拡大)</th>
               <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
               <th class="col-review" id="sortHeader-review">
                 <div class="review-sort-head">
@@ -1375,7 +1416,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.43
+// reviewcheck v6.44
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1565,7 +1606,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.43' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.44' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2303,6 +2344,7 @@ function renderProducts() {
       if (currentRankingPlacedFilter === 'placed'      && reg !== true) return false;
       if (currentRankingPlacedFilter === 'unplaced'    && reg !== false) return false;
       if (currentRankingPlacedFilter === 'in_progress' && reg !== 'in_progress') return false;
+      if (currentRankingPlacedFilter === 'review'      && reg !== 'review') return false;
     }
     return true;
   });
@@ -2995,14 +3037,16 @@ function _renderTableRow(code) {
                   : vType === 'past' ? 'ranking-type-past'
                   : vType === 'false_kept' ? 'ranking-type-false-kept'
                   : 'ranking-type-unset';
-    // v6.22/v6.37: rankingRegistered 4状態 (null/false=unregistered/'in_progress'/true=registered)
+    // v6.22/v6.37/v6.44: rankingRegistered 5状態 (null/false=unregistered/'in_progress'/'review'/true=registered)
     const vReg = p.rankingRegistered;
     const regVal = vReg === true ? 'registered'
                  : vReg === 'in_progress' ? 'in_progress'
+                 : vReg === 'review' ? 'review'
                  : vReg === false ? 'unregistered'
                  : '';
     const regCls = vReg === true ? 'ranking-registered'
                  : vReg === 'in_progress' ? 'ranking-in-progress'
+                 : vReg === 'review' ? 'ranking-review'
                  : vReg === false ? 'ranking-unregistered'
                  : 'ranking-reg-unset';
     cellItemNumber = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
@@ -3025,6 +3069,7 @@ function _renderTableRow(code) {
           <option value="" ${regVal === '' ? 'selected' : ''} class="opt-reg-unset">— 未設定 —</option>
           <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''} class="opt-reg-unregistered">⏳ 把握前-正確な日時</option>
           <option value="in_progress" ${regVal === 'in_progress' ? 'selected' : ''} class="opt-reg-in-progress">🎨 対応中-画像制作</option>
+          <option value="review" ${regVal === 'review' ? 'selected' : ''} class="opt-reg-review">🔎 対応中-画像反映確認</option>
           <option value="registered" ${regVal === 'registered' ? 'selected' : ''} class="opt-reg-registered">✓ 対応済-エビデンス付</option>
         </select>
       </div>`;
@@ -3045,6 +3090,7 @@ function _renderTableRow(code) {
     let regBadge = '';
     if (p.rankingRegistered === true) regBadge = `<span class="ranking-placed-badge placed" title="対応済-エビデンス付">✓ 対応済-エビデンス付</span>`;
     else if (p.rankingRegistered === 'in_progress') regBadge = `<span class="ranking-placed-badge in-progress" title="対応中-画像制作">🎨 対応中-画像制作</span>`;
+    else if (p.rankingRegistered === 'review') regBadge = `<span class="ranking-placed-badge review" title="対応中-画像反映確認">🔎 対応中-画像反映確認</span>`;
     else if (p.rankingRegistered === false) regBadge = `<span class="ranking-placed-badge unplaced" title="把握前-正確な日時">⏳ 把握前-正確な日時</span>`;
     // タイプバッジ / ランキング詳細 / 登録バッジ を縦に並べる
     const parts = [];
@@ -3053,6 +3099,25 @@ function _renderTableRow(code) {
     if (regBadge) parts.push(regBadge);
     cellRanking    = parts.join('');
     cellYearMonth  = _escape(p.yearMonth || '');
+  }
+
+  // v6.44: 反映確認フィルタ用セル(選択画像 + 右下拡大)。CSSでそのフィルタ時のみ表示される。
+  const _selUrl = (selIdx && p.images && p.images[selIdx - 1]) ? p.images[selIdx - 1] : '';
+  let selImgCell, cropCell;
+  if (_selUrl) {
+    const _e = _escape(_selUrl);
+    const _base = _escape(_imgBasename(_selUrl));
+    selImgCell = `<td class="col-selimg">
+      <div class="selimg-wrap" style="background-image:url('${_e}')" onclick="openLightbox('${_e}')" title="クリックで拡大"></div>
+      <div class="selimg-name">${_base}</div>
+    </td>`;
+    cropCell = `<td class="col-crop">
+      <div class="crop-box" title="選択画像の右下(ランキング名・更新日時を確認)"><div class="crop-inner" style="background-image:url('${_e}')"></div></div>
+      <div class="crop-hint">右下の日付を確認</div>
+    </td>`;
+  } else {
+    selImgCell = `<td class="col-selimg"><span class="selimg-empty">未選択</span></td>`;
+    cropCell = `<td class="col-crop"><span class="selimg-empty">—</span></td>`;
   }
 
   // v6.29: チェック状態(セッション限定) + 選択行のハイライト用クラス
@@ -3066,6 +3131,8 @@ function _renderTableRow(code) {
     <td class="col-name">${cellName}</td>
     <td class="col-ranking" title="${_escape(p.ranking || '')}">${cellRanking}</td>
     <td class="col-yearmonth">${cellYearMonth}</td>
+    ${selImgCell}
+    ${cropCell}
     ${_renderSalesCell(code)}
     <td class="col-review">
       <div class="table-review">
@@ -3339,13 +3406,15 @@ function setRankingFilter(filter) {
 }
 // v6.20/v6.22: ランキング登録状況フィルタ (配置→登録に改名。API互換のためキー名はplaced/unplaced継続)
 function setRankingPlacedFilter(filter) {
-  // v6.37: 'in_progress'(対応中-画像制作)を追加
-  const valid = ['all', 'placed', 'unplaced', 'in_progress'];
+  // v6.37/v6.44: 'in_progress'(画像制作)・'review'(画像反映確認)を追加
+  const valid = ['all', 'placed', 'unplaced', 'in_progress', 'review'];
   if (!valid.includes(filter)) filter = 'all';
   currentRankingPlacedFilter = filter;
   document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.filter === filter);
   });
+  // v6.44: 反映確認フィルタ時は専用レイアウト(選択画像+右下拡大)に切り替え
+  _syncReviewFilterClass();
   // v6.28: 登録前フィルタ選択時のみエクスポートボタンを表示
   _updateRankingExportBtnVisibility();
   renderProducts();
@@ -3355,19 +3424,22 @@ function setRankingPlacedFilter(filter) {
 //  - 対応中(in_progress)フィルタ時: 「商品情報Excel」ブロック(緑)
 function _updateRankingExportBtnVisibility() {
   const btnGroup = document.getElementById('rankingExportGroup');
-  const moveBlock = document.getElementById('exportBlockMove');
-  const infoBlock = document.getElementById('exportBlockInfo');
-  const placedBlock = document.getElementById('exportBlockPlaced');
+  const moveBlock = document.getElementById('exportBlockMove');        // 把握前 → 画像制作
+  const toReviewBlock = document.getElementById('exportBlockToReview'); // 画像制作 → 反映確認
+  const infoBlock = document.getElementById('exportBlockInfo');        // 画像制作: 商品情報Excel
+  const placedBlock = document.getElementById('exportBlockPlaced');     // 反映確認 → 対応済
   if (!btnGroup) return;
   const isRanking = tableMode === 'ranking';
-  const showMove = isRanking && currentRankingPlacedFilter === 'unplaced';
-  // v6.39: 対応中フィルタ時は「対応済に移動」+「商品情報Excel」の2ブロックを表示
-  const showInProgress = isRanking && currentRankingPlacedFilter === 'in_progress';
-  if (moveBlock) moveBlock.style.display = showMove ? '' : 'none';
-  if (placedBlock) placedBlock.style.display = showInProgress ? '' : 'none';
-  if (infoBlock) infoBlock.style.display = showInProgress ? '' : 'none';
-  // 親グループはいずれかのブロックを出すときだけ表示
-  btnGroup.style.display = (showMove || showInProgress) ? '' : 'none';
+  const f = currentRankingPlacedFilter;
+  // v6.44: フィルタごとに出すブロックを切り替え(制作→反映確認→対応済 の直線フロー)
+  const showMove       = isRanking && f === 'unplaced';     // 対応中(画像制作)に移動
+  const showInProgress = isRanking && f === 'in_progress';  // 反映確認に移動 + Excel
+  const showReview     = isRanking && f === 'review';       // 対応済に移動
+  if (moveBlock)     moveBlock.style.display     = showMove ? '' : 'none';
+  if (toReviewBlock) toReviewBlock.style.display = showInProgress ? '' : 'none';
+  if (infoBlock)     infoBlock.style.display     = showInProgress ? '' : 'none';
+  if (placedBlock)   placedBlock.style.display   = showReview ? '' : 'none';
+  btnGroup.style.display = (showMove || showInProgress || showReview) ? '' : 'none';
 }
 function _updateRankingFilterVisibility() {
   const group1 = document.getElementById('rankingFilterGroup');
@@ -3394,6 +3466,14 @@ function _updateRankingFilterVisibility() {
   }
   // v6.28: エクスポートボタンの表示制御も同期
   _updateRankingExportBtnVisibility();
+  // v6.44: 反映確認レイアウトのbodyクラスも同期
+  _syncReviewFilterClass();
+}
+
+// v6.44: 反映確認フィルタ選択中だけ body.filter-review を付与(専用列レイアウト用)
+function _syncReviewFilterClass() {
+  const on = (tableMode === 'ranking' && currentRankingPlacedFilter === 'review');
+  document.body.classList.toggle('filter-review', on);
 }
 
 // v6.17: 旧 _updateTableColumns は不要(モード切替はCSSで完結)
@@ -3606,6 +3686,30 @@ function moveSelectedToInProgress() {
   _showToast(`${moved}件を対応中に移動しました`, 'success');
 }
 
+// ── v6.44: チェック済み商品を「対応中-画像反映確認」に移動(画像制作フィルタで使用) ──
+//  - _selectedCodes 全てを rankingRegistered='review' に変更
+//  - selectedImageIdx はそのまま保持(反映確認で右下の日付を目視するため)
+function moveSelectedToReview() {
+  if (_selectedCodes.size === 0) {
+    _showToast('商品が選択されていません。チェックを入れてください。', 'error');
+    return;
+  }
+  const codes = Array.from(_selectedCodes);
+  let moved = 0;
+  for (const code of codes) {
+    const p = productCache[code];
+    if (!p) continue;
+    p.rankingRegistered = 'review';
+    moved++;
+  }
+  _selectedCodes.clear();
+  const headerCb = document.getElementById('headerSelectCb');
+  if (headerCb) { headerCb.checked = false; headerCb.indeterminate = false; }
+  scheduleGitHubSave();
+  renderProducts();
+  _showToast(`${moved}件を反映確認に移動しました`, 'success');
+}
+
 // ── v6.39: チェック済み商品を「対応済-エビデンス付」に移動(対応中フィルタで使用) ──
 //  - _selectedCodes 全てを rankingRegistered=true に変更
 //  - selectedImageIdx はそのまま保持(対応済の証跡として残す)
@@ -3703,11 +3807,16 @@ function _updateSelectedCountBadge() {
   if (badge) badge.textContent = count;
   const moveBtn = document.getElementById('moveToInProgressBtn');
   if (moveBtn) moveBtn.classList.toggle('disabled', count === 0);
-  // v6.39: 対応中の「対応済に移動」バッジ/ボタン
+  // v6.39: 反映確認の「対応済に移動」バッジ/ボタン
   const badge2 = document.getElementById('selectedCountBadgePlaced');
   if (badge2) badge2.textContent = count;
   const moveBtn2 = document.getElementById('moveToPlacedBtn');
   if (moveBtn2) moveBtn2.classList.toggle('disabled', count === 0);
+  // v6.44: 画像制作の「反映確認に移動」バッジ/ボタン
+  const badge3 = document.getElementById('selectedCountBadgeReview');
+  if (badge3) badge3.textContent = count;
+  const moveBtn3 = document.getElementById('moveToReviewBtn');
+  if (moveBtn3) moveBtn3.classList.toggle('disabled', count === 0);
 }
 
 // 表示中の行のチェック状況からヘッダーチェックボックスの状態を更新(全選択/半選択/未選択)
@@ -5891,14 +6000,16 @@ function onRankingRegisteredChange(sel) {
   if (sel.value === 'registered') newVal = true;
   else if (sel.value === 'unregistered') newVal = false;
   else if (sel.value === 'in_progress') newVal = 'in_progress';
+  else if (sel.value === 'review') newVal = 'review';
   else newVal = null;
   const oldVal = productCache[code].rankingRegistered;
-  const oldNorm = (oldVal === true || oldVal === false || oldVal === 'in_progress') ? oldVal : null;
+  const oldNorm = (oldVal === true || oldVal === false || oldVal === 'in_progress' || oldVal === 'review') ? oldVal : null;
   if (newVal === oldNorm) return;
   productCache[code].rankingRegistered = newVal;
-  sel.classList.remove('ranking-registered', 'ranking-unregistered', 'ranking-in-progress', 'ranking-reg-unset');
+  sel.classList.remove('ranking-registered', 'ranking-unregistered', 'ranking-in-progress', 'ranking-review', 'ranking-reg-unset');
   sel.classList.add(newVal === true ? 'ranking-registered'
                    : newVal === 'in_progress' ? 'ranking-in-progress'
+                   : newVal === 'review' ? 'ranking-review'
                    : newVal === false ? 'ranking-unregistered'
                    : 'ranking-reg-unset');
   const cell = sel.closest('td');
@@ -6233,7 +6344,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.43 initialized');
+  console.log('[reviewcheck] v6.44 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
