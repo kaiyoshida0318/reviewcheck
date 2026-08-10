@@ -120,6 +120,9 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .ranking-filter-btn { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; cursor: pointer; color: var(--text2); font-weight: 500; transition: all 0.1s; }
 .ranking-filter-btn:hover { background: #ebe9e3; color: var(--text); }
 .ranking-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* v6.45: フィルタボタン内の件数表示 (32) */
+.ranking-filter-btn .rf-count { font-size: 10px; font-weight: 700; opacity: 0.7; margin-left: 1px; font-family: 'DM Mono', monospace; }
+.ranking-filter-btn.active .rf-count { opacity: 0.9; }
 /* v6.28: 登録前エクスポートボタン(緑系、目立つ配色) */
 .ranking-export-btn { font-size: 12px; padding: 6px 14px; border: 1px solid #1d9e75; border-radius: var(--radius-sm); background: #1d9e75; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
 .ranking-export-btn:hover { background: #17805d; border-color: #17805d; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(29,158,117,0.3); }
@@ -434,6 +437,8 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 .inline-tag-select.tag-renewal   { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
 .inline-tag-select.tag-boost     { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
 .inline-tag-select.tag-boostPlan { background: #f3e5f5; color: #7b1fa2; border-color: #ce93d8; }
+/* v6.45: 再制作予定(ティール系) */
+.inline-tag-select.tag-remakePlan { background: #e0f2f1; color: #00838f; border-color: #80cbc4; }
 .inline-tag-select.tag-none      { color: var(--text3); }
 
 /* ── ペンディング保存バー ── */
@@ -584,6 +589,7 @@ body.mode-ranking .product-table .col-ranking {
 .tag-btn.active[data-tag="renewal"] { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
 .tag-btn.active[data-tag="boost"] { background: #fff3e0; color: #e65100; border-color: #e65100; }
 .tag-btn.active[data-tag="boostPlan"] { background: #f3e5f5; color: #7b1fa2; border-color: #7b1fa2; }
+.tag-btn.active[data-tag="remakePlan"] { background: #e0f2f1; color: #00838f; border-color: #00838f; }
 
 /* ── Mapping modal (CSV import wizard) ── */
 .mapping-modal { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; max-width: 920px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
@@ -781,7 +787,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.44</span>
+    <span class="build-date">v6.45</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -874,14 +880,14 @@ body.mode-ranking .product-table .col-ranking {
         <!-- v6.22で刷新: 「入力済/入力前/不必要」→「デイリー/リアルタイム/不必要/未設定」 -->
         <div class="toolbar-group ranking-filter-group" id="rankingFilterGroup" style="display:none">
           <span class="toolbar-label">🏆 タイプ:</span>
-          <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体</button>
-          <button class="ranking-filter-btn" data-filter="daily" onclick="setRankingFilter('daily')">⚡ デイリー</button>
-          <button class="ranking-filter-btn" data-filter="realtime" onclick="setRankingFilter('realtime')">🔥 リアルタイム</button>
-          <button class="ranking-filter-btn" data-filter="pending" onclick="setRankingFilter('pending')">🎯 獲得前</button>
-          <button class="ranking-filter-btn" data-filter="unnecessary" onclick="setRankingFilter('unnecessary')">🚫 不必要</button>
-          <button class="ranking-filter-btn" data-filter="past" onclick="setRankingFilter('past')">📦 過去のまま放置</button>
-          <button class="ranking-filter-btn" data-filter="false_kept" onclick="setRankingFilter('false_kept')">⚠ 虚偽のまま放置</button>
-          <button class="ranking-filter-btn" data-filter="unset" onclick="setRankingFilter('unset')">未設定</button>
+          <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体 <span class="rf-count" id="rfCount-all"></span></button>
+          <button class="ranking-filter-btn" data-filter="daily" onclick="setRankingFilter('daily')">⚡ デイリー <span class="rf-count" id="rfCount-daily"></span></button>
+          <button class="ranking-filter-btn" data-filter="realtime" onclick="setRankingFilter('realtime')">🔥 リアルタイム <span class="rf-count" id="rfCount-realtime"></span></button>
+          <button class="ranking-filter-btn" data-filter="pending" onclick="setRankingFilter('pending')">🎯 獲得前 <span class="rf-count" id="rfCount-pending"></span></button>
+          <button class="ranking-filter-btn" data-filter="unnecessary" onclick="setRankingFilter('unnecessary')">🚫 不必要 <span class="rf-count" id="rfCount-unnecessary"></span></button>
+          <button class="ranking-filter-btn" data-filter="past" onclick="setRankingFilter('past')">📦 過去のまま放置 <span class="rf-count" id="rfCount-past"></span></button>
+          <button class="ranking-filter-btn" data-filter="false_kept" onclick="setRankingFilter('false_kept')">⚠ 虚偽のまま放置 <span class="rf-count" id="rfCount-false_kept"></span></button>
+          <button class="ranking-filter-btn" data-filter="unset" onclick="setRankingFilter('unset')">未設定 <span class="rf-count" id="rfCount-unset"></span></button>
         </div>
         <!-- v6.20/v6.22: ランキング登録状況フィルタ(配置→登録に改名) -->
         <div class="toolbar-group ranking-filter-group" id="rankingPlacedFilterGroup" style="display:none">
@@ -1151,6 +1157,9 @@ body.mode-ranking .product-table .col-ranking {
             <button class="tag-btn" data-tag="boostPlan" onclick="toggleEditTag('boostPlan')" id="tagBtnBoostPlan">
               <span style="font-size:14px">📅</span><span>盛り上げ予定</span>
             </button>
+            <button class="tag-btn" data-tag="remakePlan" onclick="toggleEditTag('remakePlan')" id="tagBtnRemakePlan">
+              <span style="font-size:14px">🔁</span><span>再制作予定</span>
+            </button>
           </div>
         </div>
 
@@ -1416,7 +1425,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.44
+// reviewcheck v6.45
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1606,7 +1615,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.44' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.45' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2424,6 +2433,8 @@ function renderProducts() {
 
   // ソートインジケーター更新
   _updateSortIndicators();
+  // v6.45: タイプフィルタの件数(32)を更新
+  _updateRankingFilterCounts();
   // v6.42: 表ヘッダーの吸着位置をツールバー実高に合わせて再計算(裏に隠れてクリックできない問題の対策)
   _syncStickyHeaderTop();
   // ペンディング保存バーも常に同期
@@ -2622,7 +2633,7 @@ function renderSidebar() {
   document.getElementById('sidebarStatusList').innerHTML = statusHtml;
 
   // ── 制作タグ ──
-  const tagCounts = { renewal: 0, boost: 0, boostPlan: 0 };
+  const tagCounts = { renewal: 0, boost: 0, boostPlan: 0, remakePlan: 0 };
   for (const code of codes) {
     const p = productCache[code];
     if (p.status === 'ignore' || p.status === 'retired') continue;
@@ -2630,11 +2641,13 @@ function renderSidebar() {
     if (tags.renewal) tagCounts.renewal++;
     if (tags.boost) tagCounts.boost++;
     if (tags.boostPlan) tagCounts.boostPlan++;
+    if (tags.remakePlan) tagCounts.remakePlan++;
   }
   const tagDefs = [
-    { key: 'renewal',   label: 'リニューアル',     color: '#2e7d32', icon: '🔄' },
-    { key: 'boost',     label: '盛り上げ制作',     color: '#e65100', icon: '🚀' },
-    { key: 'boostPlan', label: '盛り上げ予定',     color: '#7b1fa2', icon: '📅' },
+    { key: 'renewal',    label: 'リニューアル',     color: '#2e7d32', icon: '🔄' },
+    { key: 'boost',      label: '盛り上げ制作',     color: '#e65100', icon: '🚀' },
+    { key: 'boostPlan',  label: '盛り上げ予定',     color: '#7b1fa2', icon: '📅' },
+    { key: 'remakePlan', label: '再制作予定',       color: '#00838f', icon: '🔁' },
   ];
   let tagHtml = '';
   for (const t of tagDefs) {
@@ -3177,9 +3190,10 @@ function _renderStatusButtons(code, savedStatus) {
 // savedTagsオブジェクトから現在のタグキー(1つ)を取得
 function _getActiveTagKey(savedTags) {
   if (!savedTags) return '';
-  if (savedTags.renewal)   return 'renewal';
-  if (savedTags.boost)     return 'boost';
-  if (savedTags.boostPlan) return 'boostPlan';
+  if (savedTags.renewal)    return 'renewal';
+  if (savedTags.boost)      return 'boost';
+  if (savedTags.boostPlan)  return 'boostPlan';
+  if (savedTags.remakePlan) return 'remakePlan';
   return '';
 }
 
@@ -3188,10 +3202,11 @@ function _renderTagsButtons(code, savedTags) {
   const current = _getActiveTagKey(savedTags);
   // ドロップダウン - v6.18: pending廃止
   const opts = [
-    { key: '',          label: '— なし —' },
-    { key: 'renewal',   label: '🔄 リニューアル' },
-    { key: 'boost',     label: '🚀 盛り上げ制作' },
-    { key: 'boostPlan', label: '📅 盛り上げ予定' },
+    { key: '',           label: '— なし —' },
+    { key: 'renewal',    label: '🔄 リニューアル' },
+    { key: 'boost',      label: '🚀 盛り上げ制作' },
+    { key: 'boostPlan',  label: '📅 盛り上げ予定' },
+    { key: 'remakePlan', label: '🔁 再制作予定' },
   ];
   let html = `<select class="inline-tag-select tag-${current || 'none'}" onchange="setInlineTag('${_escape(code)}', this.value)">`;
   for (const o of opts) {
@@ -3225,9 +3240,10 @@ function setInlineTag(code, tagKey) {
   if (tagKey === savedTagKey) return; // 変化なし
   // 1つだけのタグキーをセット(空文字なら全部解除)
   const newTags = {};
-  if (tagKey === 'renewal')        newTags.renewal = true;
-  else if (tagKey === 'boost')     newTags.boost = true;
-  else if (tagKey === 'boostPlan') newTags.boostPlan = true;
+  if (tagKey === 'renewal')         newTags.renewal = true;
+  else if (tagKey === 'boost')      newTags.boost = true;
+  else if (tagKey === 'boostPlan')  newTags.boostPlan = true;
+  else if (tagKey === 'remakePlan') newTags.remakePlan = true;
   productCache[code].tags = newTags;
   // 該当セルだけ再描画(緑フラッシュ付き)
   const cell = document.getElementById('tagsCell-' + code);
@@ -3474,6 +3490,60 @@ function _updateRankingFilterVisibility() {
 function _syncReviewFilterClass() {
   const on = (tableMode === 'ranking' && currentRankingPlacedFilter === 'review');
   document.body.classList.toggle('filter-review', on);
+}
+
+// v6.45: タイプフィルタ以外の絞り込み(状態/カテゴリ/評価/検索/制作タグ)を通過するか
+//   タイプフィルタと登録フィルタは無視(各タイプの総件数を出すため)。renderProducts と同じ条件を踏襲。
+function _passesBaseFiltersForCount(code, p, search) {
+  if (currentProductionTag) {
+    const tags = p.tags || {};
+    if (!tags[currentProductionTag]) return false;
+    if (search) {
+      const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  }
+  const status = p.status || 'normal';
+  const isIgnored = status === 'ignore', isRetired = status === 'retired', isFocus = status === 'focus';
+  if (currentStatusFilter === 'ignore') { if (!isIgnored) return false; }
+  else if (currentStatusFilter === 'retired') { if (!isRetired) return false; }
+  else if (currentStatusFilter === 'focus') { if (!isFocus) return false; }
+  else { if (isIgnored || isRetired || isFocus) return false; }
+  if (currentCategory !== 'all') {
+    const cat = _categoryOf(p.itemNumber);
+    if (currentCategory === '__unset__') { if (cat !== '__unset__') return false; }
+    else { if (cat !== currentCategory) return false; }
+  }
+  if (currentScoreBand !== 'all') { if (_scoreBandOf(p.reviewCount, p.reviewAvg) !== currentScoreBand) return false; }
+  if (search) {
+    const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
+    if (!hay.includes(search)) return false;
+  }
+  return true;
+}
+
+// v6.45: タイプフィルタ各ボタンの件数(32)を更新
+function _updateRankingFilterCounts() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const c = { all: 0, daily: 0, realtime: 0, pending: 0, unnecessary: 0, past: 0, false_kept: 0, unset: 0 };
+  for (const code of Object.keys(productCache)) {
+    const p = productCache[code];
+    if (!_passesBaseFiltersForCount(code, p, search)) continue;
+    c.all++;
+    const t = p.rankingType || null;
+    if (t === 'daily') c.daily++;
+    else if (t === 'realtime') c.realtime++;
+    else if (t === 'pending') c.pending++;
+    else if (t === 'unnecessary') c.unnecessary++;
+    else if (t === 'past') c.past++;
+    else if (t === 'false_kept') c.false_kept++;
+    else c.unset++;
+  }
+  for (const key of Object.keys(c)) {
+    const el = document.getElementById('rfCount-' + key);
+    if (el) el.textContent = '(' + c[key] + ')';
+  }
 }
 
 // v6.17: 旧 _updateTableColumns は不要(モード切替はCSSで完結)
@@ -5195,7 +5265,7 @@ function cancelEditItemNumber(code) {
 // ── 商品詳細編集モーダル ──
 let _editingProductCode = null;
 let _editingTempStatus = 'normal';
-let _editingTempTags = { renewal: false, boost: false, boostPlan: false };
+let _editingTempTags = { renewal: false, boost: false, boostPlan: false, remakePlan: false };
 
 function openProductEditModal(code) {
   if (!productCache[code]) return;
@@ -5208,7 +5278,7 @@ function openProductEditModal(code) {
   else _editingTempStatus = 'normal';
   // 制作タグ
   const tags = p.tags || {};
-  _editingTempTags = { renewal: !!tags.renewal, boost: !!tags.boost, boostPlan: !!tags.boostPlan };
+  _editingTempTags = { renewal: !!tags.renewal, boost: !!tags.boost, boostPlan: !!tags.boostPlan, remakePlan: !!tags.remakePlan };
 
   document.getElementById('productEditMeta').innerHTML =
     `商品管理番号: <strong>${_escape(code)}</strong>`;
@@ -6277,9 +6347,9 @@ function _updateStatusBtns() {
 function toggleEditTag(tag) {
   // 排他選択: 同じタグを再クリックでオフ、別タグなら他をオフにして新しいのをオン
   if (_editingTempTags[tag]) {
-    _editingTempTags = { renewal: false, boost: false, boostPlan: false };
+    _editingTempTags = { renewal: false, boost: false, boostPlan: false, remakePlan: false };
   } else {
-    _editingTempTags = { renewal: false, boost: false, boostPlan: false };
+    _editingTempTags = { renewal: false, boost: false, boostPlan: false, remakePlan: false };
     _editingTempTags[tag] = true;
   }
   _updateTagBtns();
@@ -6288,6 +6358,7 @@ function _updateTagBtns() {
   document.getElementById('tagBtnRenewal').classList.toggle('active', _editingTempTags.renewal);
   document.getElementById('tagBtnBoost').classList.toggle('active', _editingTempTags.boost);
   document.getElementById('tagBtnBoostPlan').classList.toggle('active', _editingTempTags.boostPlan);
+  document.getElementById('tagBtnRemakePlan').classList.toggle('active', _editingTempTags.remakePlan);
 }
 function saveProductEdit() {
   const code = _editingProductCode;
@@ -6303,6 +6374,7 @@ function saveProductEdit() {
   if (_editingTempTags.renewal) newTags.renewal = true;
   if (_editingTempTags.boost) newTags.boost = true;
   if (_editingTempTags.boostPlan) newTags.boostPlan = true;
+  if (_editingTempTags.remakePlan) newTags.remakePlan = true;
   productCache[code].tags = newTags;
   closeProductEditModal();
   renderProducts();
@@ -6344,7 +6416,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.44 initialized');
+  console.log('[reviewcheck] v6.45 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
