@@ -711,7 +711,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.35</span>
+    <span class="build-date">v6.36</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1327,7 +1327,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.35
+// reviewcheck v6.36
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1517,7 +1517,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.35' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.36' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3520,6 +3520,49 @@ function _updateHeaderSelectCbState() {
 }
 
 // ── v6.31: 画像選択(No.1画像等)とZIPダウンロード ──
+// v6.36: canvas経由で画像をblob化(CORS制限の回避策)
+// 楽天画像サーバー(thumbnail.image.rakuten.co.jp)は crossorigin="anonymous" を許可しているので、
+// Image + canvas 経由なら fetch がブロックされる環境でも取得できるケースが多い。
+function _fetchImageAsBlobViaCanvas(url, ext) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.decoding = 'async';
+    // タイムアウト(10秒)
+    const timer = setTimeout(() => {
+      img.onload = null; img.onerror = null;
+      reject(new Error('canvas timeout'));
+    }, 10000);
+    img.onload = () => {
+      clearTimeout(timer);
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        // MIME を拡張子から
+        const mime = (ext === 'png' ? 'image/png'
+                    : ext === 'webp' ? 'image/webp'
+                    : ext === 'gif' ? 'image/gif'
+                    : 'image/jpeg');
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('canvas.toBlob returned null'));
+        }, mime, 0.95);
+      } catch (e) {
+        // tainted canvas 等
+        reject(new Error('canvas draw failed: ' + (e.message || e)));
+      }
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error('image load failed (CORS or 404)'));
+    };
+    img.src = url;
+  });
+}
+
 // _selectedImages に選択中の画像を保持(セッション限定、Map で code:idx をキーに url を保存)
 function toggleImageSelection(code, idx, url, evt) {
   if (evt) {
@@ -3591,7 +3634,8 @@ async function downloadSelectedImagesZip() {
   const noItemNumber = []; // itemNumber 未設定
   let processed = 0;
   const items = Array.from(_selectedImages.values());
-  // 並列3で fetch
+  // v6.36: canvas経由で画像取得(CORS制限の回避)。楽天画像サーバーはCORS対応済のはず。
+  // fetch で失敗する場合が多いため、まず canvas でトライ、それでもダメなら fetch を試す。
   const concurrency = 3;
   const worker = async (item) => {
     const p = productCache[item.code] || {};
@@ -3604,16 +3648,27 @@ async function downloadSelectedImagesZip() {
     let ext = 'jpg';
     const extMatch = item.url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i);
     if (extMatch) ext = extMatch[1].toLowerCase();
-    // fetch して blob 化
+    // v6.36: canvas で画像をblob化(CORS対応)
+    let blob = null;
+    let errMsg = null;
     try {
-      const res = await fetch(item.url, { mode: 'cors' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const blob = await res.blob();
+      blob = await _fetchImageAsBlobViaCanvas(item.url, ext);
+    } catch (e1) {
+      // canvas 失敗 → 通常の fetch でリトライ
+      try {
+        const res = await fetch(item.url, { mode: 'cors' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        blob = await res.blob();
+      } catch (e2) {
+        errMsg = (e1.message || String(e1)) + ' / ' + (e2.message || String(e2));
+      }
+    }
+    if (blob) {
       // ファイル名は商品番号のみ(同一商品で複数枚選ぶと上書きされる仕様、要望通り)
       const filename = `${filenameBase}.${ext}`;
       zip.file(filename, blob);
-    } catch (e) {
-      warnings.push({ code: item.code, idx: item.idx, url: item.url, error: e.message || String(e) });
+    } else {
+      warnings.push({ code: item.code, idx: item.idx, url: item.url, error: errMsg || 'unknown' });
     }
     processed++;
     if (btn) btn.innerHTML = `⏳ ZIP作成中... (${processed}/${_selectedImages.size})`;
@@ -3636,8 +3691,35 @@ async function downloadSelectedImagesZip() {
       btn.innerHTML = originalText;
       _updateImageSelectionCountBadge();
     }
-    const lines = warnings.slice(0, 10).map(w => `・${w.code} 画像${w.idx}: ${w.error}`);
-    alert('⚠ すべての画像取得に失敗しました。\n\n' + lines.join('\n'));
+    // v6.36: 全滅時のフォールバック: URL一覧のテキストファイルをダウンロード
+    //  → ユーザーは別ツール(ブラウザ拡張の一括DL、wget等)で保存できる
+    const urlLines = items.map(item => {
+      const p = productCache[item.code] || {};
+      const itemNumber = (p.itemNumber && p.itemNumber.trim()) || item.code;
+      // TSV形式: itemNumber\tcode\timgIdx\tURL
+      return `${itemNumber}\t${item.code}\t${item.idx}\t${item.url}`;
+    });
+    const header = '商品番号\t商品管理番号\t画像番号\t画像URL';
+    const txtContent = header + '\n' + urlLines.join('\n');
+    const shopId = _getCurrentShopId() || 'shop';
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const txtFilename = `reviewcheck_${shopId}_image_urls_${yyyy}${mm}${dd}_${hh}${mi}.tsv`;
+    const txtBlob = new Blob(['\uFEFF' + txtContent], { type: 'text/tab-separated-values;charset=utf-8' });
+    const txtUrl = URL.createObjectURL(txtBlob);
+    const a = document.createElement('a');
+    a.href = txtUrl;
+    a.download = txtFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(txtUrl), 3000);
+    const lines = warnings.slice(0, 5).map(w => `・${w.code} 画像${w.idx}: ${w.error}`);
+    alert(`⚠ すべての画像取得に失敗しました。\n(ブラウザからの画像取得は CORS で制限されているようです)\n\n代替として画像URL一覧のTSVファイルをダウンロードしました:\n  ${txtFilename}\n\nExcelで開くか、右クリック→リンクを保存 で1枚ずつ保存してください。\n\n主なエラー:\n${lines.join('\n')}`);
     return;
   }
 
@@ -5831,7 +5913,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.35 initialized');
+  console.log('[reviewcheck] v6.36 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
