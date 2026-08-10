@@ -258,8 +258,11 @@ body.mode-ranking .img-radio-band { display: flex; }
 .product-table thead th.sortable { cursor: pointer; user-select: none; }
 .product-table thead th.sortable:hover { background: #ebe9e3; color: var(--text); }
 .product-table thead th .sort-indicator { display: inline-block; margin-left: 4px; color: var(--text3); font-size: 10px; min-width: 10px; }
+/* v6.41: 非アクティブ列の中立ソートアイコン(⇅)は薄めに。ホバーで少し濃くして押せると分かるように */
+.product-table thead th.sortable:not(.sort-active) .sort-indicator { opacity: 0.45; }
+.product-table thead th.sortable:hover .sort-indicator { opacity: 1; }
 .product-table thead th.sort-active { color: var(--text); }
-.product-table thead th.sort-active .sort-indicator { color: var(--accent); font-weight: 700; }
+.product-table thead th.sort-active .sort-indicator { color: var(--accent); font-weight: 700; opacity: 1; }
 /* v6.10.1: レビュー列の2ボタンヘッダー(件数/評価それぞれ独立ソート、タイトル無し) */
 .review-sort-head { display: flex; align-items: center; justify-content: center; }
 .review-sort-buttons { display: inline-flex; gap: 6px; }
@@ -749,7 +752,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.40</span>
+    <span class="build-date">v6.41</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1372,7 +1375,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.40
+// reviewcheck v6.41
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1562,7 +1565,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.40' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.41' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2415,7 +2418,8 @@ function _updateSortIndicators() {
       ind.textContent = currentSortDir === 'asc' ? '▲' : '▼';
     } else {
       th.classList.remove('sort-active');
-      ind.textContent = '';
+      // v6.41: 非アクティブ列にも中立の並べ替えアイコンを常時表示(クリックでソート可能と分かるように)
+      ind.textContent = '⇅';
     }
   });
   // レビュー列の2ボタン(件数 / 評価)
@@ -2428,7 +2432,7 @@ function _updateSortIndicators() {
       ind.textContent = currentSortDir === 'asc' ? '▲' : '▼';
     } else {
       btn.classList.remove('sort-active');
-      ind.textContent = '';
+      ind.textContent = '⇅';
     }
   });
   // レビュー列の <th> 自体には sort-active を付けない(2ボタン構成なので)
@@ -6203,7 +6207,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.40 initialized');
+  console.log('[reviewcheck] v6.41 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
