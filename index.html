@@ -711,7 +711,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.34</span>
+    <span class="build-date">v6.35</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1327,7 +1327,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.34
+// reviewcheck v6.35
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1517,7 +1517,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.34' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.35' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3720,9 +3720,9 @@ function exportSelectedRankingXlsx() {
     }
     const year = yearMatch[1];
     // ranking テキストから (M/D H:MM) を抽出
-    // v6.34: 全角括弧 () 半角括弧 () 両対応、間のスペースは半角/全角(\u3000)/複数対応
+    // v6.34/v6.35: 半角括弧()と全角括弧()(U+FF08/U+FF09)両対応、間のスペースは半角/全角(\u3000)対応
     const rankingText = String(p.ranking || '');
-    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[\)\)]/);
+    const dtMatch = rankingText.match(/[(\uFF08](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[)\uFF09]/);
     if (!dtMatch) {
       warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
       continue;
@@ -3807,10 +3807,10 @@ function exportRankingUnregisteredXlsx() {
     }
     const year = yearMatch[1];
     // ranking テキストから (月/日 時:分) を抽出
-    // v6.34: 全角括弧 () 半角括弧 () 両対応、間のスペースは半角/全角(\u3000)対応
+    // v6.34/v6.35: 半角括弧()と全角括弧()(U+FF08/U+FF09)両対応、間のスペースは半角/全角(\u3000)対応
     const rankingText = String(p.ranking || '');
-    // 例: 「防災...(9/5 02:52)」「イヤホン...(8/4 10:36)」「〜(全角スペースあり)」
-    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[\)\)]/);
+    // 例: 「防災...(9/5 02:52)」「防災...(8/4 10:36)」(全角括弧+半角スペース)
+    const dtMatch = rankingText.match(/[(\uFF08](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[)\uFF09]/);
     if (!dtMatch) {
       warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
       continue;
@@ -5831,7 +5831,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.34 initialized');
+  console.log('[reviewcheck] v6.35 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
