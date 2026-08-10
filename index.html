@@ -164,8 +164,9 @@ body.mode-diff .col-select { display: none; }
 .img-select-band { display: none; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 4px 0; font-size: 10px; text-align: center; background: #fff; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s; color: var(--text2); font-weight: 500; }
 body.mode-ranking .img-select-band { display: block; }
 .img-select-band:hover { background: #f7f5f0; border-color: #b4b2a9; }
-.img-select-band.img-selected { background: #f3ecff; border-color: #6a1b9a; color: #6a1b9a; font-weight: 700; }
-.img-select-band.img-selected:hover { background: #ebdff9; }
+/* v6.34: 選択済みは紫ベタ塗り+白字で視認性強化 */
+.img-select-band.img-selected { background: #6a1b9a; border-color: #6a1b9a; color: #fff; font-weight: 700; }
+.img-select-band.img-selected:hover { background: #4a1370; border-color: #4a1370; }
 
 /* ── Empty state ── */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -710,7 +711,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.33</span>
+    <span class="build-date">v6.34</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1326,7 +1327,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.33
+// reviewcheck v6.34
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1516,7 +1517,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.33' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.34' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3719,14 +3720,19 @@ function exportSelectedRankingXlsx() {
     }
     const year = yearMatch[1];
     // ranking テキストから (M/D H:MM) を抽出
+    // v6.34: 全角括弧 () 半角括弧 () 両対応、間のスペースは半角/全角(\u3000)/複数対応
     const rankingText = String(p.ranking || '');
-    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})[\)\)]/);
+    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[\)\)]/);
     if (!dtMatch) {
       warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
       continue;
     }
     const [, mo, da, hh, mm] = dtMatch;
-    const updated = `${year}/${parseInt(mo, 10)}/${parseInt(da, 10)} ${parseInt(hh, 10)}:${mm}更新`;
+    // v6.34: 月日・時を2桁ゼロ埋め(2025/08/04 10:36更新 形式)
+    const mo2 = String(parseInt(mo, 10)).padStart(2, '0');
+    const da2 = String(parseInt(da, 10)).padStart(2, '0');
+    const hh2 = String(parseInt(hh, 10)).padStart(2, '0');
+    const updated = `${year}/${mo2}/${da2} ${hh2}:${mm}更新`;
     outRows.push([code, p.itemNumber || '', rankingName, updated]);
     if (p.rankingType === 'daily') daily++;
     else realtime++;
@@ -3801,18 +3807,20 @@ function exportRankingUnregisteredXlsx() {
     }
     const year = yearMatch[1];
     // ranking テキストから (月/日 時:分) を抽出
-    // 対応: 半角括弧 () と全角括弧 () の両方、末尾優先マッチ
+    // v6.34: 全角括弧 () 半角括弧 () 両対応、間のスペースは半角/全角(\u3000)対応
     const rankingText = String(p.ranking || '');
-    // 例: 「防災...(9/5 02:52)」「イヤホン...(8/4 10:36)」
-    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})[\)\)]/);
+    // 例: 「防災...(9/5 02:52)」「イヤホン...(8/4 10:36)」「〜(全角スペースあり)」
+    const dtMatch = rankingText.match(/[\(\(](\d{1,2})\/(\d{1,2})[\s\u3000]+(\d{1,2}):(\d{2})[\)\)]/);
     if (!dtMatch) {
       warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
       continue;
     }
     const [, mo, da, hh, mm] = dtMatch;
-    // 更新年月日を組み立て
-    // 「2025/8/4 10:36更新」→ 月と日は1桁の場合そのまま(先頭0付けない)、時は同様、分は必ず2桁
-    const updated = `${year}/${parseInt(mo, 10)}/${parseInt(da, 10)} ${parseInt(hh, 10)}:${mm}更新`;
+    // v6.34: 「2025/08/04 10:36更新」形式(月日時を2桁ゼロ埋め)
+    const mo2 = String(parseInt(mo, 10)).padStart(2, '0');
+    const da2 = String(parseInt(da, 10)).padStart(2, '0');
+    const hh2 = String(parseInt(hh, 10)).padStart(2, '0');
+    const updated = `${year}/${mo2}/${da2} ${hh2}:${mm}更新`;
     outRows.push([code, p.itemNumber || '', rankingName, updated]);
     if (p.rankingType === 'daily') daily++;
     else realtime++;
@@ -5823,7 +5831,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.33 initialized');
+  console.log('[reviewcheck] v6.34 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
