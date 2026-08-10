@@ -149,9 +149,20 @@ body.mode-diff .col-select { display: none; }
 .export-block { border-radius: 8px; padding: 8px 12px 10px; border: 1px solid transparent; }
 .export-block-info { background: #f0fbf6; border-color: rgba(29,158,117,0.3); }
 .export-block-images { background: #f3ecff; border-color: rgba(106,27,154,0.3); }
+/* v6.37: 対応中に移動ブロック(オレンジ系) */
+.export-block-move { background: #fff3e0; border-color: rgba(230,81,0,0.3); }
 .export-block-title { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; font-size: 11px; font-weight: 600; }
 .export-block-info .export-block-title { color: #1d9e75; }
 .export-block-images .export-block-title { color: #6a1b9a; }
+/* v6.37: 対応中ブロックのタイトル色 */
+.export-block-move .export-block-title { color: #e65100; }
+/* v6.37: 対応中に移動ボタン(オレンジ塗り) */
+.ranking-move-btn { font-size: 12px; padding: 6px 12px; border: 1px solid #e65100; border-radius: var(--radius-sm); background: #e65100; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.ranking-move-btn:hover { background: #bf360c; border-color: #bf360c; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(230,81,0,0.3); }
+.ranking-move-btn:active { transform: translateY(0); }
+.ranking-move-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+.ranking-move-btn.disabled:hover { background: #e65100; box-shadow: none; transform: none; }
+.ranking-move-btn .selected-count-badge { background: #fff; color: #e65100; }
 .export-block-body { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 /* v6.31: 画像ZIPダウンロードボタン(紫系) */
 .image-zip-btn { font-size: 12px; padding: 6px 12px; border: 1px solid #6a1b9a; border-radius: var(--radius-sm); background: #6a1b9a; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
@@ -167,6 +178,19 @@ body.mode-ranking .img-select-band { display: block; }
 /* v6.34: 選択済みは紫ベタ塗り+白字で視認性強化 */
 .img-select-band.img-selected { background: #6a1b9a; border-color: #6a1b9a; color: #fff; font-weight: 700; }
 .img-select-band.img-selected:hover { background: #4a1370; border-color: #4a1370; }
+/* v6.37: 画像下のラジオ式選択帯(商品ごとに1枚だけ選択)。ランキング証拠用モードのみ表示 */
+.img-radio-band { display: none; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 4px 0; font-size: 10px; text-align: center; background: #fff; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s; color: var(--text2); font-weight: 500; align-items: center; justify-content: center; gap: 5px; }
+body.mode-ranking .img-radio-band { display: flex; }
+.img-radio-band:hover { background: #f7f5f0; border-color: #b4b2a9; }
+.img-radio-band .img-radio-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #b4b2a9; box-sizing: border-box; flex-shrink: 0; background: #fff; }
+.img-radio-band.img-radio-selected { background: #6a1b9a; border-color: #6a1b9a; color: #fff; font-weight: 700; }
+.img-radio-band.img-radio-selected:hover { background: #4a1370; border-color: #4a1370; }
+.img-radio-band.img-radio-selected .img-radio-dot { background: #fff; border-color: #fff; }
+/* v6.37: 対応中モードでの非選択画像セルの淡色化(選択画像だけくっきり)。hoverで一時的に戻す */
+.product-table td.col-image.img-dimmed { opacity: 0.35; transition: opacity 0.12s; }
+.product-table td.col-image.img-dimmed:hover { opacity: 1; }
+/* v6.37: 選択画像下のファイル名(ドラッグ保存の目印)。全選択して簡単にコピー可 */
+.img-filename { margin-top: 3px; font-size: 9px; line-height: 1.3; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; text-align: center; user-select: all; }
 
 /* ── Empty state ── */
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -316,6 +340,8 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 /* v6.32: 対応済(旧登録済)を緑系→青系に変更、把握前(旧登録前)は黄のまま */
 .bulk-ranking-reg-select.ranking-registered { background: #e8f4fd; color: #0d47a1; border-color: rgba(13,71,161,0.4); font-weight: 600; }
 .bulk-ranking-reg-select.ranking-unregistered { background: #fff3cd; color: #6d4c00; border-color: #ffe082; font-weight: 600; }
+/* v6.37: 対応中-画像制作 (オレンジ系、作業中を示す) */
+.bulk-ranking-reg-select.ranking-in-progress { background: #ffe0b2; color: #e65100; border-color: rgba(230,81,0,0.4); font-weight: 600; }
 .bulk-ranking-reg-select.ranking-reg-unset { background: #fff; color: var(--text3); }
 /* v6.33: ドロップダウンを開いたときの各<option>の色分け(Chrome/Edge/Firefox対応、Safariは反映されない可能性あり) */
 /* rankingType の各選択肢 */
@@ -329,6 +355,7 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 /* rankingRegistered の各選択肢 */
 .bulk-ranking-reg-select option.opt-reg-unset { background: #fff; color: var(--text3); }
 .bulk-ranking-reg-select option.opt-reg-unregistered { background: #fff3cd; color: #6d4c00; font-weight: 600; }
+.bulk-ranking-reg-select option.opt-reg-in-progress { background: #ffe0b2; color: #e65100; font-weight: 600; }
 .bulk-ranking-reg-select option.opt-reg-registered { background: #e8f4fd; color: #0d47a1; font-weight: 600; }
 /* v6.22: 通常表示モードでの rankingType バッジ */
 .ranking-type-badge { display: inline-block; margin-bottom: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
@@ -345,6 +372,8 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .ranking-placed-badge { display: inline-block; margin-top: 3px; padding: 1px 6px; font-size: 10px; border-radius: 3px; font-weight: 600; font-family: 'Noto Sans JP', sans-serif; }
 .ranking-placed-badge.placed { background: #e8f4fd; color: #0d47a1; border: 1px solid rgba(13,71,161,0.3); }
 .ranking-placed-badge.unplaced { background: #fff3cd; color: #6d4c00; border: 1px solid #ffe082; }
+/* v6.37: 対応中-画像制作 バッジ(オレンジ) */
+.ranking-placed-badge.in-progress { background: #ffe0b2; color: #e65100; border: 1px solid rgba(230,81,0,0.3); }
 /* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
 body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
 
@@ -711,7 +740,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.36</span>
+    <span class="build-date">v6.37</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -818,25 +847,24 @@ body.mode-ranking .product-table .col-ranking {
           <span class="toolbar-label">📍 登録:</span>
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingPlacedFilter('all')">全体</button>
           <button class="ranking-filter-btn" data-filter="unplaced" onclick="setRankingPlacedFilter('unplaced')">⏳ 把握前-正確な日時</button>
+          <button class="ranking-filter-btn" data-filter="in_progress" onclick="setRankingPlacedFilter('in_progress')">🎨 対応中-画像制作</button>
           <button class="ranking-filter-btn" data-filter="placed" onclick="setRankingPlacedFilter('placed')">✓ 対応済-エビデンス付</button>
         </div>
-        <!-- v6.28/v6.29/v6.31: ランキング証拠用モード+登録前フィルタ選択時のみ表示するエクスポート群 -->
+        <!-- v6.28/v6.29/v6.31/v6.37: ランキング証拠用モード時に登録フィルタに応じて出るツール群 -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
-          <!-- 商品情報ブロック(緑系) -->
-          <div class="export-block export-block-info">
-            <div class="export-block-title">📄 商品情報 (Excel)</div>
+          <!-- 把握前フィルタ時: 対応中に移動(オレンジ系) -->
+          <div class="export-block export-block-move" id="exportBlockMove" style="display:none">
+            <div class="export-block-title">🎨 対応中に移動</div>
             <div class="export-block-body">
-              <button class="ranking-export-btn" onclick="exportRankingUnregisteredXlsx()" title="把握前(登録前)のランキング商品一覧をExcelでダウンロード">⬇ 把握前をExcelで</button>
-              <button class="ranking-export-btn ranking-export-btn-outline" onclick="exportSelectedRankingXlsx()" title="チェックした商品だけをExcelでダウンロード">✓ 選択分だけExcelで <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
+              <button class="ranking-move-btn" id="moveToInProgressBtn" onclick="moveSelectedToInProgress()" title="チェックした商品を対応中-画像制作に移動">➜ 選択商品を対応中に移動 <span class="selected-count-badge" id="selectedCountBadge">0</span></button>
               <button class="ranking-clear-btn" onclick="clearRankingSelection()" title="すべてのチェックを外す">☐ 選択解除</button>
             </div>
           </div>
-          <!-- 獲得画像ブロック(紫系) -->
-          <div class="export-block export-block-images">
-            <div class="export-block-title">🖼 獲得画像 (ZIP)</div>
+          <!-- 対応中フィルタ時: 商品情報Excel(緑系) -->
+          <div class="export-block export-block-info" id="exportBlockInfo" style="display:none">
+            <div class="export-block-title">📄 商品情報 (Excel)</div>
             <div class="export-block-body">
-              <button class="image-zip-btn" id="imageZipDownloadBtn" onclick="downloadSelectedImagesZip()" title="選択した画像をZIPでダウンロード">⬇ 選択画像をZIPで <span class="image-count-badge" id="imageSelectionCountBadge">0</span></button>
-              <button class="ranking-clear-btn" onclick="clearImageSelection()" title="すべての画像選択を外す">☐ 画像選択解除</button>
+              <button class="ranking-export-btn" onclick="exportInProgressXlsx()" title="対応中の全商品情報をExcelでダウンロード">⬇ 対応中をExcelで</button>
             </div>
           </div>
         </div>
@@ -1327,7 +1355,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.36
+// reviewcheck v6.37
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1517,7 +1545,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.36' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.37' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2249,11 +2277,12 @@ function renderProducts() {
       if (currentRankingFilter === 'false_kept'  && t !== 'false_kept') return false;
       if (currentRankingFilter === 'unset'       && t !== null) return false;
     }
-    // v6.20/v6.22: ランキング登録状況フィルタ(rankingRegistered)
+    // v6.20/v6.22/v6.37: ランキング登録状況フィルタ(rankingRegistered 4状態)
     if (tableMode === 'ranking' && currentRankingPlacedFilter !== 'all') {
       const reg = p.rankingRegistered;
-      if (currentRankingPlacedFilter === 'placed'   && reg !== true) return false;
-      if (currentRankingPlacedFilter === 'unplaced' && reg !== false) return false;
+      if (currentRankingPlacedFilter === 'placed'      && reg !== true) return false;
+      if (currentRankingPlacedFilter === 'unplaced'    && reg !== false) return false;
+      if (currentRankingPlacedFilter === 'in_progress' && reg !== 'in_progress') return false;
     }
     return true;
   });
@@ -2842,23 +2871,30 @@ function _renderTableRow(code) {
   const itemUrl = p.itemUrl || `https://item.rakuten.co.jp/${_getCurrentShop()?.shopCode}/${code}/`;
   const hasReviews = (p.reviewCount || 0) > 0;
 
+  // v6.37: 画像下はラジオ式(商品ごとに1枚だけ選択、selectedImageIdx に保存)。
+  // 対応中(in_progress)の商品は、選択中の1枚だけくっきり・他は淡色化。
+  const selIdx = (p.selectedImageIdx === 1 || p.selectedImageIdx === 2 || p.selectedImageIdx === 3) ? p.selectedImageIdx : null;
+  const isInProgress = p.rankingRegistered === 'in_progress';
   const imageCells = (p.images || [null, null, null]).map((img, i) => {
+    const imgIdx = i + 1;
     if (!img) {
       return `<td class="col-image"><div class="table-img-cell empty">なし</div></td>`;
     }
-    // v6.31: 各画像下に選択帯(ランキング証拠用モード時のみ表示、CSSで制御)
-    const imgIdx = i + 1;
-    const selKey = code + ':' + imgIdx;
-    const isImgSelected = _selectedImages.has(selKey);
-    const selectedCls = isImgSelected ? ' img-selected' : '';
-    const labelText = isImgSelected ? '✓ 選択済' : '選択';
-    return `<td class="col-image">
+    const isSel = (selIdx === imgIdx);
+    // 対応中商品で選択が済んでいるとき、非選択セルを淡色化(選択が無ければ淡色化しない)
+    const dimCls = (isInProgress && selIdx !== null && !isSel) ? ' img-dimmed' : '';
+    const selectedCls = isSel ? ' img-radio-selected' : '';
+    const labelText = isSel ? '✓ 選択済' : '選択';
+    // 選択中の画像だけ、その下にファイル名(拡張子なし)を表示
+    const filenameHtml = isSel ? `<div class="img-filename" title="${_escape(_imgBasename(img))}">${_escape(_imgBasename(img))}</div>` : '';
+    return `<td class="col-image${dimCls}">
       <div class="table-img-cell" onclick="openLightbox('${_escape(img)}')">
         <img src="${_escape(img)}" alt="画像${imgIdx}" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML='なし'">
       </div>
-      <label class="img-select-band${selectedCls}" data-code="${_escape(code)}" data-idx="${imgIdx}" data-url="${_escape(img)}" onclick="toggleImageSelection('${_escape(code)}', ${imgIdx}, '${_escape(img)}', event)">
-        <span class="img-select-band-text">${labelText}</span>
+      <label class="img-radio-band${selectedCls}" data-code="${_escape(code)}" data-idx="${imgIdx}" data-url="${_escape(img)}" onclick="selectImageRadio('${_escape(code)}', ${imgIdx}, event)">
+        <span class="img-radio-dot"></span><span class="img-radio-band-text">${labelText}</span>
       </label>
+      ${filenameHtml}
     </td>`;
   }).join('');
 
@@ -2917,9 +2953,16 @@ function _renderTableRow(code) {
                   : vType === 'past' ? 'ranking-type-past'
                   : vType === 'false_kept' ? 'ranking-type-false-kept'
                   : 'ranking-type-unset';
+    // v6.22/v6.37: rankingRegistered 4状態 (null/false=unregistered/'in_progress'/true=registered)
     const vReg = p.rankingRegistered;
-    const regVal = vReg === true ? 'registered' : (vReg === false ? 'unregistered' : '');
-    const regCls = vReg === true ? 'ranking-registered' : (vReg === false ? 'ranking-unregistered' : 'ranking-reg-unset');
+    const regVal = vReg === true ? 'registered'
+                 : vReg === 'in_progress' ? 'in_progress'
+                 : vReg === false ? 'unregistered'
+                 : '';
+    const regCls = vReg === true ? 'ranking-registered'
+                 : vReg === 'in_progress' ? 'ranking-in-progress'
+                 : vReg === false ? 'ranking-unregistered'
+                 : 'ranking-reg-unset';
     cellItemNumber = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
     // v6.26: 一括編集モードでも商品名下に「商品ページを開く」ボタン
     cellName       = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">
@@ -2939,6 +2982,7 @@ function _renderTableRow(code) {
         <select class="bulk-ranking-reg-select ${regCls}" data-code="${_escape(code)}" onchange="onRankingRegisteredChange(this)">
           <option value="" ${regVal === '' ? 'selected' : ''} class="opt-reg-unset">— 未設定 —</option>
           <option value="unregistered" ${regVal === 'unregistered' ? 'selected' : ''} class="opt-reg-unregistered">⏳ 把握前-正確な日時</option>
+          <option value="in_progress" ${regVal === 'in_progress' ? 'selected' : ''} class="opt-reg-in-progress">🎨 対応中-画像制作</option>
           <option value="registered" ${regVal === 'registered' ? 'selected' : ''} class="opt-reg-registered">✓ 対応済-エビデンス付</option>
         </select>
       </div>`;
@@ -2958,6 +3002,7 @@ function _renderTableRow(code) {
     else if (p.rankingType === 'false_kept') typeBadge = `<span class="ranking-type-badge false-kept" title="虚偽のまま放置">⚠ 虚偽のまま放置</span>`;
     let regBadge = '';
     if (p.rankingRegistered === true) regBadge = `<span class="ranking-placed-badge placed" title="対応済-エビデンス付">✓ 対応済-エビデンス付</span>`;
+    else if (p.rankingRegistered === 'in_progress') regBadge = `<span class="ranking-placed-badge in-progress" title="対応中-画像制作">🎨 対応中-画像制作</span>`;
     else if (p.rankingRegistered === false) regBadge = `<span class="ranking-placed-badge unplaced" title="把握前-正確な日時">⏳ 把握前-正確な日時</span>`;
     // タイプバッジ / ランキング詳細 / 登録バッジ を縦に並べる
     const parts = [];
@@ -3252,7 +3297,8 @@ function setRankingFilter(filter) {
 }
 // v6.20/v6.22: ランキング登録状況フィルタ (配置→登録に改名。API互換のためキー名はplaced/unplaced継続)
 function setRankingPlacedFilter(filter) {
-  const valid = ['all', 'placed', 'unplaced'];
+  // v6.37: 'in_progress'(対応中-画像制作)を追加
+  const valid = ['all', 'placed', 'unplaced', 'in_progress'];
   if (!valid.includes(filter)) filter = 'all';
   currentRankingPlacedFilter = filter;
   document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3262,13 +3308,21 @@ function setRankingPlacedFilter(filter) {
   _updateRankingExportBtnVisibility();
   renderProducts();
 }
-// v6.28: エクスポートボタン表示制御
+// v6.28/v6.37: エクスポートボタン表示制御(2ブロック構成)
+//  - 把握前(unplaced)フィルタ時: 「対応中に移動」ブロック(オレンジ)
+//  - 対応中(in_progress)フィルタ時: 「商品情報Excel」ブロック(緑)
 function _updateRankingExportBtnVisibility() {
   const btnGroup = document.getElementById('rankingExportGroup');
+  const moveBlock = document.getElementById('exportBlockMove');
+  const infoBlock = document.getElementById('exportBlockInfo');
   if (!btnGroup) return;
-  // ランキング証拠用モード + 登録前フィルタ選択時のみ表示
-  const shouldShow = (tableMode === 'ranking' && currentRankingPlacedFilter === 'unplaced');
-  btnGroup.style.display = shouldShow ? '' : 'none';
+  const isRanking = tableMode === 'ranking';
+  const showMove = isRanking && currentRankingPlacedFilter === 'unplaced';
+  const showInfo = isRanking && currentRankingPlacedFilter === 'in_progress';
+  if (moveBlock) moveBlock.style.display = showMove ? '' : 'none';
+  if (infoBlock) infoBlock.style.display = showInfo ? '' : 'none';
+  // 親グループはどちらかのブロックを出すときだけ表示
+  btnGroup.style.display = (showMove || showInfo) ? '' : 'none';
 }
 function _updateRankingFilterVisibility() {
   const group1 = document.getElementById('rankingFilterGroup');
@@ -3455,11 +3509,51 @@ function exportProductMappingCSV() {
 function toggleRowSelection(code, checked) {
   if (checked) _selectedCodes.add(code);
   else _selectedCodes.delete(code);
-  // 該当行の row-selected クラス切替(全再描画は不要、DOM 直接更新)
-  const tr = document.getElementById('row-' + code);
-  if (tr) tr.classList.toggle('row-selected', checked);
+  // v6.37: チェックを入れた時点で画像が未選択なら画像2を既定選択(要望)。
+  //   チェックを外しても selectedImageIdx はそのまま保持(永続データ)。
+  let rerendered = false;
+  if (checked) {
+    const p = productCache[code];
+    if (p && p.selectedImageIdx == null) {
+      p.selectedImageIdx = 2;
+      scheduleGitHubSave();
+      const row = document.getElementById('row-' + code);
+      if (row) { row.outerHTML = _renderTableRow(code); rerendered = true; }
+    }
+  }
+  if (!rerendered) {
+    // 該当行の row-selected クラス切替(全再描画は不要、DOM 直接更新)
+    const tr = document.getElementById('row-' + code);
+    if (tr) tr.classList.toggle('row-selected', checked);
+  }
   _updateSelectedCountBadge();
   _updateHeaderSelectCbState();
+}
+
+// ── v6.37: チェック済み商品を「対応中-画像制作」に移動 ──
+//  - _selectedCodes 全てを rankingRegistered='in_progress' に変更
+//  - selectedImageIdx が未設定なら 2 を既定選択(要望)
+//  - チェックは外し、GitHub保存 + 再描画 + トースト表示
+function moveSelectedToInProgress() {
+  if (_selectedCodes.size === 0) {
+    _showToast('商品が選択されていません。チェックを入れてください。', 'error');
+    return;
+  }
+  const codes = Array.from(_selectedCodes);
+  let moved = 0;
+  for (const code of codes) {
+    const p = productCache[code];
+    if (!p) continue;
+    p.rankingRegistered = 'in_progress';
+    if (p.selectedImageIdx == null) p.selectedImageIdx = 2;
+    moved++;
+  }
+  _selectedCodes.clear();
+  const headerCb = document.getElementById('headerSelectCb');
+  if (headerCb) { headerCb.checked = false; headerCb.indeterminate = false; }
+  scheduleGitHubSave();
+  renderProducts();
+  _showToast(`${moved}件を対応中に移動しました`, 'success');
 }
 
 function toggleSelectAllVisible(headerCb) {
@@ -3491,9 +3585,9 @@ function _updateSelectedCountBadge() {
   const badge = document.getElementById('selectedCountBadge');
   const count = _selectedCodes.size;
   if (badge) badge.textContent = count;
-  // 選択0件のときは「選択分ダウンロード」ボタンを無効化風に
-  const selBtn = document.querySelector('.ranking-export-btn-outline');
-  if (selBtn) selBtn.classList.toggle('disabled', count === 0);
+  // v6.37: 選択0件のときは「対応中に移動」ボタンを無効化風に
+  const moveBtn = document.getElementById('moveToInProgressBtn');
+  if (moveBtn) moveBtn.classList.toggle('disabled', count === 0);
 }
 
 // 表示中の行のチェック状況からヘッダーチェックボックスの状態を更新(全選択/半選択/未選択)
@@ -3519,6 +3613,14 @@ function _updateHeaderSelectCbState() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ⚠ v6.37 で廃止(DEPRECATED): 以下の画像ZIP/選択分Excel群は UI から撤去済み。
+//   ・downloadSelectedImagesZip / _fetchImageAsBlobViaCanvas
+//     → 画像ZIPは CORS 問題で廃止。画像は選択後にファイル名を目印にドラッグ保存する運用へ。
+//   ・exportSelectedRankingXlsx / _updateImageSelectionCountBadge
+//     → 選択分Excelは exportInProgressXlsx(対応中の全商品)に置き換え。
+//   どこからも呼ばれない不使用コードだが、過去バージョン互換のため定義のみ残置。
+// ══════════════════════════════════════════════════════════════════════
 // ── v6.31: 画像選択(No.1画像等)とZIPダウンロード ──
 // v6.36: canvas経由で画像をblob化(CORS制限の回避策)
 // 楽天画像サーバー(thumbnail.image.rakuten.co.jp)は crossorigin="anonymous" を許可しているので、
@@ -3563,43 +3665,42 @@ function _fetchImageAsBlobViaCanvas(url, ext) {
   });
 }
 
-// _selectedImages に選択中の画像を保持(セッション限定、Map で code:idx をキーに url を保存)
-function toggleImageSelection(code, idx, url, evt) {
-  if (evt) {
-    evt.preventDefault();
-    evt.stopPropagation();
-  }
-  const key = code + ':' + idx;
-  const label = document.querySelector(`.img-select-band[data-code="${CSS.escape(code)}"][data-idx="${idx}"]`);
-  if (_selectedImages.has(key)) {
-    _selectedImages.delete(key);
-    if (label) {
-      label.classList.remove('img-selected');
-      const t = label.querySelector('.img-select-band-text');
-      if (t) t.textContent = '選択';
-    }
-  } else {
-    _selectedImages.set(key, { code, idx, url });
-    if (label) {
-      label.classList.add('img-selected');
-      const t = label.querySelector('.img-select-band-text');
-      if (t) t.textContent = '✓ 選択済';
-    }
-  }
-  _updateImageSelectionCountBadge();
+// ── v6.37: 画像のラジオ式選択(商品ごとに1枚だけ、GitHubに永続保存) ──
+// 画像URL末尾から basename を取り出し、拡張子を除いた文字列を返す。
+//   例: https://.../eq-24-01_2.jpg?_ex=128x128 → eq-24-01_2
+function _imgBasename(url) {
+  if (!url) return '';
+  let s = String(url).split('?')[0].split('#')[0];
+  const slash = s.lastIndexOf('/');
+  if (slash >= 0) s = s.slice(slash + 1);
+  s = s.replace(/\.(jpg|jpeg|png|gif|webp|bmp|tiff?)$/i, '');
+  return s;
 }
 
-function clearImageSelection() {
-  if (_selectedImages.size === 0) return;
-  _selectedImages.clear();
-  document.querySelectorAll('.img-select-band.img-selected').forEach(el => {
-    el.classList.remove('img-selected');
-    const t = el.querySelector('.img-select-band-text');
-    if (t) t.textContent = '選択';
-  });
-  _updateImageSelectionCountBadge();
-  _showToast('画像選択をすべて解除しました', 'info');
+// ラジオ式: クリックで selectedImageIdx = idx を保存。
+//  - 同じ商品で別画像を選ぶと自動で切り替わる(ラジオ)。
+//  - 既に選択中の画像をもう一度押すと選択解除(誤操作リカバリ)。
+//  - selectedImageIdx は productCache に保存され、GitHub に永続化される。
+function selectImageRadio(code, idx, evt) {
+  if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+  const p = productCache[code];
+  if (!p) return;
+  if (p.selectedImageIdx === idx) {
+    p.selectedImageIdx = null; // 同じものを再クリック → 解除
+  } else {
+    p.selectedImageIdx = idx;
+  }
+  scheduleGitHubSave();
+  // 行を再描画(選択帯・淡色化・ファイル名を反映)
+  const row = document.getElementById('row-' + code);
+  if (row) row.outerHTML = _renderTableRow(code);
 }
+
+// ── 以下は v6.31〜v6.36 の複数選択+ZIP/選択分Excelの旧実装。
+//    v6.37 でラジオ式・CORS問題によりZIP廃止となり、UIから撤去済み。
+//    過去バージョンとの互換のため空スタブとして残す(呼び出されても no-op)。 ──
+function toggleImageSelection() { /* v6.37: 廃止(ラジオ式 selectImageRadio に統合) */ }
+function clearImageSelection() { /* v6.37: 廃止 */ }
 
 function _updateImageSelectionCountBadge() {
   const badge = document.getElementById('imageSelectionCountBadge');
@@ -3854,6 +3955,100 @@ function exportSelectedRankingXlsx() {
   }
   if (warnMsgs.length > 0) {
     alert(`✓ Excel をダウンロードしました。\n(デイリー ${daily}件 / リアルタイム ${realtime}件)\n\n⚠ 一部スキップ:\n\n${warnMsgs.join('\n\n')}`);
+  }
+}
+
+
+// ── v6.37: 「対応中-画像制作」の全商品を Excel でダウンロード ──
+// 対象: rankingRegistered === 'in_progress' の全商品
+// 列(5列): 商品管理番号 / 商品番号 / 1行目(ランキング名) / 2行目(更新年月日) / 選択画像ファイル名
+//  - 選択画像ファイル名: selectedImageIdx の画像URL末尾から拡張子を除いたもの(例: eq-24-01_2)
+//  - スキップ+警告: selectedImageIdx 未設定 / ランキング詳細から日時抽出失敗 / yearMonth 未設定
+//    / タイプがデイリー・リアルタイムでない(ランキング名を確定できないため)
+function exportInProgressXlsx() {
+  if (typeof XLSX === 'undefined') {
+    alert('⚠ Excel生成ライブラリの読み込みに失敗しています。ネットワーク接続を確認してリロードしてください。');
+    return;
+  }
+  const outRows = [['商品管理番号', '商品番号', '1行目(ランキング名)', '2行目(更新年月日)', '選択画像ファイル名']];
+  const warnings = []; // {code, itemNumber, reason}[]
+  let daily = 0, realtime = 0;
+  const codes = Object.keys(productCache).sort();
+  for (const code of codes) {
+    const p = productCache[code] || {};
+    // 対応中(in_progress)以外はスキップ
+    if (p.rankingRegistered !== 'in_progress') continue;
+    // タイプがデイリー/リアルタイム以外はランキング名を確定できないためスキップ+警告
+    if (p.rankingType !== 'daily' && p.rankingType !== 'realtime') {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'タイプがデイリー/リアルタイムではない' });
+      continue;
+    }
+    const rankingName = p.rankingType === 'daily' ? 'デイリーランキング' : 'リアルタイムランキング';
+    // 年を yearMonth から
+    const ym = String(p.yearMonth || '').trim();
+    const yearMatch = ym.match(/^(\d{4})/);
+    if (!yearMatch) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: '年月(yearMonth)が未設定' });
+      continue;
+    }
+    const year = yearMatch[1];
+    // ranking テキストから (月/日 時:分) を抽出(半角/全角括弧・スペース両対応)
+    const rankingText = String(p.ranking || '');
+    const dtMatch = rankingText.match(/[(（](\d{1,2})\/(\d{1,2})[\s　]+(\d{1,2}):(\d{2})[)）]/);
+    if (!dtMatch) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: 'ランキング詳細から日時(M/D H:MM)を抽出できず' });
+      continue;
+    }
+    // 選択画像(selectedImageIdx)からファイル名(拡張子なし)を作る
+    const selIdx = p.selectedImageIdx;
+    if (selIdx !== 1 && selIdx !== 2 && selIdx !== 3) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: '選択画像(selectedImageIdx)が未設定' });
+      continue;
+    }
+    const imgUrl = (p.images && p.images[selIdx - 1]) ? p.images[selIdx - 1] : '';
+    if (!imgUrl) {
+      warnings.push({ code, itemNumber: p.itemNumber || '', reason: `選択画像(${selIdx}枚目)のURLが無い` });
+      continue;
+    }
+    const imgName = _imgBasename(imgUrl);
+    const [, mo, da, hh, mm] = dtMatch;
+    const mo2 = String(parseInt(mo, 10)).padStart(2, '0');
+    const da2 = String(parseInt(da, 10)).padStart(2, '0');
+    const hh2 = String(parseInt(hh, 10)).padStart(2, '0');
+    const updated = `${year}/${mo2}/${da2} ${hh2}:${mm}更新`;
+    outRows.push([code, p.itemNumber || '', rankingName, updated, imgName]);
+    if (p.rankingType === 'daily') daily++;
+    else realtime++;
+  }
+  if (outRows.length <= 1) {
+    let msg = '⚠ エクスポート対象がありません。\n\n「対応中-画像制作」で、必要な情報(タイプ・年月・日時・選択画像)が揃った商品が見つかりませんでした。';
+    if (warnings.length > 0) {
+      const lines = warnings.slice(0, 15).map(w => `・${w.code}${w.itemNumber ? ` (${w.itemNumber})` : ''}: ${w.reason}`);
+      const more = warnings.length > 15 ? `\n... 他 ${warnings.length - 15}件` : '';
+      msg += `\n\n${warnings.length}件は情報不足でスキップされました:\n${lines.join('\n')}${more}`;
+    }
+    alert(msg);
+    return;
+  }
+  const ws = XLSX.utils.aoa_to_sheet(outRows);
+  ws['!cols'] = [{ wch: 14 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 20 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '対応中-画像制作');
+  const shopId = _getCurrentShopId() || 'shop';
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const filename = `reviewcheck_${shopId}_対応中商品情報_${yyyy}${mm}${dd}_${hh}${mi}.xlsx`;
+  XLSX.writeFile(wb, filename);
+  console.log(`[reviewcheck] Excel エクスポート完了(対応中): ${filename} (デイリー${daily}件 / リアルタイム${realtime}件)`);
+  // 警告があればアラート
+  if (warnings.length > 0) {
+    const lines = warnings.slice(0, 30).map(w => `・${w.code}${w.itemNumber ? ` (${w.itemNumber})` : ''}: ${w.reason}`);
+    const more = warnings.length > 30 ? `\n\n... 他 ${warnings.length - 30}件` : '';
+    alert(`✓ Excel をダウンロードしました。\n(デイリー ${daily}件 / リアルタイム ${realtime}件)\n\n⚠ 以下の${warnings.length}件は情報不足でスキップされました:\n\n${lines.join('\n')}${more}`);
   }
 }
 
@@ -5567,20 +5762,25 @@ function onRankingTypeChange(sel) {
   scheduleGitHubSave();
 }
 
-// v6.22: rankingRegistered (登録前/登録済) の変更ハンドラ (旧onRankingPlacedChangeをリネーム)
+// v6.22/v6.37: rankingRegistered の変更ハンドラ
+// 4状態: null (未設定) / false (把握前) / 'in_progress' (対応中) / true (対応済)
 function onRankingRegisteredChange(sel) {
   const code = sel.dataset.code;
   if (!code || !productCache[code]) return;
   let newVal;
   if (sel.value === 'registered') newVal = true;
   else if (sel.value === 'unregistered') newVal = false;
+  else if (sel.value === 'in_progress') newVal = 'in_progress';
   else newVal = null;
   const oldVal = productCache[code].rankingRegistered;
-  const oldNorm = (oldVal === true || oldVal === false) ? oldVal : null;
+  const oldNorm = (oldVal === true || oldVal === false || oldVal === 'in_progress') ? oldVal : null;
   if (newVal === oldNorm) return;
   productCache[code].rankingRegistered = newVal;
-  sel.classList.remove('ranking-registered', 'ranking-unregistered', 'ranking-reg-unset');
-  sel.classList.add(newVal === true ? 'ranking-registered' : (newVal === false ? 'ranking-unregistered' : 'ranking-reg-unset'));
+  sel.classList.remove('ranking-registered', 'ranking-unregistered', 'ranking-in-progress', 'ranking-reg-unset');
+  sel.classList.add(newVal === true ? 'ranking-registered'
+                   : newVal === 'in_progress' ? 'ranking-in-progress'
+                   : newVal === false ? 'ranking-unregistered'
+                   : 'ranking-reg-unset');
   const cell = sel.closest('td');
   _flashCell(cell);
   scheduleGitHubSave();
@@ -5913,7 +6113,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.36 initialized');
+  console.log('[reviewcheck] v6.37 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
