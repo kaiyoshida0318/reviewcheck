@@ -740,7 +740,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.37</span>
+    <span class="build-date">v6.38</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1355,7 +1355,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.37
+// reviewcheck v6.38
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1545,7 +1545,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.37' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.38' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3559,15 +3559,36 @@ function moveSelectedToInProgress() {
 function toggleSelectAllVisible(headerCb) {
   const rowCbs = document.querySelectorAll('.row-select-cb');
   const desired = headerCb.checked;
-  rowCbs.forEach(cb => {
-    const code = cb.dataset.code;
-    if (!code) return;
-    cb.checked = desired;
-    if (desired) _selectedCodes.add(code);
-    else _selectedCodes.delete(code);
-    const tr = document.getElementById('row-' + code);
-    if (tr) tr.classList.toggle('row-selected', desired);
-  });
+  // まず対象の商品コードを収集(再描画中に NodeList が変化しても安全なように)
+  const codes = [];
+  rowCbs.forEach(cb => { if (cb.dataset.code) codes.push(cb.dataset.code); });
+  // 選択状態を更新。チェックを入れる場合は、画像未選択なら画像2を既定選択(単一チェックと同じ挙動)
+  let changedImg = false;
+  for (const code of codes) {
+    if (desired) {
+      _selectedCodes.add(code);
+      const p = productCache[code];
+      if (p && p.selectedImageIdx == null) { p.selectedImageIdx = 2; changedImg = true; }
+    } else {
+      _selectedCodes.delete(code);
+    }
+  }
+  if (desired && changedImg) {
+    // 画像2の自動選択を反映するため、対象行を再描画してから保存
+    scheduleGitHubSave();
+    for (const code of codes) {
+      const row = document.getElementById('row-' + code);
+      if (row) row.outerHTML = _renderTableRow(code);
+    }
+  } else {
+    // 画像選択に変化なし(チェック解除、または既に全て選択済み)→ DOM だけ更新
+    for (const code of codes) {
+      const cb2 = document.querySelector(`.row-select-cb[data-code="${CSS.escape(code)}"]`);
+      if (cb2) cb2.checked = desired;
+      const tr = document.getElementById('row-' + code);
+      if (tr) tr.classList.toggle('row-selected', desired);
+    }
+  }
   _updateSelectedCountBadge();
 }
 
@@ -6113,7 +6134,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.37 initialized');
+  console.log('[reviewcheck] v6.38 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
