@@ -312,6 +312,9 @@ body.filter-review .product-table .col-crop { display: table-cell; }
 /* 反映確認フィルタ時はレビュー列・画像1〜3列を隠し、選択画像+右下拡大に置き換える */
 body.filter-review .product-table .col-review,
 body.filter-review .product-table .col-image { display: none; }
+/* v6.50: 対応済-エビデンス付フィルタでは通常の列(画像1〜3含む)はそのままで、
+   画像3の右に「選択画像の右下(拡大)」列だけを追加表示する */
+body.filter-placed .product-table .col-crop { display: table-cell; }
 .selimg-wrap { width: 84px; height: 84px; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #fff; cursor: pointer; }
 .selimg-name { margin-top: 3px; font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; user-select: all; }
 .selimg-empty { font-size: 11px; color: var(--text3); }
@@ -804,7 +807,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.49</span>
+    <span class="build-date">v6.50</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -990,7 +993,6 @@ body.mode-ranking .product-table .col-ranking {
               <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月日 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
               <!-- v6.44: 対応中-画像反映確認フィルタ専用列(CSSでそのフィルタ時のみ表示) -->
               <th class="col-selimg">選択した画像</th>
-              <th class="col-crop">選択画像の右下(拡大)</th>
               <th class="col-sales sortable" onclick="setSortKey('sales')" id="sortHeader-sales" style="display:none">売上 <span class="sort-indicator" id="sortInd-sales"></span></th>
               <th class="col-review" id="sortHeader-review">
                 <div class="review-sort-head">
@@ -1007,6 +1009,8 @@ body.mode-ranking .product-table .col-ranking {
               <th class="col-image">画像1</th>
               <th class="col-image">画像2</th>
               <th class="col-image">画像3</th>
+              <!-- v6.50: 選択画像の右下(拡大)は画像3の右に配置(反映確認・対応済フィルタで表示) -->
+              <th class="col-crop">選択画像の右下(拡大)</th>
               <th class="col-status">状態</th>
               <th class="col-tags">制作予定</th>
               <th class="col-action">確認</th>
@@ -1440,7 +1444,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.49
+// reviewcheck v6.50
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1630,7 +1634,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.49' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.50' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3164,7 +3168,6 @@ function _renderTableRow(code) {
     <td class="col-ranking" title="${_escape(p.ranking || '')}">${cellRanking}</td>
     <td class="col-yearmonth">${cellYearMonth}</td>
     ${selImgCell}
-    ${cropCell}
     ${_renderSalesCell(code)}
     <td class="col-review">
       <div class="table-review">
@@ -3179,6 +3182,7 @@ function _renderTableRow(code) {
     </td>
     ${diffCells}
     ${imageCells}
+    ${cropCell}
     <td class="col-status" id="statusCell-${_escape(code)}">${_renderStatusButtons(code, p.status)}</td>
     <td class="col-tags" id="tagsCell-${_escape(code)}">${_renderTagsButtons(code, p.tags)}</td>
     <td class="col-action">
@@ -3502,10 +3506,11 @@ function _updateRankingFilterVisibility() {
   _syncReviewFilterClass();
 }
 
-// v6.44: 反映確認フィルタ選択中だけ body.filter-review を付与(専用列レイアウト用)
+// v6.44/v6.50: 反映確認・対応済フィルタで専用列レイアウトを切り替える body クラスを同期
 function _syncReviewFilterClass() {
-  const on = (tableMode === 'ranking' && currentRankingPlacedFilter === 'review');
-  document.body.classList.toggle('filter-review', on);
+  const isRanking = tableMode === 'ranking';
+  document.body.classList.toggle('filter-review', isRanking && currentRankingPlacedFilter === 'review');
+  document.body.classList.toggle('filter-placed', isRanking && currentRankingPlacedFilter === 'placed');
 }
 
 // v6.45: タイプフィルタ以外の絞り込み(状態/カテゴリ/評価/検索/制作タグ)を通過するか
@@ -6432,7 +6437,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.49 initialized');
+  console.log('[reviewcheck] v6.50 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
