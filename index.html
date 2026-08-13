@@ -309,6 +309,8 @@ body.mode-ranking .img-radio-band { display: flex; }
 .product-table .col-crop { width: 288px; display: none; }
 body.filter-review .product-table .col-selimg,
 body.filter-review .product-table .col-crop { display: table-cell; }
+/* v6.54: 反映確認でも右下拡大(268px)の右側に左端と同じ12pxの隙間を作る(268+12×2) */
+body.filter-review .product-table .col-crop { width: 292px; }
 /* 反映確認フィルタ時はレビュー列・画像1〜3列を隠し、選択画像+右下拡大に置き換える */
 body.filter-review .product-table .col-review,
 body.filter-review .product-table .col-image { display: none; }
@@ -329,7 +331,9 @@ body.filter-placed .product-table .col-name      { width: 200px; }
 body.filter-placed .product-table .col-yearmonth { width: 90px; }
 body.filter-placed .product-table .col-review    { width: 120px; }
 body.filter-placed .product-table .col-image     { width: 92px; }
-body.filter-placed .product-table .col-crop      { width: 172px; }
+/* v6.54: 右下拡大(160px)+ 左右のセルpadding(12px×2)= 184px。
+   これで画像の右側にも、左端〜チェックボックスと同じ12pxの隙間ができる。 */
+body.filter-placed .product-table .col-crop      { width: 184px; }
 body.filter-placed .product-table .col-ranking   { width: auto; }  /* 残りを吸収 */
 .selimg-wrap { width: 84px; height: 84px; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #fff; cursor: pointer; }
 .selimg-name { margin-top: 3px; font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; user-select: all; }
@@ -354,6 +358,8 @@ body.mode-ranking .product-table .col-ranking .rank-detail {
   direction: rtl;   /* 先頭(左)に「…」、末尾の日付を右端に残す */
   text-align: right;
 }
+/* v6.55: 編集モードでもランキングの2行目(詳細入力)を右寄せにする(末尾の日付が見えるように) */
+.bulk-ranking-cell input.bulk-edit-input { text-align: right; }
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
 /* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
 /* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
@@ -547,6 +553,8 @@ body.mode-ranking .product-table .col-ranking {
 .product-table .diff-result-empty { color: var(--text3); font-size: 16px; font-family: 'DM Mono', monospace; }
 .product-table .table-img-cell { width: 90px; height: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; position: relative; }
 .product-table .table-img-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* v6.55: ランキング証拠用モードでは3枚の画像の高さをそろえる(セルいっぱいに敷き詰める) */
+body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .product-table .table-img-cell.empty { display: flex; align-items: center; justify-content: center; cursor: default; font-size: 9px; color: var(--text3); }
 .product-table .table-review { display: flex; flex-direction: column; gap: 2px; }
 .product-table .table-review-line1 { display: flex; align-items: center; gap: 4px; }
@@ -823,7 +831,7 @@ body.mode-ranking .product-table .col-ranking {
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.53</span>
+    <span class="build-date">v6.55</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -1460,7 +1468,7 @@ body.mode-ranking .product-table .col-ranking {
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.53
+// reviewcheck v6.55
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1650,7 +1658,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.53' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.55' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3018,8 +3026,8 @@ function _renderTableRow(code) {
     const dimCls = (isInProgress && selIdx !== null && !isSel) ? ' img-dimmed' : '';
     const selectedCls = isSel ? ' img-radio-selected' : '';
     const labelText = isSel ? '✓ 選択済' : '選択';
-    // 選択中の画像だけ、その下にファイル名(拡張子なし)を表示
-    const filenameHtml = isSel ? `<div class="img-filename" title="${_escape(_imgBasename(img))}">${_escape(_imgBasename(img))}</div>` : '';
+    // v6.55: 選択画像下のファイル名表示は廃止(非表示)
+    const filenameHtml = '';
     return `<td class="col-image${dimCls}">
       <div class="table-img-cell" onclick="openLightbox('${_escape(img)}')">
         <img src="${_escape(img)}" alt="画像${imgIdx}" loading="lazy" onerror="this.parentNode.classList.add('empty');this.style.display='none';this.parentNode.innerHTML='なし'">
@@ -6453,7 +6461,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.53 initialized');
+  console.log('[reviewcheck] v6.55 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
