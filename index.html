@@ -76,6 +76,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .filter-clear-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text); transition: all 0.15s; width: 100%; }
 .filter-clear-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(191, 0, 0, 0.2); }
 .filter-clear-btn:active { transform: translateY(0); }
+.filter-clear-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 /* v6.8: 全レビューボタン(クリアの下、アクセント控えめ) */
 .all-reviews-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text); transition: all 0.15s; width: 100%; }
 .all-reviews-btn:hover { background: #3949ab; color: #fff; border-color: #3949ab; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(57, 73, 171, 0.25); }
@@ -868,7 +869,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.59</span>
+    <span class="build-date">v6.60</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -923,6 +924,10 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           </div>
           <div class="sidebar-list" id="sidebarTagList"></div>
         </div>
+        <!-- v6.60: カテゴリパネル表示トグルボタン -->
+        <button class="filter-clear-btn" id="categoryToggleBtn" onclick="toggleCategoryPanel()" title="カテゴリで絞り込むパネルを表示/非表示">
+          <span style="font-size:14px">🗂</span><span>カテゴリ</span>
+        </button>
         <!-- フィルタ全クリアボタン -->
         <button class="filter-clear-btn" onclick="clearAllFilters()" title="左カラムの全選択をデフォルトに戻します">
           <span style="font-size:14px">🔄</span><span>クリア</span>
@@ -932,8 +937,8 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span style="font-size:14px">📊</span><span>全レビュー</span>
         </button>
       </div>
-      <!-- 右列: カテゴリカード(縦長) -->
-      <div class="sidebar-col-right">
+      <!-- 右列: カテゴリカード(縦長) — v6.60: 既定は非表示、カテゴリボタンで表示 -->
+      <div class="sidebar-col-right" id="sidebarColRight" style="display:none">
         <div class="sidebar">
           <div class="sidebar-header">
             <span>カテゴリ</span>
@@ -1518,7 +1523,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.59
+// reviewcheck v6.60
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1737,7 +1742,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.59' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.60' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2845,6 +2850,15 @@ function setSidebarSort(mode) {
   document.getElementById('sidebarSortAlpha').classList.toggle('active', mode === 'alpha');
   document.getElementById('sidebarSortCount').classList.toggle('active', mode === 'count');
   renderSidebar();
+}
+// v6.60: カテゴリパネルの表示/非表示トグル
+function toggleCategoryPanel() {
+  const panel = document.getElementById('sidebarColRight');
+  const btn = document.getElementById('categoryToggleBtn');
+  if (!panel) return;
+  const show = panel.style.display === 'none';
+  panel.style.display = show ? '' : 'none';
+  if (btn) btn.classList.toggle('active', show);
 }
 function _loadSidebarSort() {
   const saved = localStorage.getItem(SIDEBAR_SORT_KEY);
@@ -6621,7 +6635,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.59 initialized');
+  console.log('[reviewcheck] v6.60 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
