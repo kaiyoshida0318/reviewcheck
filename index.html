@@ -412,8 +412,10 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .bulk-ranking-type-select.ranking-type-pending { background: #fff9c4; color: #827717; border-color: rgba(130,119,23,0.4); font-weight: 600; }
 /* v6.56: 獲得前（一部獲得済）(ライトグリーン系) */
 .bulk-ranking-type-select.ranking-type-pending-partial { background: #dcedc8; color: #558b2f; border-color: rgba(85,139,47,0.4); font-weight: 600; }
-/* v6.57: 状態 改善予定(インディゴ) / 獲得済(グリーン) */
-.bulk-ranking-type-select.ranking-type-improve { background: #e8eaf6; color: #3949ab; border-color: rgba(57,73,171,0.4); font-weight: 600; }
+/* v6.58: 状態 ランキング登録可能(水色) / ランキング済レビュー前(ピンク) / レビュー登録可能(ティール) */
+.bulk-ranking-type-select.ranking-type-rank-ready { background: #e1f5fe; color: #0277bd; border-color: rgba(2,119,189,0.4); font-weight: 600; }
+.bulk-ranking-type-select.ranking-type-rank-done { background: #fce4ec; color: #c2185b; border-color: rgba(194,24,91,0.4); font-weight: 600; }
+.bulk-ranking-type-select.ranking-type-review-ready { background: #e0f2f1; color: #00897b; border-color: rgba(0,137,123,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-acquired { background: #e8f5e9; color: #2e7d32; border-color: rgba(46,125,50,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-unnecessary { background: #ffe0b2; color: #bf360c; border-color: rgba(191,54,12,0.4); font-weight: 600; text-decoration: line-through; }
 /* v6.24: 過去のまま放置(紫系) */
@@ -439,7 +441,9 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 .bulk-ranking-type-select option.opt-type-daily { background: #e3f2fd; color: #1565c0; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-realtime { background: #fff0f0; color: #c62828; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-pending { background: #fff9c4; color: #827717; font-weight: 600; }
-.bulk-ranking-type-select option.opt-type-improve { background: #e8eaf6; color: #3949ab; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-rank-ready { background: #e1f5fe; color: #0277bd; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-rank-done { background: #fce4ec; color: #c2185b; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-review-ready { background: #e0f2f1; color: #00897b; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-acquired { background: #e8f5e9; color: #2e7d32; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-unnecessary { background: #ffe0b2; color: #bf360c; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-past { background: #f3e8ff; color: #6a1b9a; font-weight: 600; }
@@ -458,7 +462,9 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 /* v6.25: 獲得前バッジ(黄色系) */
 .ranking-type-badge.pending { background: #fff9c4; color: #827717; border: 1px solid rgba(130,119,23,0.3); }
 .ranking-type-badge.pending-partial { background: #dcedc8; color: #558b2f; border: 1px solid rgba(85,139,47,0.3); }
-.ranking-type-badge.improve { background: #e8eaf6; color: #3949ab; border: 1px solid rgba(57,73,171,0.3); }
+.ranking-type-badge.rank-ready { background: #e1f5fe; color: #0277bd; border: 1px solid rgba(2,119,189,0.3); }
+.ranking-type-badge.rank-done { background: #fce4ec; color: #c2185b; border: 1px solid rgba(194,24,91,0.3); }
+.ranking-type-badge.review-ready { background: #e0f2f1; color: #00897b; border: 1px solid rgba(0,137,123,0.3); }
 .ranking-type-badge.acquired { background: #e8f5e9; color: #2e7d32; border: 1px solid rgba(46,125,50,0.3); }
 /* v6.57: ランキングタイプ用の select / option / badge */
 .bulk-ranking-kind-select { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 11px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; cursor: pointer; }
@@ -862,7 +868,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.57</span>
+    <span class="build-date">v6.58</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -958,7 +964,9 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span class="toolbar-label">📊 状態:</span>
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体 <span class="rf-count" id="rfCount-all"></span></button>
           <button class="ranking-filter-btn" data-filter="pending" onclick="setRankingFilter('pending')">🎯 獲得前 <span class="rf-count" id="rfCount-pending"></span></button>
-          <button class="ranking-filter-btn" data-filter="improve" onclick="setRankingFilter('improve')">🔧 改善予定 <span class="rf-count" id="rfCount-improve"></span></button>
+          <button class="ranking-filter-btn" data-filter="rank_ready" onclick="setRankingFilter('rank_ready')">🆗 ランキング登録可能 <span class="rf-count" id="rfCount-rank_ready"></span></button>
+          <button class="ranking-filter-btn" data-filter="rank_done" onclick="setRankingFilter('rank_done')">⏳ ランキング済レビュー前 <span class="rf-count" id="rfCount-rank_done"></span></button>
+          <button class="ranking-filter-btn" data-filter="review_ready" onclick="setRankingFilter('review_ready')">📝 レビュー登録可能 <span class="rf-count" id="rfCount-review_ready"></span></button>
           <button class="ranking-filter-btn" data-filter="acquired" onclick="setRankingFilter('acquired')">✅ 獲得済 <span class="rf-count" id="rfCount-acquired"></span></button>
           <button class="ranking-filter-btn" data-filter="unnecessary" onclick="setRankingFilter('unnecessary')">🚫 不必要 <span class="rf-count" id="rfCount-unnecessary"></span></button>
           <button class="ranking-filter-btn" data-filter="past" onclick="setRankingFilter('past')">📦 過去のまま放置 <span class="rf-count" id="rfCount-past"></span></button>
@@ -1511,7 +1519,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.57
+// reviewcheck v6.58
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1615,6 +1623,9 @@ function _migrateRankingSchema() {
       changed = true;
     } else if (t === 'pending_partial') {
       p.rankingType = 'pending';             // 獲得前（一部獲得済）→ 獲得前
+      changed = true;
+    } else if (t === 'improve') {
+      p.rankingType = 'rank_ready';          // v6.58: 改善予定 → ランキング登録可能
       changed = true;
     }
   }
@@ -1727,7 +1738,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.57' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.58' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -3161,7 +3172,9 @@ function _renderTableRow(code) {
     // v6.57: 4フィールド構造 (状態=rankingType / ランキングタイプ=rankingKind / ranking / 対応内容=rankingRegistered)
     const vType = p.rankingType || '';   // 状態
     const typeCls = vType === 'pending' ? 'ranking-type-pending'
-                  : vType === 'improve' ? 'ranking-type-improve'
+                  : vType === 'rank_ready' ? 'ranking-type-rank-ready'
+                  : vType === 'rank_done' ? 'ranking-type-rank-done'
+                  : vType === 'review_ready' ? 'ranking-type-review-ready'
                   : vType === 'acquired' ? 'ranking-type-acquired'
                   : vType === 'unnecessary' ? 'ranking-type-unnecessary'
                   : vType === 'past' ? 'ranking-type-past'
@@ -3196,7 +3209,9 @@ function _renderTableRow(code) {
         <select class="bulk-ranking-type-select ${typeCls}" data-code="${_escape(code)}" onchange="onRankingTypeChange(this)" title="状態">
           <option value="" ${vType === '' ? 'selected' : ''} class="opt-type-unset">— 状態(未設定) —</option>
           <option value="pending" ${vType === 'pending' ? 'selected' : ''} class="opt-type-pending">🎯 獲得前</option>
-          <option value="improve" ${vType === 'improve' ? 'selected' : ''} class="opt-type-improve">🔧 改善予定</option>
+          <option value="rank_ready" ${vType === 'rank_ready' ? 'selected' : ''} class="opt-type-rank-ready">🆗 ランキング登録可能</option>
+          <option value="rank_done" ${vType === 'rank_done' ? 'selected' : ''} class="opt-type-rank-done">⏳ ランキング済レビュー前</option>
+          <option value="review_ready" ${vType === 'review_ready' ? 'selected' : ''} class="opt-type-review-ready">📝 レビュー登録可能</option>
           <option value="acquired" ${vType === 'acquired' ? 'selected' : ''} class="opt-type-acquired">✅ 獲得済</option>
           <option value="unnecessary" ${vType === 'unnecessary' ? 'selected' : ''} class="opt-type-unnecessary">🚫 不必要</option>
           <option value="past" ${vType === 'past' ? 'selected' : ''} class="opt-type-past">📦 過去のまま放置</option>
@@ -3229,7 +3244,9 @@ function _renderTableRow(code) {
     // v6.57: 状態バッジ(rankingType)
     let typeBadge = '';
     if (p.rankingType === 'pending') typeBadge = `<span class="ranking-type-badge pending" title="獲得前">🎯 獲得前</span>`;
-    else if (p.rankingType === 'improve') typeBadge = `<span class="ranking-type-badge improve" title="改善予定">🔧 改善予定</span>`;
+    else if (p.rankingType === 'rank_ready') typeBadge = `<span class="ranking-type-badge rank-ready" title="ランキング登録可能">🆗 ランキング登録可能</span>`;
+    else if (p.rankingType === 'rank_done') typeBadge = `<span class="ranking-type-badge rank-done" title="ランキング済レビュー前">⏳ ランキング済レビュー前</span>`;
+    else if (p.rankingType === 'review_ready') typeBadge = `<span class="ranking-type-badge review-ready" title="レビュー登録可能">📝 レビュー登録可能</span>`;
     else if (p.rankingType === 'acquired') typeBadge = `<span class="ranking-type-badge acquired" title="獲得済">✅ 獲得済</span>`;
     else if (p.rankingType === 'unnecessary') typeBadge = `<span class="ranking-type-badge unnecessary" title="不必要">🚫 不必要</span>`;
     else if (p.rankingType === 'past') typeBadge = `<span class="ranking-type-badge past" title="過去のまま放置">📦 過去のまま放置</span>`;
@@ -3551,7 +3568,7 @@ function _loadTableMode() {
 
 // v6.19/v6.22/v6.24/v6.25/v6.27: ランキングタイプフィルタ
 function setRankingFilter(filter) {
-  const valid = ['all', 'pending', 'improve', 'acquired', 'unnecessary', 'past', 'false_kept', 'unset', 'remake'];
+  const valid = ['all', 'pending', 'rank_ready', 'rank_done', 'review_ready', 'acquired', 'unnecessary', 'past', 'false_kept', 'unset', 'remake'];
   if (!valid.includes(filter)) filter = 'all';
   currentRankingFilter = filter;
   // ボタン active 状態
@@ -3687,7 +3704,7 @@ function _passesBaseFiltersForCount(code, p, search) {
 function _updateRankingFilterCounts() {
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   // 状態(rankingType)の件数
-  const c = { all: 0, pending: 0, improve: 0, acquired: 0, unnecessary: 0, past: 0, false_kept: 0, unset: 0, remake: 0 };
+  const c = { all: 0, pending: 0, rank_ready: 0, rank_done: 0, review_ready: 0, acquired: 0, unnecessary: 0, past: 0, false_kept: 0, unset: 0, remake: 0 };
   // ランキングタイプ(rankingKind)の件数
   const k = { all: 0, realtime: 0, daily: 0, weekly: 0, crown2: 0, crown3: 0, unset: 0 };
   for (const code of Object.keys(productCache)) {
@@ -6211,14 +6228,16 @@ function onRankingTypeChange(sel) {
   const code = sel.dataset.code;
   if (!code || !productCache[code]) return;
   // v6.57: 状態(rankingType)の新しい値
-  const validTypes = ['pending', 'improve', 'acquired', 'unnecessary', 'past', 'false_kept', 'remake'];
+  const validTypes = ['pending', 'rank_ready', 'rank_done', 'review_ready', 'acquired', 'unnecessary', 'past', 'false_kept', 'remake'];
   const newVal = validTypes.includes(sel.value) ? sel.value : null;
   const oldVal = productCache[code].rankingType || null;
   if (newVal === oldVal) return;
   productCache[code].rankingType = newVal;
-  sel.classList.remove('ranking-type-pending', 'ranking-type-improve', 'ranking-type-acquired', 'ranking-type-unnecessary', 'ranking-type-past', 'ranking-type-false-kept', 'ranking-type-remake', 'ranking-type-unset');
+  sel.classList.remove('ranking-type-pending', 'ranking-type-rank-ready', 'ranking-type-rank-done', 'ranking-type-review-ready', 'ranking-type-acquired', 'ranking-type-unnecessary', 'ranking-type-past', 'ranking-type-false-kept', 'ranking-type-remake', 'ranking-type-unset');
   sel.classList.add(newVal === 'pending' ? 'ranking-type-pending'
-                   : newVal === 'improve' ? 'ranking-type-improve'
+                   : newVal === 'rank_ready' ? 'ranking-type-rank-ready'
+                   : newVal === 'rank_done' ? 'ranking-type-rank-done'
+                   : newVal === 'review_ready' ? 'ranking-type-review-ready'
                    : newVal === 'acquired' ? 'ranking-type-acquired'
                    : newVal === 'unnecessary' ? 'ranking-type-unnecessary'
                    : newVal === 'past' ? 'ranking-type-past'
@@ -6603,7 +6622,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.57 initialized');
+  console.log('[reviewcheck] v6.58 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
