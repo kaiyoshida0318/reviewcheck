@@ -868,7 +868,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.58</span>
+    <span class="build-date">v6.59</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -971,7 +971,6 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <button class="ranking-filter-btn" data-filter="unnecessary" onclick="setRankingFilter('unnecessary')">🚫 不必要 <span class="rf-count" id="rfCount-unnecessary"></span></button>
           <button class="ranking-filter-btn" data-filter="past" onclick="setRankingFilter('past')">📦 過去のまま放置 <span class="rf-count" id="rfCount-past"></span></button>
           <button class="ranking-filter-btn" data-filter="false_kept" onclick="setRankingFilter('false_kept')">⚠ 虚偽のまま放置 <span class="rf-count" id="rfCount-false_kept"></span></button>
-          <button class="ranking-filter-btn" data-filter="unset" onclick="setRankingFilter('unset')">未設定 <span class="rf-count" id="rfCount-unset"></span></button>
           <button class="ranking-filter-btn" data-filter="remake" onclick="setRankingFilter('remake')">🔁 再制作予定 <span class="rf-count" id="rfCount-remake"></span></button>
         </div>
         <!-- v6.57: ランキングタイプ(新規: リアルタイム/デイリー/ウィークリー/2冠/3冠) -->
@@ -1519,7 +1518,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.58
+// reviewcheck v6.59
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1738,7 +1737,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.58' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.59' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -6622,7 +6621,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.58 initialized');
+  console.log('[reviewcheck] v6.59 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
