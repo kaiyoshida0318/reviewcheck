@@ -107,7 +107,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 52px; z-index: 30; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
 .toolbar-group { display: flex; align-items: center; gap: 8px; }
 /* v6.27: ランキングタイプフィルタグループはボタンが多くなったので折り返し可能に */
-.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.66: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
+.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.67: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
 .toolbar-label { font-size: 11px; color: var(--text3); font-weight: 500; }
 .search-input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; min-width: 220px; }
 .search-input:focus { outline: none; border-color: var(--accent); }
@@ -357,15 +357,15 @@ body.mode-ranking .product-table .col-ranking .rank-detail {
   white-space: nowrap;
   text-overflow: ellipsis;
   direction: rtl;   /* 収まらない時は先頭(左)に「…」省略。文字順は保持 */
-  text-align: left; /* v6.66: 収まる時は左詰め(右側に隙間)。左の無駄な空きを解消 */
+  text-align: left; /* v6.67: 収まる時は左詰め(右側に隙間)。左の無駄な空きを解消 */
 }
 /* v6.55: 編集モードでもランキングの2行目(詳細入力)を右寄せにする(末尾の日付が見えるように) */
-/* v6.66: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
+/* v6.67: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
    (右寄せだと短い文字で左に隙間ができ、バックスペースで先頭に戻れない問題を解消) */
 .bulk-ranking-cell input.bulk-edit-input { text-align: left; }
-/* v6.66: ランキング詳細の下に追加した日時欄。プレースホルダ「日時」を薄く表示 */
+/* 日時欄: プレースホルダ「日時」だけ薄く、入力した文字は通常のはっきりした黒(v6.67で修正) */
+.bulk-ranking-datetime { color: var(--text); }
 .bulk-ranking-datetime::placeholder { color: var(--text3); opacity: 0.7; font-weight: 400; }
-.bulk-ranking-datetime { color: var(--text2); }
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
 /* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
 /* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
@@ -571,7 +571,11 @@ body.mode-ranking .col-diff-growth,
 body.mode-ranking .col-sales,
 body.mode-ranking .col-status,
 body.mode-ranking .col-tags,
+body.mode-ranking .col-yearmonth,/* v6.67: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
 body.mode-ranking .col-action { display: none; }
+/* v6.67: 年月日は反映確認/対応済でも非表示にする(念のため明示) */
+body.filter-review .product-table .col-yearmonth,
+body.filter-placed .product-table .col-yearmonth { display: none; }
 /* v6.17.2: ランキング証拠用モードではランキング列を折り返し表示(全文見えるように) */
 /* v6.17.3: 文字サイズを少し大きく(11px→13px) */
 body.mode-ranking .product-table .col-ranking {
@@ -874,7 +878,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.66</span>
+    <span class="build-date">v6.67</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -929,7 +933,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           </div>
           <div class="sidebar-list" id="sidebarTagList"></div>
         </div>
-        <!-- v6.66: カテゴリパネル表示トグルボタン -->
+        <!-- v6.67: カテゴリパネル表示トグルボタン -->
         <button class="filter-clear-btn" id="categoryToggleBtn" onclick="toggleCategoryPanel()" title="カテゴリで絞り込むパネルを表示/非表示">
           <span style="font-size:14px">🗂</span><span>カテゴリ</span>
         </button>
@@ -942,7 +946,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span style="font-size:14px">📊</span><span>全レビュー</span>
         </button>
       </div>
-      <!-- 右列: カテゴリカード(縦長) — v6.66: 既定は非表示、カテゴリボタンで表示 -->
+      <!-- 右列: カテゴリカード(縦長) — v6.67: 既定は非表示、カテゴリボタンで表示 -->
       <div class="sidebar-col-right" id="sidebarColRight" style="display:none">
         <div class="sidebar">
           <div class="sidebar-header">
@@ -963,7 +967,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="toolbar-group">
           <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
         </div>
-        <!-- v6.66: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
+        <!-- v6.67: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
         <!-- v6.19/v6.22: ランキング証拠用モード時のみ表示するランキングタイプフィルタ -->
         <!-- v6.22で刷新: 「入力済/入力前/不必要」→「デイリー/リアルタイム/不必要/未設定」 -->
         <!-- v6.57: 状態(旧タイプ) -->
@@ -1525,7 +1529,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.66
+// reviewcheck v6.67
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1744,7 +1748,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.66' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.67' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2853,7 +2857,7 @@ function setSidebarSort(mode) {
   document.getElementById('sidebarSortCount').classList.toggle('active', mode === 'count');
   renderSidebar();
 }
-// v6.66: カテゴリパネルの表示/非表示トグル
+// v6.67: カテゴリパネルの表示/非表示トグル
 function toggleCategoryPanel() {
   const panel = document.getElementById('sidebarColRight');
   const btn = document.getElementById('categoryToggleBtn');
@@ -3032,7 +3036,7 @@ function deleteSalesMonth(ym) {
 
 // ツールバーの月選択ドロップダウンを更新
 function _refreshSalesMonthSelect() {
-  // v6.66: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
+  // v6.67: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
   const group = document.getElementById('salesMonthGroup');
   const sel = document.getElementById('salesMonthSelect');
   if (!group || !sel) return;
@@ -3186,7 +3190,7 @@ function _renderTableRow(code) {
     const vName       = p.name || '';
     const vRanking    = p.ranking || '';
     const vYearMonth  = p.yearMonth || '';
-    const vRankingDateTime = p.rankingDateTime || ''; // v6.66: ランキング詳細の下に追加した日時欄
+    const vRankingDateTime = p.rankingDateTime || ''; // v6.67: ランキング詳細の下に追加した日時欄
     // v6.57: 4フィールド構造 (状態=rankingType / ランキングタイプ=rankingKind / ranking / 対応内容=rankingRegistered)
     const vType = p.rankingType || '';   // 状態
     const typeCls = vType === 'pending' ? 'ranking-type-pending'
@@ -3589,7 +3593,7 @@ function _loadTableMode() {
 function setRankingFilter(filter) {
   const valid = ['all', 'pending', 'rank_ready', 'rank_done', 'review_ready', 'acquired', 'unnecessary', 'past', 'false_kept', 'unset', 'remake'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.66: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.67: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingFilter && filter !== 'all') filter = 'all';
   currentRankingFilter = filter;
   // ボタン active 状態
@@ -3602,7 +3606,7 @@ function setRankingFilter(filter) {
 function setRankingKindFilter(filter) {
   const valid = ['all', 'realtime', 'daily', 'weekly', 'crown2', 'crown3', 'unset'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.66: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.67: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingKindFilter && filter !== 'all') filter = 'all';
   currentRankingKindFilter = filter;
   document.querySelectorAll('#rankingKindFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3615,7 +3619,7 @@ function setRankingPlacedFilter(filter) {
   // v6.37/v6.44: 'in_progress'(画像制作)・'review'(画像反映確認)を追加
   const valid = ['all', 'placed', 'unplaced', 'in_progress', 'review'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.66: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.67: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingPlacedFilter && filter !== 'all') filter = 'all';
   currentRankingPlacedFilter = filter;
   document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -6647,7 +6651,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.66 initialized');
+  console.log('[reviewcheck] v6.67 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
