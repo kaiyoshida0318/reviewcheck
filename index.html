@@ -107,7 +107,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 52px; z-index: 30; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
 .toolbar-group { display: flex; align-items: center; gap: 8px; }
 /* v6.27: ランキングタイプフィルタグループはボタンが多くなったので折り返し可能に */
-.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.69: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
+.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.70: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
 .toolbar-label { font-size: 11px; color: var(--text3); font-weight: 500; }
 .search-input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; min-width: 220px; }
 .search-input:focus { outline: none; border-color: var(--accent); }
@@ -357,13 +357,13 @@ body.mode-ranking .product-table .col-ranking .rank-detail {
   white-space: nowrap;
   text-overflow: ellipsis;
   direction: rtl;   /* 収まらない時は先頭(左)に「…」省略。文字順は保持 */
-  text-align: left; /* v6.69: 収まる時は左詰め(右側に隙間)。左の無駄な空きを解消 */
+  text-align: left; /* v6.70: 収まる時は左詰め(右側に隙間)。左の無駄な空きを解消 */
 }
 /* v6.55: 編集モードでもランキングの2行目(詳細入力)を右寄せにする(末尾の日付が見えるように) */
-/* v6.69: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
+/* v6.70: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
    (右寄せだと短い文字で左に隙間ができ、バックスペースで先頭に戻れない問題を解消) */
 .bulk-ranking-cell input.bulk-edit-input { text-align: left; }
-/* 日時欄: プレースホルダ「日時」だけ薄く、入力した文字は通常のはっきりした黒(v6.69で修正) */
+/* 日時欄: プレースホルダ「日時」だけ薄く、入力した文字は通常のはっきりした黒(v6.70で修正) */
 .bulk-ranking-datetime { color: var(--text); }
 .bulk-ranking-datetime::placeholder { color: var(--text3); opacity: 0.7; font-weight: 400; }
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
@@ -419,7 +419,7 @@ body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; 
 /* v6.56: 獲得前（一部獲得済）(ライトグリーン系) */
 .bulk-ranking-type-select.ranking-type-pending-partial { background: #dcedc8; color: #558b2f; border-color: rgba(85,139,47,0.4); font-weight: 600; }
 /* v6.58: 状態 ランキング登録可能(水色) / ランキング済レビュー前(ピンク) / レビュー登録可能(ティール) */
-/* v6.69: 監視リスト追加済(インディゴ系、獲得前と登録可能の間) */
+/* v6.70: 伝令ちゃん追加済(インディゴ系、獲得前と登録可能の間) */
 .bulk-ranking-type-select.ranking-type-watch-added { background: #e8eaf6; color: #3949ab; border-color: rgba(57,73,171,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-ready { background: #e1f5fe; color: #0277bd; border-color: rgba(2,119,189,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-done { background: #fce4ec; color: #c2185b; border-color: rgba(194,24,91,0.4); font-weight: 600; }
@@ -575,9 +575,9 @@ body.mode-ranking .col-diff-growth,
 body.mode-ranking .col-sales,
 body.mode-ranking .col-status,
 body.mode-ranking .col-tags,
-body.mode-ranking .col-yearmonth,/* v6.69: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
+body.mode-ranking .col-yearmonth,/* v6.70: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
 body.mode-ranking .col-action { display: none; }
-/* v6.69: 年月日は反映確認/対応済でも非表示にする(念のため明示) */
+/* v6.70: 年月日は反映確認/対応済でも非表示にする(念のため明示) */
 body.filter-review .product-table .col-yearmonth,
 body.filter-placed .product-table .col-yearmonth { display: none; }
 /* v6.17.2: ランキング証拠用モードではランキング列を折り返し表示(全文見えるように) */
@@ -882,7 +882,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.69</span>
+    <span class="build-date">v6.70</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -937,7 +937,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           </div>
           <div class="sidebar-list" id="sidebarTagList"></div>
         </div>
-        <!-- v6.69: カテゴリパネル表示トグルボタン -->
+        <!-- v6.70: カテゴリパネル表示トグルボタン -->
         <button class="filter-clear-btn" id="categoryToggleBtn" onclick="toggleCategoryPanel()" title="カテゴリで絞り込むパネルを表示/非表示">
           <span style="font-size:14px">🗂</span><span>カテゴリ</span>
         </button>
@@ -950,7 +950,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span style="font-size:14px">📊</span><span>全レビュー</span>
         </button>
       </div>
-      <!-- 右列: カテゴリカード(縦長) — v6.69: 既定は非表示、カテゴリボタンで表示 -->
+      <!-- 右列: カテゴリカード(縦長) — v6.70: 既定は非表示、カテゴリボタンで表示 -->
       <div class="sidebar-col-right" id="sidebarColRight" style="display:none">
         <div class="sidebar">
           <div class="sidebar-header">
@@ -971,7 +971,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="toolbar-group">
           <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
         </div>
-        <!-- v6.69: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
+        <!-- v6.70: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
         <!-- v6.19/v6.22: ランキング証拠用モード時のみ表示するランキングタイプフィルタ -->
         <!-- v6.22で刷新: 「入力済/入力前/不必要」→「デイリー/リアルタイム/不必要/未設定」 -->
         <!-- v6.57: 状態(旧タイプ) -->
@@ -979,7 +979,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span class="toolbar-label">📊 状態:</span>
           <button class="ranking-filter-btn active" data-filter="all" onclick="setRankingFilter('all')">全体 <span class="rf-count" id="rfCount-all"></span></button>
           <button class="ranking-filter-btn" data-filter="pending" onclick="setRankingFilter('pending')">🎯 獲得前 <span class="rf-count" id="rfCount-pending"></span></button>
-          <button class="ranking-filter-btn" data-filter="watch_added" onclick="setRankingFilter('watch_added')">👁 監視リスト追加済 <span class="rf-count" id="rfCount-watch_added"></span></button>
+          <button class="ranking-filter-btn" data-filter="watch_added" onclick="setRankingFilter('watch_added')">👁 伝令ちゃん追加済 <span class="rf-count" id="rfCount-watch_added"></span></button>
           <button class="ranking-filter-btn" data-filter="rank_ready" onclick="setRankingFilter('rank_ready')">🆗 ランキング登録可能 <span class="rf-count" id="rfCount-rank_ready"></span></button>
           <button class="ranking-filter-btn" data-filter="rank_done" onclick="setRankingFilter('rank_done')">⏳ ランキング済レビュー前 <span class="rf-count" id="rfCount-rank_done"></span></button>
           <button class="ranking-filter-btn" data-filter="review_ready" onclick="setRankingFilter('review_ready')">📝 レビュー登録可能 <span class="rf-count" id="rfCount-review_ready"></span></button>
@@ -1534,7 +1534,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.69
+// reviewcheck v6.70
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1596,7 +1596,7 @@ let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
 let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
-let currentStatusFilter = 'all'; // v6.69: 状態フィルタ ('all'=全体[デフォルト] | 'normal'=通常 | 'focus'=注目 | 'ignore'=無視 | 'retired'=引退済)
+let currentStatusFilter = 'all'; // v6.70: 状態フィルタ ('all'=全体[デフォルト] | 'normal'=通常 | 'focus'=注目 | 'ignore'=無視 | 'retired'=引退済)
 // インライン編集の保留変更 { code: { status?: 'focus'|'normal'|'ignore', tags?: { renewal, boost, boostPlan } } }
 let pendingEdits = {};
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
@@ -1753,7 +1753,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.69' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.70' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2453,7 +2453,7 @@ function renderProducts() {
     const isRetired = status === 'retired';
     const isFocus = status === 'focus';
     if (currentStatusFilter === 'all') {
-      // v6.69: 「全体」モード(デフォルト): 状態で絞り込まない(すべて表示)
+      // v6.70: 「全体」モード(デフォルト): 状態で絞り込まない(すべて表示)
     } else if (currentStatusFilter === 'ignore') {
       if (!isIgnored) return false; // 「無視」モード: 無視のみ表示
     } else if (currentStatusFilter === 'retired') {
@@ -2761,7 +2761,7 @@ function renderSidebar() {
     else normalCount++; // 'normal' or undefined はすべて通常扱い
   }
   const statusDefs = [
-    { key: 'all',     label: '全体', icon: '🗂', count: codes.length },/* v6.69: 全状態を表示(初期選択) */
+    { key: 'all',     label: '全体', icon: '🗂', count: codes.length },/* v6.70: 全状態を表示(初期選択) */
     { key: 'normal',  label: '通常', icon: '👁', count: normalCount },
     { key: 'focus',   label: '注目', icon: '⭐', count: focusCount },
     { key: 'ignore',  label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
@@ -2827,7 +2827,7 @@ function setStatusFilter(status) {
 // 左サイドバーのフィルタ選択を全部デフォルトに戻す
 function clearAllFilters() {
   currentScoreBand = 'all';
-  currentStatusFilter = 'all'; // v6.69: クリアで状態も「全体」に戻す
+  currentStatusFilter = 'all'; // v6.70: クリアで状態も「全体」に戻す
   currentProductionTag = null;
   currentCategory = 'all';
   // 検索ボックスもクリア
@@ -2865,7 +2865,7 @@ function setSidebarSort(mode) {
   document.getElementById('sidebarSortCount').classList.toggle('active', mode === 'count');
   renderSidebar();
 }
-// v6.69: カテゴリパネルの表示/非表示トグル
+// v6.70: カテゴリパネルの表示/非表示トグル
 function toggleCategoryPanel() {
   const panel = document.getElementById('sidebarColRight');
   const btn = document.getElementById('categoryToggleBtn');
@@ -3044,7 +3044,7 @@ function deleteSalesMonth(ym) {
 
 // ツールバーの月選択ドロップダウンを更新
 function _refreshSalesMonthSelect() {
-  // v6.69: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
+  // v6.70: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
   const group = document.getElementById('salesMonthGroup');
   const sel = document.getElementById('salesMonthSelect');
   if (!group || !sel) return;
@@ -3198,7 +3198,7 @@ function _renderTableRow(code) {
     const vName       = p.name || '';
     const vRanking    = p.ranking || '';
     const vYearMonth  = p.yearMonth || '';
-    const vRankingDateTime = p.rankingDateTime || ''; // v6.69: ランキング詳細の下に追加した日時欄
+    const vRankingDateTime = p.rankingDateTime || ''; // v6.70: ランキング詳細の下に追加した日時欄
     // v6.57: 4フィールド構造 (状態=rankingType / ランキングタイプ=rankingKind / ranking / 対応内容=rankingRegistered)
     const vType = p.rankingType || '';   // 状態
     const typeCls = vType === 'pending' ? 'ranking-type-pending'
@@ -3240,7 +3240,7 @@ function _renderTableRow(code) {
         <select class="bulk-ranking-type-select ${typeCls}" data-code="${_escape(code)}" onchange="onRankingTypeChange(this)" title="状態">
           <option value="" ${vType === '' ? 'selected' : ''} class="opt-type-unset">— 状態(未設定) —</option>
           <option value="pending" ${vType === 'pending' ? 'selected' : ''} class="opt-type-pending">🎯 獲得前</option>
-          <option value="watch_added" ${vType === 'watch_added' ? 'selected' : ''} class="opt-type-watch-added">👁 監視リスト追加済</option>
+          <option value="watch_added" ${vType === 'watch_added' ? 'selected' : ''} class="opt-type-watch-added">👁 伝令ちゃん追加済</option>
           <option value="rank_ready" ${vType === 'rank_ready' ? 'selected' : ''} class="opt-type-rank-ready">🆗 ランキング登録可能</option>
           <option value="rank_done" ${vType === 'rank_done' ? 'selected' : ''} class="opt-type-rank-done">⏳ ランキング済レビュー前</option>
           <option value="review_ready" ${vType === 'review_ready' ? 'selected' : ''} class="opt-type-review-ready">📝 レビュー登録可能</option>
@@ -3277,7 +3277,7 @@ function _renderTableRow(code) {
     // v6.57: 状態バッジ(rankingType)
     let typeBadge = '';
     if (p.rankingType === 'pending') typeBadge = `<span class="ranking-type-badge pending" title="獲得前">🎯 獲得前</span>`;
-    else if (p.rankingType === 'watch_added') typeBadge = `<span class="ranking-type-badge watch-added" title="監視リスト追加済">👁 監視リスト追加済</span>`;
+    else if (p.rankingType === 'watch_added') typeBadge = `<span class="ranking-type-badge watch-added" title="伝令ちゃん追加済">👁 伝令ちゃん追加済</span>`;
     else if (p.rankingType === 'rank_ready') typeBadge = `<span class="ranking-type-badge rank-ready" title="ランキング登録可能">🆗 ランキング登録可能</span>`;
     else if (p.rankingType === 'rank_done') typeBadge = `<span class="ranking-type-badge rank-done" title="ランキング済レビュー前">⏳ ランキング済レビュー前</span>`;
     else if (p.rankingType === 'review_ready') typeBadge = `<span class="ranking-type-badge review-ready" title="レビュー登録可能">📝 レビュー登録可能</span>`;
@@ -3604,7 +3604,7 @@ function _loadTableMode() {
 function setRankingFilter(filter) {
   const valid = ['all', 'pending', 'watch_added', 'rank_ready', 'rank_done', 'review_ready', 'acquired', 'unnecessary', 'past', 'false_kept', 'unset', 'remake'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.69: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.70: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingFilter && filter !== 'all') filter = 'all';
   currentRankingFilter = filter;
   // ボタン active 状態
@@ -3617,7 +3617,7 @@ function setRankingFilter(filter) {
 function setRankingKindFilter(filter) {
   const valid = ['all', 'realtime', 'daily', 'weekly', 'crown2', 'crown3', 'unset'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.69: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.70: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingKindFilter && filter !== 'all') filter = 'all';
   currentRankingKindFilter = filter;
   document.querySelectorAll('#rankingKindFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3630,7 +3630,7 @@ function setRankingPlacedFilter(filter) {
   // v6.37/v6.44: 'in_progress'(画像制作)・'review'(画像反映確認)を追加
   const valid = ['all', 'placed', 'unplaced', 'in_progress', 'review'];
   if (!valid.includes(filter)) filter = 'all';
-  // v6.69: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.70: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingPlacedFilter && filter !== 'all') filter = 'all';
   currentRankingPlacedFilter = filter;
   document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3723,7 +3723,7 @@ function _passesBaseFiltersForCount(code, p, search) {
   }
   const status = p.status || 'normal';
   const isIgnored = status === 'ignore', isRetired = status === 'retired', isFocus = status === 'focus';
-  if (currentStatusFilter === 'all') { /* v6.69: 全体は状態で絞り込まない */ }
+  if (currentStatusFilter === 'all') { /* v6.70: 全体は状態で絞り込まない */ }
   else if (currentStatusFilter === 'ignore') { if (!isIgnored) return false; }
   else if (currentStatusFilter === 'retired') { if (!isRetired) return false; }
   else if (currentStatusFilter === 'focus') { if (!isFocus) return false; }
@@ -5084,7 +5084,7 @@ function _normalizeRankingType(v) {
   if (/^(デイリー|daily|d)$/i.test(s)) return 'daily';
   if (/^(リアルタイム|realtime|real-time|real|rt|r)$/i.test(s)) return 'realtime';
   if (/^(獲得前|獲得待ち|獲得予定|狙う|狙い|pending|target|todo)$/i.test(s)) return 'pending';
-  if (/^(監視リスト追加済|監視リスト追加|監視リスト|監視済|監視|watch|watched|watch_added|watchlist)$/i.test(s)) return 'watch_added';
+  if (/^(伝令ちゃん追加済|伝令ちゃん追加|伝令ちゃん|伝令|監視リスト追加済|監視リスト追加|監視リスト|監視済|監視|watch|watched|watch_added|watchlist)$/i.test(s)) return 'watch_added';
   if (/^(不必要|不要|なし|unnecessary|none|-|—)$/i.test(s)) return 'unnecessary';
   if (/^(過去のまま放置|過去のまま|過去|放置|past|kept|legacy)$/i.test(s)) return 'past';
   if (/^(虚偽のまま放置|虚偽のまま|虚偽|嘘|false|false_kept|fake)$/i.test(s)) return 'false_kept';
@@ -6665,7 +6665,7 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.69 initialized');
+  console.log('[reviewcheck] v6.70 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
