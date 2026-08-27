@@ -8,6 +8,8 @@
   "sales": 120,
   "review": 100,
   "image": 80,
+  "selimg": 104,
+  "crop": 250,
   "status": 100,
   "tags": 97,
   "action": 90,
