@@ -150,6 +150,14 @@
       "label": "対応不要",
       "bg": "#eceff1",
       "fg": "#546e7a"
+    },
+    {
+      "key": "custom_1",
+      "icon": "🚫",
+      "label": "放置",
+      "bg": "#eceff1",
+      "fg": "#546e7a",
+      "custom": true
     }
   ]
 }
