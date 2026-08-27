@@ -1,4 +1,12 @@
 {
+  "removed": {
+    "type": [
+      "rank_ready",
+      "review_ready"
+    ],
+    "kind": [],
+    "reg": []
+  },
   "type": [
     {
       "key": "pending",
@@ -15,25 +23,11 @@
       "fg": "#3949ab"
     },
     {
-      "key": "rank_ready",
-      "icon": "🆗",
-      "label": "ランキング登録可能",
-      "bg": "#e1f5fe",
-      "fg": "#0277bd"
-    },
-    {
       "key": "rank_done",
       "icon": "⏳",
       "label": "ランキング済レビュー前",
       "bg": "#fce4ec",
       "fg": "#c2185b"
-    },
-    {
-      "key": "review_ready",
-      "icon": "📝",
-      "label": "レビュー登録可能",
-      "bg": "#e0f2f1",
-      "fg": "#00897b"
     },
     {
       "key": "acquired",
