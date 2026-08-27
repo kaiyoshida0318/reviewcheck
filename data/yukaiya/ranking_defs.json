@@ -1,0 +1,113 @@
+{
+  "type": [
+    {
+      "key": "pending",
+      "icon": "🎯",
+      "label": "獲得前"
+    },
+    {
+      "key": "watch_added",
+      "icon": "👁",
+      "label": "伝令ちゃん追加済"
+    },
+    {
+      "key": "rank_ready",
+      "icon": "🆗",
+      "label": "ランキング登録可能"
+    },
+    {
+      "key": "rank_done",
+      "icon": "⏳",
+      "label": "ランキング済レビュー前"
+    },
+    {
+      "key": "review_ready",
+      "icon": "📝",
+      "label": "レビュー登録可能"
+    },
+    {
+      "key": "acquired",
+      "icon": "✅",
+      "label": "獲得済"
+    },
+    {
+      "key": "past",
+      "icon": "📦",
+      "label": "過去のまま放置"
+    },
+    {
+      "key": "false_kept",
+      "icon": "⚠",
+      "label": "虚偽のまま放置"
+    },
+    {
+      "key": "remake",
+      "icon": "🔁",
+      "label": "再制作予定"
+    },
+    {
+      "key": "unnecessary",
+      "icon": "🚫",
+      "label": "不必要"
+    }
+  ],
+  "kind": [
+    {
+      "key": "realtime",
+      "icon": "🔥",
+      "label": "リアルタイム"
+    },
+    {
+      "key": "daily",
+      "icon": "⚡",
+      "label": "デイリー"
+    },
+    {
+      "key": "weekly",
+      "icon": "📆",
+      "label": "ウィークリー"
+    },
+    {
+      "key": "crown2",
+      "icon": "👑",
+      "label": "２冠"
+    },
+    {
+      "key": "crown3",
+      "icon": "👑",
+      "label": "３冠"
+    },
+    {
+      "key": "not_needed",
+      "icon": "🚫",
+      "label": "不要"
+    }
+  ],
+  "reg": [
+    {
+      "key": "unregistered",
+      "icon": "⏳",
+      "label": "把握前-正確な日時"
+    },
+    {
+      "key": "in_progress",
+      "icon": "🎨",
+      "label": "対応中-画像制作"
+    },
+    {
+      "key": "review",
+      "icon": "🔎",
+      "label": "対応中-画像反映確認"
+    },
+    {
+      "key": "registered",
+      "icon": "✓",
+      "label": "対応済-エビデンス付"
+    },
+    {
+      "key": "not_needed",
+      "icon": "🚫",
+      "label": "対応不要"
+    }
+  ]
+}
