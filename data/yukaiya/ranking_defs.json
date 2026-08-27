@@ -67,8 +67,8 @@
       "key": "unnecessary",
       "icon": "🚫",
       "label": "不必要",
-      "bg": "#ecf9f1",
-      "fg": "#546e70"
+      "bg": "#eceff1",
+      "fg": "#546e7a"
     }
   ],
   "kind": [
