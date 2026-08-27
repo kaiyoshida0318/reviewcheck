@@ -107,7 +107,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 52px; z-index: 30; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
 .toolbar-group { display: flex; align-items: center; gap: 8px; }
 /* v6.27: ランキングタイプフィルタグループはボタンが多くなったので折り返し可能に */
-.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.93: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
+.ranking-filter-group { flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }/* v6.94: 各フィルタ群を1行ずつ縦積みに(対応内容をランキングタイプの下へ) */
 .toolbar-label { font-size: 11px; color: var(--text3); font-weight: 500; }
 .search-input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); font-family: inherit; min-width: 220px; }
 .search-input:focus { outline: none; border-color: var(--accent); }
@@ -155,8 +155,8 @@ body.mode-diff .col-select { display: none; }
 .export-block-title { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; font-size: 11px; font-weight: 600; }
 .export-block-info .export-block-title { color: #1d9e75; }
 /* v6.37: 対応中ブロックのタイトル色 */
-/* v6.93: 選択商品の一括変更パネル(旧「◯◯に移動」ボタン3種を置き換え) */
-/* v6.93: 項目編集モーダル */
+/* v6.94: 選択商品の一括変更パネル(旧「◯◯に移動」ボタン3種を置き換え) */
+/* v6.94: 項目編集モーダル */
 .rd-group { margin-bottom: 16px; }
 .rd-group-title { font-size: 12px; font-weight: 700; color: var(--text2); padding: 6px 0 6px 2px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
 .rd-row { display: flex; align-items: center; gap: 6px; padding: 3px 2px; }
@@ -175,14 +175,14 @@ body.mode-diff .col-select { display: none; }
 .rd-mini:hover:not(:disabled) { background: #ebe9e3; color: var(--text); }
 .rd-mini:disabled { opacity: 0.3; cursor: default; }
 .rd-color { flex-shrink: 0; width: 30px; height: 26px; padding: 1px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; cursor: pointer; }
-/* v6.93: 配色パレット */
+/* v6.94: 配色パレット */
 .rd-palette { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 2px 0 8px 34px; padding: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; }
 .rd-chip { width: 30px; height: 26px; padding: 0; font-size: 10px; font-weight: 700; font-family: inherit; border: 1px solid; border-radius: 4px; cursor: pointer; transition: transform 0.08s; }
 .rd-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.18); }
 .rd-chip.current { outline: 2px solid #1976d2; outline-offset: 1px; }
 .rd-palette-custom { display: flex; align-items: center; gap: 4px; margin-left: auto; padding-left: 8px; }
 .rd-palette-label { font-size: 10px; color: var(--text3); }
-/* v6.93: コピー中バー */
+/* v6.94: コピー中バー */
 .rd-add { margin: 4px 0 0 34px; padding: 4px 12px; font-size: 11px; font-family: inherit; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px dashed var(--border2); border-radius: 4px; cursor: pointer; }
 .rd-add:hover { background: #eaf2fb; border-color: #1976d2; color: #0d47a1; }
 .rd-del:hover:not(:disabled) { background: #ffebee; border-color: #b71c1c; color: #b71c1c; }
@@ -226,7 +226,7 @@ body.mode-ranking .img-radio-band { display: flex; }
 .img-radio-band.img-radio-selected { background: #6a1b9a; border-color: #6a1b9a; color: #fff; font-weight: 700; }
 .img-radio-band.img-radio-selected:hover { background: #4a1370; border-color: #4a1370; }
 .img-radio-band.img-radio-selected .img-radio-dot { background: #fff; border-color: #fff; }
-/* v6.93: 「選択」帯の下の小さな説明リンク。帯と同じくランキング証拠用モードでのみ表示 */
+/* v6.94: 「選択」帯の下の小さな説明リンク。帯と同じくランキング証拠用モードでのみ表示 */
 .img-radio-help { display: none; width: 100%; margin-top: 2px; padding: 0; background: none; border: none; font-family: inherit; font-size: 9px; line-height: 1.4; color: var(--text3); text-decoration: underline; text-underline-offset: 1px; cursor: pointer; text-align: center; }
 body.mode-ranking .img-radio-help { display: block; }
 .img-radio-help:hover { color: #6a1b9a; }
@@ -318,7 +318,7 @@ body.mode-ranking .img-radio-help { display: block; }
 .product-table tbody tr.checked { background: #fafff8; }
 .product-table tbody tr.checked:hover { background: #f0f8ec; }
 .product-table .col-check { width: 90px; }
-/* v6.93: 更新日時列。既定は非表示、ランキング証拠用モードのみ表示。
+/* v6.94: 更新日時列。既定は非表示、ランキング証拠用モードのみ表示。
    ただし反映確認/対応済の固定幅レイアウトでは崩れ防止のため非表示にする。 */
 .product-table .col-updated { width: var(--col-updatedAt-w, 92px); font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text2); text-align: center; display: none; }
 body.mode-ranking .product-table .col-updated { display: table-cell; }
@@ -346,7 +346,7 @@ body.filter-placed .product-table .col-updated { display: none; }
 .product-table .col-crop { width: var(--col-crop-w, 292px); display: none; }
 body.filter-review .product-table .col-selimg,
 body.filter-review .product-table .col-crop { display: table-cell; }
-/* v6.93: 「選択画像の右下(拡大)」はランキング証拠用モードなら対応内容フィルタを問わず常に表示。
+/* v6.94: 「選択画像の右下(拡大)」はランキング証拠用モードなら対応内容フィルタを問わず常に表示。
    列の並び上、この列がいちばん右になる(状態/制作予定/確認 列はランキングモードでは非表示のため)。 */
 body.mode-ranking .product-table .col-crop { display: table-cell; }
 /* 反映確認フィルタ時はレビュー列・画像1〜3列を隠し、選択画像+右下拡大に置き換える */
@@ -357,9 +357,9 @@ body.filter-review .product-table .col-image { display: none; }
 body.filter-placed .product-table .col-crop { display: table-cell; }
 /* v6.51: 対応済では右下拡大を小さめ・左寄せにして横幅を抑える */
 body.filter-placed .product-table .col-crop { text-align: left; vertical-align: middle; }
-body.filter-placed .product-table .col-crop .crop-box { margin: 0; }   /* v6.93: 幅は列に追従 */
+body.filter-placed .product-table .col-crop .crop-box { margin: 0; }   /* v6.94: 幅は列に追従 */
 body.filter-placed .product-table .col-crop .crop-hint { display: none; }
-/* v6.93: 対応済フィルタの固定幅指定を撤廃。
+/* v6.94: 対応済フィルタの固定幅指定を撤廃。
    以前は「常に整った配置」のため各列幅をpx直打ちしていたが、
    そのせいで幅調整(ドラッグ/数値入力)がこの画面だけ効かなかった。
    他の画面と同じく CSS変数(--col-*-w)に従うようにする。 */
@@ -370,7 +370,7 @@ body.filter-placed .product-table .col-ranking { width: auto; }  /* 残りを吸
 .selimg-name { margin-top: 3px; font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; user-select: all; }
 .selimg-empty { font-size: 11px; color: var(--text3); }
 /* 右下だけを拡大表示するクロップ(日付の目視確認用) */
-/* v6.93: 列幅に合わせて100%で伸縮。高さは元の 268:88 の比率を保つ */
+/* v6.94: 列幅に合わせて100%で伸縮。高さは元の 268:88 の比率を保つ */
 .crop-box { width: 100%; aspect-ratio: 268 / 88; border: 2px solid #0d47a1; border-radius: 6px; overflow: hidden; background: #000; }
 .crop-inner { width: 100%; height: 100%; background-repeat: no-repeat; background-size: 370% auto; background-position: right bottom; }
 .crop-hint { margin-top: 3px; font-size: 10px; font-weight: 600; color: var(--text3); }
@@ -379,23 +379,26 @@ body.filter-placed .product-table .col-ranking { width: auto; }  /* 残りを吸
    収まらなければ右寄せ・先頭「…」省略で末尾(日付)を優先表示する。 */
 body.filter-review .product-table { table-layout: fixed; width: 100%; }
 body.filter-review .product-table .col-ranking { width: auto; }
-/* v6.48: すべてのランキング表示(ランキング証拠用モード)で、2行目(ランキング詳細)を
-   1行・右寄せにし、収まらなければ先頭「…」省略で末尾(日付)を右端に残す。 */
+/* v6.94: 閲覧モードのランキング詳細は省略せず、必要なだけ折り返して全文表示する。
+   (以前は1行固定 + 先頭「…」省略だったため、カテゴリ階層が読めなかった) */
+body.mode-ranking .product-table .col-ranking { white-space: normal; overflow: visible; text-overflow: clip; }
 body.mode-ranking .product-table .col-ranking .rank-detail {
   display: block;
   max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  direction: rtl;   /* 収まらない時は先頭(左)に「…」省略。文字順は保持 */
-  text-align: left; /* v6.93: 収まる時は左詰め(右側に隙間)。左の無駄な空きを解消 */
+  margin: 2px 0;
+  white-space: normal;      /* 折り返す */
+  overflow-wrap: anywhere;  /* 長いカテゴリ階層もきれいに割る */
+  word-break: break-word;
+  line-height: 1.45;
+  direction: ltr;
+  text-align: left;
 }
 /* v6.55: 編集モードでもランキングの2行目(詳細入力)を右寄せにする(末尾の日付が見えるように) */
-/* v6.93: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
+/* v6.94: 日時は専用欄に分離したため、ランキング詳細/日時の入力欄は通常の左寄せに戻す
    (右寄せだと短い文字で左に隙間ができ、バックスペースで先頭に戻れない問題を解消) */
 .bulk-ranking-cell input.bulk-edit-input,
 .bulk-ranking-cell textarea.bulk-edit-input { text-align: left; }
-/* 日時欄: プレースホルダ「日時」だけ薄く、入力した文字は通常のはっきりした黒(v6.93で修正) */
+/* 日時欄: プレースホルダ「日時」だけ薄く、入力した文字は通常のはっきりした黒(v6.94で修正) */
 /* v6.13: 列リサイズハンドル(ヘッダー右端の細い持ち手) */
 /* v6.14: 幅調整モード ON のときだけ操作可能。OFF時は非表示・不活性 */
 /* 注意: .product-table thead th は元々 position: sticky なので、ここで position を再指定しない */
@@ -407,7 +410,7 @@ body.resize-mode .col-resize-handle.dragging { background: rgba(191, 0, 0, 0.45)
 body.col-resizing { cursor: col-resize !important; user-select: none !important; }
 body.col-resizing * { cursor: col-resize !important; }
 /* 「↔ 幅調整」ボタンの ON 状態 */
-/* v6.93: 幅調整モード中、ヘッダー内で幅をpx直接入力できる欄 */
+/* v6.94: 幅調整モード中、ヘッダー内で幅をpx直接入力できる欄 */
 .col-width-input { display: none; width: 100%; max-width: 78px; box-sizing: border-box; margin-top: 6px; padding: 2px 3px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; text-align: center; color: #bf0000; background: #fff; border: 1px solid rgba(191,0,0,0.45); border-radius: 3px; cursor: text; }
 body.resize-mode .col-width-input { display: block; }
 .col-width-input:focus { outline: none; border-color: #bf0000; box-shadow: 0 0 0 2px rgba(191,0,0,0.15); }
@@ -430,14 +433,14 @@ body.bulk-edit-mode .product-table thead th { background: #eef4fb; }
 /* v6.26: 商品名セル下の「商品ページを開く」ボタン */
 .product-link-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); text-decoration: none !important; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
 .product-link-btn:hover { background: #bf0000; color: #fff !important; border-color: #bf0000; text-decoration: none !important; }
-/* v6.93: 商品名セルは 商品名 / 商品ページを開く / 商品URLをコピー を必ず縦3行に並べる。
+/* v6.94: 商品名セルは 商品名 / 商品ページを開く / 商品URLをコピー を必ず縦3行に並べる。
    閲覧モードでは商品名リンクがインラインのため、開くボタンが右隣に回り込んでいた。 */
 .product-table .col-name > a:not(.product-link-btn) { display: block; }
 .product-table .col-name .product-link-btn { display: flex; width: fit-content; }
 /* 一括編集モード時は pointer-events:none を無効化(v6.15の設定を上書き) */
 body.bulk-edit-mode .col-name .product-link-btn { pointer-events: auto; color: var(--text2); }
 body.bulk-edit-mode .col-name .product-link-btn:hover { color: #fff !important; }
-/* v6.93: 商品名セル下の「商品URLをコピー」ボタン(商品ページを開くの直下に別行で並ぶ) */
+/* v6.94: 商品名セル下の「商品URLをコピー」ボタン(商品ページを開くの直下に別行で並ぶ) */
 .product-copy-btn { display: flex; width: fit-content; align-items: center; gap: 4px; margin-top: 4px; padding: 4px 10px; font-size: 11px; font-weight: 600; font-family: inherit; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.1s; white-space: nowrap; }
 .product-copy-btn:hover { background: #1976d2; color: #fff; border-color: #1976d2; }
 .product-copy-btn.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
@@ -451,10 +454,10 @@ body.bulk-edit-mode .col-name .product-copy-btn { pointer-events: auto; }
 .bulk-edit-yearmonth { font-family: 'DM Mono', monospace; text-align: center; }
 /* v6.20: ランキングセル内の縦並びレイアウト(タイプ + 詳細 + 登録) */
 .bulk-ranking-cell { display: flex; flex-direction: column; gap: 4px; }
-/* v6.93: 状態とランキングタイプを横並び(2列)にして、その分ランキング詳細を2行に広げる */
+/* v6.94: 状態とランキングタイプを横並び(2列)にして、その分ランキング詳細を2行に広げる */
 .bulk-ranking-topline { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; min-width: 0; }
 .bulk-ranking-topline > select { min-width: 0; font-size: 10px; padding: 3px 4px; }
-/* v6.93: ランキング詳細は2行表示(カテゴリ階層が長いので1行だと切れる) */
+/* v6.94: ランキング詳細は2行表示(カテゴリ階層が長いので1行だと切れる) */
 .bulk-ranking-cell textarea.bulk-ranking-detail {
   width: 100%; box-sizing: border-box; padding: 4px 6px;
   font-size: 11px; line-height: 1.4; font-family: inherit;
@@ -475,7 +478,7 @@ body.bulk-edit-mode .col-name .product-copy-btn { pointer-events: auto; }
 /* v6.56: 獲得前（一部獲得済）(ライトグリーン系) */
 .bulk-ranking-type-select.ranking-type-pending-partial { background: #dcedc8; color: #558b2f; border-color: rgba(85,139,47,0.4); font-weight: 600; }
 /* v6.58: 状態 ランキング登録可能(水色) / ランキング済レビュー前(ピンク) / レビュー登録可能(ティール) */
-/* v6.93: 伝令ちゃん追加済(インディゴ系、獲得前と登録可能の間) */
+/* v6.94: 伝令ちゃん追加済(インディゴ系、獲得前と登録可能の間) */
 .bulk-ranking-type-select.ranking-type-watch-added { background: #e8eaf6; color: #3949ab; border-color: rgba(57,73,171,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-ready { background: #e1f5fe; color: #0277bd; border-color: rgba(2,119,189,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-done { background: #fce4ec; color: #c2185b; border-color: rgba(194,24,91,0.4); font-weight: 600; }
@@ -496,9 +499,9 @@ body.bulk-edit-mode .col-name .product-copy-btn { pointer-events: auto; }
 .bulk-ranking-reg-select.ranking-in-progress { background: #ffe0b2; color: #e65100; border-color: rgba(230,81,0,0.4); font-weight: 600; }
 /* v6.44: 対応中-画像反映確認 (紫系) */
 .bulk-ranking-reg-select.ranking-review { background: #f3e5f5; color: #7b1fa2; border-color: rgba(123,31,162,0.4); font-weight: 600; }
-/* v6.93: 対応不要(グレー・取り消し線。フローから外れたことが一目で分かるように) */
+/* v6.94: 対応不要(グレー・取り消し線。フローから外れたことが一目で分かるように) */
 .bulk-ranking-reg-select.ranking-not-needed { background: #eceff1; color: #546e7a; border-color: rgba(84,110,122,0.4); font-weight: 600; text-decoration: line-through; }
-/* v6.93: ユーザーが追加した項目。色はインラインstyleで当たるので装飾だけ揃える */
+/* v6.94: ユーザーが追加した項目。色はインラインstyleで当たるので装飾だけ揃える */
 .bulk-ranking-type-select.rd-custom,
 .bulk-ranking-kind-select.rd-custom,
 .bulk-ranking-reg-select.rd-custom { font-weight: 600; }
@@ -545,7 +548,7 @@ body.bulk-edit-mode .col-name .product-copy-btn { pointer-events: auto; }
 .bulk-ranking-kind-select.ranking-kind-weekly { background: #ede7f6; color: #5e35b1; border-color: rgba(94,53,177,0.4); font-weight: 600; }
 .bulk-ranking-kind-select.ranking-kind-crown2 { background: #fff8e1; color: #f9a825; border-color: rgba(249,168,37,0.5); font-weight: 700; }
 .bulk-ranking-kind-select.ranking-kind-crown3 { background: #ffecb3; color: #ff6f00; border-color: rgba(255,111,0,0.5); font-weight: 700; }
-/* v6.93: ランキングタイプ「不要」(グレー・取り消し線) */
+/* v6.94: ランキングタイプ「不要」(グレー・取り消し線) */
 .bulk-ranking-kind-select.ranking-kind-not-needed { background: #eceff1; color: #546e7a; border-color: rgba(84,110,122,0.4); font-weight: 600; text-decoration: line-through; }
 .bulk-ranking-kind-select option.opt-kind-not-needed { background: #eceff1; color: #546e7a; font-weight: 600; }
 .bulk-ranking-kind-select option.opt-kind-realtime { background: #fff0f0; color: #c62828; font-weight: 600; }
@@ -573,7 +576,7 @@ body.bulk-edit-mode .col-name .product-copy-btn { pointer-events: auto; }
 .ranking-placed-badge.in-progress { background: #ffe0b2; color: #e65100; border: 1px solid rgba(230,81,0,0.3); }
 /* v6.44: 対応中-画像反映確認 バッジ(紫) */
 .ranking-placed-badge.review { background: #f3e5f5; color: #7b1fa2; border: 1px solid rgba(123,31,162,0.3); }
-/* v6.93: 対応不要 バッジ(グレー) */
+/* v6.94: 対応不要 バッジ(グレー) */
 .ranking-placed-badge.not-needed { background: #eceff1; color: #546e7a; border: 1px solid rgba(84,110,122,0.3); text-decoration: line-through; }
 /* 一括編集モード時、テーブルの元のイベント(リンク等)を無効化 */
 body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text-decoration: none; }
@@ -640,9 +643,9 @@ body.mode-ranking .col-diff-growth,
 body.mode-ranking .col-sales,
 body.mode-ranking .col-status,
 body.mode-ranking .col-tags,
-body.mode-ranking .col-yearmonth,/* v6.93: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
+body.mode-ranking .col-yearmonth,/* v6.94: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
 body.mode-ranking .col-action { display: none; }
-/* v6.93: 年月日は反映確認/対応済でも非表示にする(念のため明示) */
+/* v6.94: 年月日は反映確認/対応済でも非表示にする(念のため明示) */
 body.filter-review .product-table .col-yearmonth,
 body.filter-placed .product-table .col-yearmonth { display: none; }
 /* v6.17.2: ランキング証拠用モードではランキング列を折り返し表示(全文見えるように) */
@@ -945,7 +948,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v6.93</span>
+    <span class="build-date">v6.94</span>
     <div class="view-toggle">
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="件数再確認モード(画面上件数を入力してレビュー差を確認)">🔍 件数再確認</button>
@@ -959,7 +962,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
     <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
     <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
     <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
-    <!-- v6.93: 「商品番号・商品名」「売上反映」は ⚙ 各種設定 メニューへ移動(ヘッダーの混雑解消) -->
+    <!-- v6.94: 「商品番号・商品名」「売上反映」は ⚙ 各種設定 メニューへ移動(ヘッダーの混雑解消) -->
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
     <!-- v6.15: 一括編集モード切替(セッション限定) -->
@@ -999,7 +1002,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           </div>
           <div class="sidebar-list" id="sidebarTagList"></div>
         </div>
-        <!-- v6.93: カテゴリパネル表示トグルボタン -->
+        <!-- v6.94: カテゴリパネル表示トグルボタン -->
         <button class="filter-clear-btn" id="categoryToggleBtn" onclick="toggleCategoryPanel()" title="カテゴリで絞り込むパネルを表示/非表示">
           <span style="font-size:14px">🗂</span><span>カテゴリ</span>
         </button>
@@ -1012,7 +1015,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
           <span style="font-size:14px">📊</span><span>全レビュー</span>
         </button>
       </div>
-      <!-- 右列: カテゴリカード(縦長) — v6.93: 既定は非表示、カテゴリボタンで表示 -->
+      <!-- 右列: カテゴリカード(縦長) — v6.94: 既定は非表示、カテゴリボタンで表示 -->
       <div class="sidebar-col-right" id="sidebarColRight" style="display:none">
         <div class="sidebar">
           <div class="sidebar-header">
@@ -1033,7 +1036,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="toolbar-group">
           <input type="search" class="search-input" id="searchInput" placeholder="商品名・商品管理番号・商品番号で検索..." oninput="renderProducts()">
         </div>
-        <!-- v6.93: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
+        <!-- v6.94: 売上月の選択欄はUIから削除(salesMonthGroupは廃止) -->
         <!-- v6.19/v6.22: ランキング証拠用モード時のみ表示するランキングタイプフィルタ -->
         <!-- v6.22で刷新: 「入力済/入力前/不必要」→「デイリー/リアルタイム/不必要/未設定」 -->
         <!-- v6.57: 状態(旧タイプ) -->
@@ -1048,7 +1051,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="toolbar-group ranking-filter-group" id="rankingPlacedFilterGroup" style="display:none">
           <span class="toolbar-label">📍 対応内容:</span>
         </div>
-        <!-- v6.93: 選択商品の一括変更パネル。状態/ランキングタイプ/対応内容を好きな組み合わせでまとめて変更する -->
+        <!-- v6.94: 選択商品の一括変更パネル。状態/ランキングタイプ/対応内容を好きな組み合わせでまとめて変更する -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
           <div class="export-block export-block-bulk" id="exportBlockBulk">
             <div class="export-block-title">✏ 選択商品を一括変更 <span class="selected-count-badge" id="selectedCountBadge">0</span></div>
@@ -1161,7 +1164,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 </div>
 
-<!-- v6.93: 項目編集(状態/ランキングタイプ/対応内容)モーダル -->
+<!-- v6.94: 項目編集(状態/ランキングタイプ/対応内容)モーダル -->
 <div class="modal-overlay" id="rankingDefsModal">
   <div class="modal" style="max-width:620px">
     <h3>🏷 項目編集</h3>
@@ -1184,7 +1187,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
   </div>
 </div>
 
-<!-- v6.93: 画像の「選択」の説明モーダル -->
+<!-- v6.94: 画像の「選択」の説明モーダル -->
 <div class="modal-overlay" id="imgSelectHelpModal" onclick="if(event.target===this)closeImgSelectHelp()">
   <div class="modal" style="max-width:560px">
     <h3>画像の「<span class="imgsel-help-chip">◯ 選択</span>」について</h3>
@@ -1218,7 +1221,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="action-title"><span class="action-title-icon">🔑</span><span>楽天データ入力</span></div>
         <div class="action-desc">楽天アプリID・アクセスキー・店舗コード(shopCode)を入力します。GitHub PATを設定すると、複数PCでデータを共有できます。初回起動時は必ず設定してください。</div>
       </button>
-      <!-- v6.93: ヘッダーから移動 -->
+      <!-- v6.94: ヘッダーから移動 -->
       <button class="menu-action-btn" onclick="closeSetupMenuModal();openDataMenuModal()">
         <div class="action-title"><span class="action-title-icon">📋</span><span>商品番号・商品名</span></div>
         <div class="action-desc">CSVから商品番号・商品名などを一括で取り込みます。列のマッピングを指定して、商品管理番号をキーに既存データへ反映できます。エクスポートもここから行えます。</div>
@@ -1227,7 +1230,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
         <div class="action-title"><span class="action-title-icon">📊</span><span>売上反映</span></div>
         <div class="action-desc">楽天RMSの月別商品売上CSVをアップロードして、売上データを取り込みます。月はCSV内の表示期間から自動判定されます。取り込み済みの月の一覧・削除もここから。</div>
       </button>
-      <!-- v6.93: 項目編集 -->
+      <!-- v6.94: 項目編集 -->
       <button class="menu-action-btn" onclick="closeSetupMenuModal();openRankingDefsModal()">
         <div class="action-title"><span class="action-title-icon">🏷</span><span>項目編集</span></div>
         <div class="action-desc">「状態」「ランキングタイプ」「対応内容」の各項目のアイコン・名前・背景色・文字色・並び順を変更できます。並び順はフィルタのボタンとドロップダウンの両方に反映されます。設定はGitHubに保存され、全PCで共有されます(店舗別)。</div>
@@ -1617,7 +1620,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 <!-- JavaScript will be added in next step -->
 <script>
 // ─────────────────────────────────────────────────────
-// reviewcheck v6.93
+// reviewcheck v6.94
 // 楽天店舗向け：商品レビュー＆画像チェックツール
 // ─────────────────────────────────────────────────────
 
@@ -1679,7 +1682,7 @@ let productCache = {};
 let currentFilter = 'all';
 let currentCategory = 'all'; // サイドバーカテゴリ ('all' | '__unset__' | 'ih' | 'yoga' ...)
 let currentScoreBand = 'all'; // レビュー点数帯 ('all' | 'high' | 'mid' | 'low' | 'poor' | 'unrated')
-let currentStatusFilter = 'all'; // v6.93: 状態フィルタ ('all'=全体[デフォルト] | 'normal'=通常 | 'focus'=注目 | 'ignore'=無視 | 'retired'=引退済)
+let currentStatusFilter = 'all'; // v6.94: 状態フィルタ ('all'=全体[デフォルト] | 'normal'=通常 | 'focus'=注目 | 'ignore'=無視 | 'retired'=引退済)
 // インライン編集の保留変更 { code: { status?: 'focus'|'normal'|'ignore', tags?: { renewal, boost, boostPlan } } }
 let pendingEdits = {};
 let currentProductionTag = null; // 制作タグフィルタ ('renewal' | 'boost' | 'boostPlan' | null)
@@ -1695,7 +1698,7 @@ let currentRankingPlacedFilter = 'all';
 // v6.29: ランキング証拠用モードでのExcelエクスポート選択(セッション限定、リロードでリセット)
 let _selectedCodes = new Set();
 // ══════════════════════════════════════════════════════════════════════
-// v6.93: 楽天API エンドポイント管理
+// v6.94: 楽天API エンドポイント管理
 //   2026年の楽天ウェブサービス基盤刷新で、旧バージョン 20220601 が廃止された。
 //   （呼ぶと HTTP 400 {"error":"wrong_parameter","error_description":"API Configuration not found"}）
 //   新しい版が出たときに詰まないよう、候補を順に試して通った版を localStorage に記憶する。
@@ -1747,7 +1750,7 @@ async function _rakutenApiTryVersions(shop, params) {
   return { ok: false, status: 400, message: tried.join('  /  '), version: null };
 }
 
-// v6.93: パラメータ構成のフォールバック。
+// v6.94: パラメータ構成のフォールバック。
 //   将来 elements や sort が廃止されても止まらないよう、段階的に削って再試行する。
 //   通った構成は _rakutenParamMode に記憶し、以降のページでは無駄な再試行をしない。
 //     full       … sort + elements あり(通常)
@@ -1917,7 +1920,7 @@ async function saveToGitHub(opts = {}) {
         if (rest.status === 'watch') rest.status = 'normal';
         cleanCache[k] = rest;
       }
-      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.93' };
+      const payload = { productCache: cleanCache, monthlySales, savedAt: new Date().toISOString(), version: 'v6.94' };
       // v6.6: GitHub Actions が記録した lastAutoFetch は手動保存時も保持する
       if (existingLastAutoFetch) payload.lastAutoFetch = existingLastAutoFetch;
       const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -2092,7 +2095,7 @@ async function fetchAllProductInfo() {
   let totalFetched = 0;
   let newCount = 0;
   let updateCount = 0;
-  let fetchError = null;   // v6.93: APIエラーの内容(nullなら成功)
+  let fetchError = null;   // v6.94: APIエラーの内容(nullなら成功)
 
   _lockUI('楽天APIから商品データを取得中...<br>1.2秒間隔のため時間がかかります。', { pct: 0 });
 
@@ -2116,7 +2119,7 @@ async function fetchAllProductInfo() {
         continue;
       }
       if (!r.ok) {
-        // v6.93: 以前はここで黙って break していたため、失敗しても「取得完了！」と出て気づけなかった
+        // v6.94: 以前はここで黙って break していたため、失敗しても「取得完了！」と出て気づけなかった
         fetchError = r.message || ('HTTP ' + r.status);
         console.error('[reviewcheck] API error:', fetchError);
         break;
@@ -2187,9 +2190,9 @@ async function fetchAllProductInfo() {
             lastFetched: new Date().toISOString(),
             itemNumber: null,
             reviewHistory: { [today]: newReviewCount },
-            rankingRegistered: false, // v6.93: 新規商品は「把握前-正確な日時」で登録
-            rankingType: 'pending',   // v6.93: 状態の未設定は廃止 → 獲得前
-            rankingKind: 'not_needed', // v6.93: ランキングタイプの未設定は廃止 → 不要
+            rankingRegistered: false, // v6.94: 新規商品は「把握前-正確な日時」で登録
+            rankingType: 'pending',   // v6.94: 状態の未設定は廃止 → 獲得前
+            rankingKind: 'not_needed', // v6.94: ランキングタイプの未設定は廃止 → 不要
           };
         } else {
           updateCount++;
@@ -2230,7 +2233,7 @@ async function fetchAllProductInfo() {
   _unlockUI();
   renderProducts();
 
-  // v6.93: 1件も取れずにエラーで終わったときは、成功メッセージを出さず原因をはっきり伝える
+  // v6.94: 1件も取れずにエラーで終わったときは、成功メッセージを出さず原因をはっきり伝える
   if (fetchError && totalFetched === 0) {
     alert('⚠ 楽天APIからの取得に失敗しました。データは変更されていません。\n\n' +
       '【エラー内容】\n' + fetchError + '\n\n' +
@@ -2403,7 +2406,7 @@ async function diagnoseFetchAll() {
     html += `</div>`;
     html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「📥 商品データ取得」で再取得してください</div>`;
   }
-  // v6.93: API取得が0件 or エラーありのときは「古いデータ」判定を信用してはいけない。
+  // v6.94: API取得が0件 or エラーありのときは「古いデータ」判定を信用してはいけない。
   //   (バージョン廃止で全滅したとき、全商品が「古いデータ」に見えて全消しできてしまう事故を防ぐ)
   const apiTrustworthy = (apiArr.length > 0 && errors.length === 0);
   if (orphanInCache.length > 0 && !apiTrustworthy) {
@@ -2644,7 +2647,7 @@ function renderProducts() {
     const isRetired = status === 'retired';
     const isFocus = status === 'focus';
     if (currentStatusFilter === 'all') {
-      // v6.93: 「全体」モード(デフォルト): 状態で絞り込まない(すべて表示)
+      // v6.94: 「全体」モード(デフォルト): 状態で絞り込まない(すべて表示)
     } else if (currentStatusFilter === 'ignore') {
       if (!isIgnored) return false; // 「無視」モード: 無視のみ表示
     } else if (currentStatusFilter === 'retired') {
@@ -2672,19 +2675,19 @@ function renderProducts() {
       const hay = (code + ' ' + (p.name || '') + ' ' + (p.itemNumber || '')).toLowerCase();
       if (!hay.includes(search)) return false;
     }
-    // v6.93: 状態フィルタ(rankingType)。未設定は「獲得前」に寄せて判定
+    // v6.94: 状態フィルタ(rankingType)。未設定は「獲得前」に寄せて判定
     if (tableMode === 'ranking' && currentRankingFilter !== 'all') {
-      const t = p.rankingType || 'pending';   // v6.93: 未設定は「獲得前」
+      const t = p.rankingType || 'pending';   // v6.94: 未設定は「獲得前」
       if (t !== currentRankingFilter) return false;
     }
-    // v6.93: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
+    // v6.94: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
     if (tableMode === 'ranking' && currentRankingKindFilter !== 'all') {
-      const k = p.rankingKind || 'not_needed';   // v6.93: 未設定は「不要」
+      const k = p.rankingKind || 'not_needed';   // v6.94: 未設定は「不要」
       if (k !== currentRankingKindFilter) return false;
     }
     // v6.20/v6.22/v6.37: ランキング登録状況フィルタ(rankingRegistered 4状態)
     if (tableMode === 'ranking' && currentRankingPlacedFilter !== 'all') {
-      // v6.93: 項目定義から動的に判定(ユーザー追加項目にも対応)。未設定は「把握前」扱い
+      // v6.94: 項目定義から動的に判定(ユーザー追加項目にも対応)。未設定は「把握前」扱い
       const wantDef = _rdByFilterKey('reg', currentRankingPlacedFilter);
       if (!wantDef) return false;
       if (_rdRegKeyFromValue(p.rankingRegistered) !== wantDef.key) return false;
@@ -2711,7 +2714,7 @@ function renderProducts() {
         break;
       }
       case 'updatedAt': {
-        // v6.93: ISO文字列は辞書順=時系列順(単純比較。localeCompareは記号の扱いが揺れるので使わない)
+        // v6.94: ISO文字列は辞書順=時系列順(単純比較。localeCompareは記号の扱いが揺れるので使わない)
         const ua = pa.updatedAt || '';
         const ub = pb.updatedAt || '';
         if (!ua && !ub) { cmp = 0; break; }
@@ -2963,7 +2966,7 @@ function renderSidebar() {
     else normalCount++; // 'normal' or undefined はすべて通常扱い
   }
   const statusDefs = [
-    { key: 'all',     label: '全体', icon: '🗂', count: codes.length },/* v6.93: 全状態を表示(初期選択) */
+    { key: 'all',     label: '全体', icon: '🗂', count: codes.length },/* v6.94: 全状態を表示(初期選択) */
     { key: 'normal',  label: '通常', icon: '👁', count: normalCount },
     { key: 'focus',   label: '注目', icon: '⭐', count: focusCount },
     { key: 'ignore',  label: '無視（非表示）', icon: '🙈', count: ignoredCount, divider: true },
@@ -3029,7 +3032,7 @@ function setStatusFilter(status) {
 // 左サイドバーのフィルタ選択を全部デフォルトに戻す
 function clearAllFilters() {
   currentScoreBand = 'all';
-  currentStatusFilter = 'all'; // v6.93: クリアで状態も「全体」に戻す
+  currentStatusFilter = 'all'; // v6.94: クリアで状態も「全体」に戻す
   currentProductionTag = null;
   currentCategory = 'all';
   // 検索ボックスもクリア
@@ -3067,7 +3070,7 @@ function setSidebarSort(mode) {
   document.getElementById('sidebarSortCount').classList.toggle('active', mode === 'count');
   renderSidebar();
 }
-// v6.93: カテゴリパネルの表示/非表示トグル
+// v6.94: カテゴリパネルの表示/非表示トグル
 function toggleCategoryPanel() {
   const panel = document.getElementById('sidebarColRight');
   const btn = document.getElementById('categoryToggleBtn');
@@ -3246,7 +3249,7 @@ function deleteSalesMonth(ym) {
 
 // ツールバーの月選択ドロップダウンを更新
 function _refreshSalesMonthSelect() {
-  // v6.93: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
+  // v6.94: ツールバーの売上月セレクタは廃止。要素が無ければ何もしない。
   const group = document.getElementById('salesMonthGroup');
   const sel = document.getElementById('salesMonthSelect');
   if (!group || !sel) return;
@@ -3402,13 +3405,13 @@ function _renderTableRow(code) {
     const vRanking    = p.ranking || '';
     const vYearMonth  = p.yearMonth || '';
     // v6.57: 4フィールド構造 (状態=rankingType / ランキングタイプ=rankingKind / ranking / 対応内容=rankingRegistered)
-    const vType = p.rankingType || 'pending';   // v6.93: 状態。未設定は「獲得前」
-    const typeCls = _rdSelCls('type', vType, 'pending');   // v6.93: 定義データから
-    const vKind = p.rankingKind || 'not_needed';   // v6.93: ランキングタイプ。未設定は「不要」
-    const kindCls = _rdSelCls('kind', vKind, 'not_needed');   // v6.93: 定義データから
-    // v6.93: 対応内容は4状態のみ。未設定(null)は「把握前-正確な日時」として扱う
-    const regVal = _rdRegKeyFromValue(p.rankingRegistered);   // v6.93
-    const regCls = _rdSelCls('reg', regVal, 'unregistered');   // v6.93: 定義データから
+    const vType = p.rankingType || 'pending';   // v6.94: 状態。未設定は「獲得前」
+    const typeCls = _rdSelCls('type', vType, 'pending');   // v6.94: 定義データから
+    const vKind = p.rankingKind || 'not_needed';   // v6.94: ランキングタイプ。未設定は「不要」
+    const kindCls = _rdSelCls('kind', vKind, 'not_needed');   // v6.94: 定義データから
+    // v6.94: 対応内容は4状態のみ。未設定(null)は「把握前-正確な日時」として扱う
+    const regVal = _rdRegKeyFromValue(p.rankingRegistered);   // v6.94
+    const regCls = _rdSelCls('reg', regVal, 'unregistered');   // v6.94: 定義データから
     cellItemNumber = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="itemNumber" value="${_escape(vItemNumber)}" onchange="onBulkEditChange(this)" placeholder="—">`;
     // v6.26: 一括編集モードでも商品名下に「商品ページを開く」ボタン
     cellName       = `<input type="text" class="bulk-edit-input" data-code="${_escape(code)}" data-field="name" value="${_escape(vName)}" onchange="onBulkEditChange(this)" placeholder="—">
@@ -3436,10 +3439,10 @@ function _renderTableRow(code) {
     cellName       = `<a href="${_escape(itemUrl)}" target="_blank" rel="noopener">${_escape(p.name || '(商品名未取得)')}</a>
       <a class="product-link-btn" href="${_escape(itemUrl)}" target="_blank" rel="noopener" title="楽天の商品ページを新規タブで開く">🛒 商品ページを開く</a>
       <button type="button" class="product-copy-btn" data-url="${_escape(itemUrl)}" onclick="copyProductUrl(this)" title="商品URLをクリップボードにコピー">📋 商品URLをコピー</button>`;
-    // v6.93: バッジは項目定義(rankingDefs)から生成
+    // v6.94: バッジは項目定義(rankingDefs)から生成
     const typeBadge = _rdBadge('type', p.rankingType, 'pending', 'ranking-type-badge');
     const kindBadge = _rdBadge('kind', p.rankingKind, 'not_needed', 'ranking-kind-badge');
-    const _regKey = _rdRegKeyFromValue(p.rankingRegistered);   // v6.93
+    const _regKey = _rdRegKeyFromValue(p.rankingRegistered);   // v6.94
     const regBadge = _rdBadge('reg', _regKey, 'unregistered', 'ranking-placed-badge');
     // 状態 / ランキングタイプ / ランキング詳細 / 対応内容 を縦に並べる
     const parts = [];
@@ -3752,7 +3755,7 @@ function _loadTableMode() {
 function setRankingFilter(filter) {
   const valid = ['all'].concat(_rdList('type').map(d => d.key));
   if (!valid.includes(filter)) filter = 'all';
-  // v6.93: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.94: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingFilter && filter !== 'all') filter = 'all';
   currentRankingFilter = filter;
   // ボタン active 状態
@@ -3765,7 +3768,7 @@ function setRankingFilter(filter) {
 function setRankingKindFilter(filter) {
   const valid = ['all'].concat(_rdList('kind').map(d => d.key));
   if (!valid.includes(filter)) filter = 'all';
-  // v6.93: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.94: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingKindFilter && filter !== 'all') filter = 'all';
   currentRankingKindFilter = filter;
   document.querySelectorAll('#rankingKindFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3778,7 +3781,7 @@ function setRankingPlacedFilter(filter) {
   // v6.37/v6.44: 'in_progress'(画像制作)・'review'(画像反映確認)を追加
   const valid = ['all'].concat(_rdList('reg').map(d => d.filterKey || d.key));
   if (!valid.includes(filter)) filter = 'all';
-  // v6.93: 同じボタンをもう一度押したら「全体」に戻す(トグル)
+  // v6.94: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingPlacedFilter && filter !== 'all') filter = 'all';
   currentRankingPlacedFilter = filter;
   document.querySelectorAll('#rankingPlacedFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -3790,11 +3793,11 @@ function setRankingPlacedFilter(filter) {
   _updateRankingExportBtnVisibility();
   renderProducts();
 }
-// v6.93: ランキング証拠用モードでの「選択商品を一括変更」パネルの表示制御
+// v6.94: ランキング証拠用モードでの「選択商品を一括変更」パネルの表示制御
 function _updateRankingExportBtnVisibility() {
   const btnGroup = document.getElementById('rankingExportGroup');
   if (!btnGroup) return;
-  // v6.93: フィルタごとの出し分けを廃止。ランキング証拠用モードなら常に一括変更パネルを表示する
+  // v6.94: フィルタごとの出し分けを廃止。ランキング証拠用モードなら常に一括変更パネルを表示する
   //   (どのフィルタからでも、任意の項目へまとめて変更できるようにしたため)
   btnGroup.style.display = (tableMode === 'ranking') ? '' : 'none';
   _syncBulkApplyUI();
@@ -3858,7 +3861,7 @@ function _passesBaseFiltersForCount(code, p, search) {
   }
   const status = p.status || 'normal';
   const isIgnored = status === 'ignore', isRetired = status === 'retired', isFocus = status === 'focus';
-  if (currentStatusFilter === 'all') { /* v6.93: 全体は状態で絞り込まない */ }
+  if (currentStatusFilter === 'all') { /* v6.94: 全体は状態で絞り込まない */ }
   else if (currentStatusFilter === 'ignore') { if (!isIgnored) return false; }
   else if (currentStatusFilter === 'retired') { if (!isRetired) return false; }
   else if (currentStatusFilter === 'focus') { if (!isFocus) return false; }
@@ -3876,25 +3879,25 @@ function _passesBaseFiltersForCount(code, p, search) {
   return true;
 }
 
-// v6.45/v6.57/v6.93: 状態(rfCount-*)・ランキングタイプ(rkCount-*)・対応内容(rpCount-*) 各ボタンの件数を更新
+// v6.45/v6.57/v6.94: 状態(rfCount-*)・ランキングタイプ(rkCount-*)・対応内容(rpCount-*) 各ボタンの件数を更新
 function _updateRankingFilterCounts() {
   const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   // 状態(rankingType)の件数
   const c = { all: 0 }; _rdList('type').forEach(d => { c[d.key] = 0; });
   // ランキングタイプ(rankingKind)の件数
   const k = { all: 0 }; _rdList('kind').forEach(d => { k[d.key] = 0; });
-  // v6.93: 対応内容(rankingRegistered)の件数
+  // v6.94: 対応内容(rankingRegistered)の件数
   const rp = { all: 0 }; _rdList('reg').forEach(d => { rp[d.filterKey || d.key] = 0; });
   for (const code of Object.keys(productCache)) {
     const p = productCache[code];
     if (!_passesBaseFiltersForCount(code, p, search)) continue;
     c.all++; k.all++; rp.all++;
-    // v6.93: 対応内容。未設定は「把握前」扱い。ただし「不必要」タイプは把握前に出さない(絞り込みと同じ条件)
-    // v6.93: 項目定義から動的に集計
+    // v6.94: 対応内容。未設定は「把握前」扱い。ただし「不必要」タイプは把握前に出さない(絞り込みと同じ条件)
+    // v6.94: 項目定義から動的に集計
     const regFk = _rdFilterKey('reg', _rdRegKeyFromValue(p.rankingRegistered));
     if (regFk === 'unplaced' && p.rankingType === 'unnecessary') { /* 不必要は把握前に出さない */ }
     else if (rp[regFk] !== undefined) rp[regFk]++;
-    // v6.93: 未設定は 状態=獲得前 / ランキングタイプ=不要 に寄せて数える
+    // v6.94: 未設定は 状態=獲得前 / ランキングタイプ=不要 に寄せて数える
     const t = p.rankingType || 'pending';
     if (c[t] !== undefined) c[t]++; else c.pending++;
     const kd = p.rankingKind || 'not_needed';
@@ -3974,9 +3977,9 @@ function _escape(s) {
   }[c]));
 }
 
-// v6.93: 状態/ランキングタイプの表示ラベル(横並びで見切れるため title に出す)
+// v6.94: 状態/ランキングタイプの表示ラベル(横並びで見切れるため title に出す)
 // ══════════════════════════════════════════════════════════════════════
-// v6.93: 状態 / ランキングタイプ / 対応内容 の項目定義。
+// v6.94: 状態 / ランキングタイプ / 対応内容 の項目定義。
 //   アイコン・名前・並び順だけをユーザーが編集でき、内部キー(key)と色クラスは固定。
 //   キーが変わらないので、名前を変えても既存データは一切壊れない。
 //   編集結果は data/{shopId}/ranking_defs.json に保存して全PCで共有する。
@@ -4045,7 +4048,7 @@ function _rdApplyConfig(cfg) {
           fg: _rdIsHex(item.fg) ? item.fg.toLowerCase() : base.fg,
         }));
       } else {
-        // v6.93: ユーザーが追加した項目。色はインラインstyleで当てるのでCSSクラスは汎用
+        // v6.94: ユーザーが追加した項目。色はインラインstyleで当てるのでCSSクラスは汎用
         const ck = String(item.key).slice(0, 40);
         out.push({
           key: ck,
@@ -4075,7 +4078,7 @@ function _rdToConfig() {
   }
   return out;
 }
-// v6.93: #rrggbb → rgba(r,g,b,a)。枠線色を文字色から作る
+// v6.94: #rrggbb → rgba(r,g,b,a)。枠線色を文字色から作る
 function _rdRgba(hex, a) {
   const m = /^#([0-9a-f]{6})$/i.exec(String(hex || ''));
   if (!m) return 'rgba(0,0,0,' + a + ')';
@@ -4095,7 +4098,7 @@ function _rdSelCls(group, key, fallbackKey) {
   const d = _rdFind(group, key) || _rdFind(group, fallbackKey);
   return d ? d.selCls : '';
 }
-// v6.93: 色は定義データからインラインstyleで当てる(CSSの太字/取り消し線はそのまま効く)
+// v6.94: 色は定義データからインラインstyleで当てる(CSSの太字/取り消し線はそのまま効く)
 function _rdStyle(group, key, fallbackKey, borderAlpha) {
   const d = _rdFind(group, key) || _rdFind(group, fallbackKey);
   if (!d || !d.bg || !d.fg) return '';
@@ -4116,7 +4119,7 @@ function _rdBadge(group, key, fallbackKey, baseCls) {
   return '<span class="' + baseCls + ' ' + d.badgeCls + '"' + st + ' title="' + _escape(d.label) + '">'
     + _escape(_rdText(group, d.key)) + '</span>';
 }
-// v6.93: 対応内容は保存値に true/false が混ざるので、定義キーとの変換を挟む
+// v6.94: 対応内容は保存値に true/false が混ざるので、定義キーとの変換を挟む
 //   registered ⇔ true / unregistered ⇔ false / それ以外はキーがそのまま保存値
 function _rdRegKeyFromValue(v) {
   if (v === true) return 'registered';
@@ -4135,7 +4138,7 @@ function _rdByFilterKey(group, fk) { return _rdList(group).find(d => (d.filterKe
 function _rankingTypeLabel(v) { return _rdText('type', v) || _rdText('type', 'pending'); }
 function _rankingKindLabel(v) { return _rdText('kind', v) || _rdText('kind', 'not_needed'); }
 
-// ══ v6.93: 上部フィルタのボタン群を項目定義から生成 ══
+// ══ v6.94: 上部フィルタのボタン群を項目定義から生成 ══
 function _renderRankingFilterButtons() {
   const specs = [
     { id: 'rankingFilterGroup',       group: 'type', prefix: 'rf', fn: 'setRankingFilter',       cur: currentRankingFilter },
@@ -4159,7 +4162,7 @@ function _renderRankingFilterButtons() {
   _updateRankingFilterCounts();
 }
 
-// ══ v6.93: 一括変更パネルの選択肢を項目定義から生成 ══
+// ══ v6.94: 一括変更パネルの選択肢を項目定義から生成 ══
 function _renderBulkApplySelects() {
   const specs = [
     { id: 'bulkApplyType', group: 'type', head: '📊 状態: 変更しない' },
@@ -4238,7 +4241,7 @@ function initRankingDefs() {
   } catch (e) {}
 }
 
-// ══ v6.93: 項目編集モーダル ══
+// ══ v6.94: 項目編集モーダル ══
 let _rdDraft = null;   // 編集中のコピー(保存するまで本体に反映しない)
 
 function openRankingDefsModal() {
@@ -4254,7 +4257,7 @@ function closeRankingDefsModal() {
   document.getElementById('rankingDefsModal').classList.remove('open');
   _rdDraft = null;
 }
-// v6.93: よく使う配色プリセット(背景/文字のセット)。クリック1回で両方決まる
+// v6.94: よく使う配色プリセット(背景/文字のセット)。クリック1回で両方決まる
 const RD_PALETTE = [
   { bg:'#fff9c4', fg:'#827717', name:'イエロー' },
   { bg:'#fff3cd', fg:'#6d4c00', name:'アンバー' },
@@ -4336,7 +4339,7 @@ function _renderRankingDefsForm() {
   }
   box.innerHTML = html;
 }
-// v6.93: 項目を1つ追加(末尾に入る)。内部キーは custom_1, custom_2 … で自動採番
+// v6.94: 項目を1つ追加(末尾に入る)。内部キーは custom_1, custom_2 … で自動採番
 function _rdAddItem(group) {
   if (!_rdDraft || !_rdDraft[group]) return;
   const used = {};
@@ -4363,7 +4366,7 @@ function _rdAddItem(group) {
     if (last) { last.focus(); last.select(); }
   }, 0);
 }
-// v6.93: 追加した項目の削除。使用中の商品があるときは消さない(孤立データ防止)
+// v6.94: 追加した項目の削除。使用中の商品があるときは消さない(孤立データ防止)
 function _rdDeleteItem(group, idx) {
   if (!_rdDraft || !_rdDraft[group] || !_rdDraft[group][idx]) return;
   const d = _rdDraft[group][idx];
@@ -4413,7 +4416,7 @@ function _rdClearCopy() {
 function _rdEdit(group, idx, field, val, redraw) {
   if (!_rdDraft || !_rdDraft[group] || !_rdDraft[group][idx]) return;
   _rdDraft[group][idx][field] = val;
-  if (redraw) _renderRankingDefsForm();   // v6.93: 色見本を即時反映
+  if (redraw) _renderRankingDefsForm();   // v6.94: 色見本を即時反映
 }
 function _rdMove(group, idx, dir) {
   if (!_rdDraft || !_rdDraft[group]) return;
@@ -4459,7 +4462,7 @@ async function saveRankingDefs() {
   }
 }
 
-// v6.93: 画像の「選択」の説明モーダル
+// v6.94: 画像の「選択」の説明モーダル
 function openImgSelectHelp() {
   document.getElementById('imgSelectHelpModal').classList.add('open');
 }
@@ -4467,7 +4470,7 @@ function closeImgSelectHelp() {
   document.getElementById('imgSelectHelpModal').classList.remove('open');
 }
 
-// v6.93: 更新日時(updatedAt)。行を編集した瞬間の ISO 文字列を記録する。
+// v6.94: 更新日時(updatedAt)。行を編集した瞬間の ISO 文字列を記録する。
 function _touchUpdatedAt(code) {
   if (!code || !productCache[code]) return;
   const iso = new Date().toISOString();
@@ -4498,7 +4501,7 @@ function _fmtUpdatedAtFull(iso) {
   return '最終編集: ' + d.toLocaleString('ja-JP');
 }
 
-// v6.93: 商品URLをクリップボードにコピー
+// v6.94: 商品URLをクリップボードにコピー
 function copyProductUrl(btn) {
   const url = (btn && btn.dataset && btn.dataset.url) || '';
   if (!url) { _showToast('URLが取得できませんでした', 'error'); return; }
@@ -4653,7 +4656,7 @@ function toggleRowSelection(code, checked) {
 }
 
 
-// ══ v6.93: 選択商品の一括変更 ══════════════════════════════════════════
+// ══ v6.94: 選択商品の一括変更 ══════════════════════════════════════════
 // 「◯◯に移動」ボタン3種の代わりに、状態 / ランキングタイプ / 対応内容 を
 // 好きな組み合わせで、チェックした商品すべてに適用する。
 // 「変更しない」のままの項目は一切触らない(部分適用)。
@@ -4713,7 +4716,7 @@ function applyBulkRankingChange() {
       if ((p.rankingKind || null) !== v) { p.rankingKind = v; touched = true; }
     }
     if (rVal) {
-      const v = _rdRegValueFromKey(rVal);   // v6.93
+      const v = _rdRegValueFromKey(rVal);   // v6.94
       if (p.rankingRegistered !== v) { p.rankingRegistered = v; touched = true; }
       // 旧「対応中に移動」の挙動を継承: 画像制作に移すとき未選択なら画像2を既定選択
       if (v === 'in_progress' && p.selectedImageIdx == null) { p.selectedImageIdx = 2; touched = true; }
@@ -4802,7 +4805,7 @@ function clearRankingSelection() {
 
 function _updateSelectedCountBadge() {
   const count = _selectedCodes.size;
-  // v6.93: 一括変更パネルの件数バッジ + 適用ボタンの活性
+  // v6.94: 一括変更パネルの件数バッジ + 適用ボタンの活性
   const badge = document.getElementById('selectedCountBadge');
   if (badge) badge.textContent = count;
   _syncBulkApplyUI();
@@ -5049,7 +5052,7 @@ async function testApi() {
   status.className = 'modal-status info';
   status.textContent = '⏳ 接続テスト中...';
   try {
-    // v6.93: バージョン自動フォールバック付きの共通ヘルパーを使う
+    // v6.94: バージョン自動フォールバック付きの共通ヘルパーを使う
     const r = await _rakutenApiFetch({ appId, accessKey, shopCode }, `shopCode=${shopCode}&hits=1&format=json`);
     if (!r.ok) throw new Error(r.message || ('HTTP ' + r.status));
     const total = r.data.count || 0;
@@ -6491,7 +6494,7 @@ function attachColumnResizeHandles() {
     handle.title = '幅調整モードONの時にドラッグで幅調整';
     handle.addEventListener('mousedown', _onResizeMouseDown);
     th.appendChild(handle);
-    // v6.93: ドラッグが使いづらいので、幅を数値で直接入力できる欄をヘッダー内に置く
+    // v6.94: ドラッグが使いづらいので、幅を数値で直接入力できる欄をヘッダー内に置く
     const def = COLUMN_DEFS.find(c => c.id === colId);
     const winput = document.createElement('input');
     winput.type = 'number';
@@ -6532,7 +6535,7 @@ function toggleColumnResizeMode() {
   document.querySelectorAll('.col-resize-handle').forEach(h => {
     h.title = _resizeModeOn ? 'ドラッグで幅を変更' : '幅調整モードOFF';
   });
-  // v6.93: ONにしたタイミングで各ヘッダーの数値欄を現在値に合わせる
+  // v6.94: ONにしたタイミングで各ヘッダーの数値欄を現在値に合わせる
   if (_resizeModeOn) {
     _syncColWidthInputs(null, null);
     _showToast('ヘッダーの数値を直接入力しても幅を変えられます(↑↓キーも可)', 'info');
@@ -6580,7 +6583,7 @@ function onBulkEditChange(input) {
       input.value = newVal;
     }
   }
-  // v6.93: ランキング詳細は textarea になったので、Enterで入った改行は半角スペースに畳む
+  // v6.94: ランキング詳細は textarea になったので、Enterで入った改行は半角スペースに畳む
   //   (カテゴリ階層は1行のデータ。改行が混ざるとExcel出力や表示で崩れるため)
   if (field === 'ranking' && newVal) {
     const collapsed = newVal.replace(/\s*[\r\n]+\s*/g, ' ').trim();
@@ -6606,15 +6609,15 @@ function onRankingTypeChange(sel) {
   const code = sel.dataset.code;
   if (!code || !productCache[code]) return;
   // v6.57: 状態(rankingType)の新しい値
-  const newVal = _rdFind('type', sel.value) ? sel.value : 'pending';   // v6.93: 項目定義から検証
+  const newVal = _rdFind('type', sel.value) ? sel.value : 'pending';   // v6.94: 項目定義から検証
   const oldVal = productCache[code].rankingType || null;
   if (newVal === oldVal) return;
   productCache[code].rankingType = newVal;
   _touchUpdatedAt(code);
-  // v6.93: 項目定義から色クラスを当て直す(ユーザー追加項目にも対応)
+  // v6.94: 項目定義から色クラスを当て直す(ユーザー追加項目にも対応)
   _rdList('type').forEach(d => sel.classList.remove(d.selCls));
   sel.classList.remove('ranking-type-unset', 'rd-custom');
-  sel.setAttribute('style', _rdStyle('type', newVal, 'pending'));   // v6.93
+  sel.setAttribute('style', _rdStyle('type', newVal, 'pending'));   // v6.94
   sel.title = '状態: ' + _rankingTypeLabel(newVal);
   const _tCls = _rdSelCls('type', newVal, 'pending');
   if (_tCls) sel.classList.add(_tCls);
@@ -6627,14 +6630,14 @@ function onRankingTypeChange(sel) {
 function onRankingKindChange(sel) {
   const code = sel.dataset.code;
   if (!code || !productCache[code]) return;
-  const newVal = _rdFind('kind', sel.value) ? sel.value : 'not_needed';   // v6.93: 項目定義から検証
+  const newVal = _rdFind('kind', sel.value) ? sel.value : 'not_needed';   // v6.94: 項目定義から検証
   const oldVal = productCache[code].rankingKind || null;
   if (newVal === oldVal) return;
   productCache[code].rankingKind = newVal;
   _touchUpdatedAt(code);
   _rdList('kind').forEach(d => sel.classList.remove(d.selCls));
   sel.classList.remove('ranking-kind-unset', 'rd-custom');
-  sel.setAttribute('style', _rdStyle('kind', newVal, 'not_needed'));   // v6.93
+  sel.setAttribute('style', _rdStyle('kind', newVal, 'not_needed'));   // v6.94
   sel.title = 'ランキングタイプ: ' + _rankingKindLabel(newVal);
   const _kCls = _rdSelCls('kind', newVal, 'not_needed');
   if (_kCls) sel.classList.add(_kCls);
@@ -6643,12 +6646,12 @@ function onRankingKindChange(sel) {
 }
 
 // v6.22/v6.37: rankingRegistered の変更ハンドラ
-// v6.93: 4状態 false (把握前) / 'in_progress' (画像制作) / 'review' (反映確認) / true (対応済)
+// v6.94: 4状態 false (把握前) / 'in_progress' (画像制作) / 'review' (反映確認) / true (対応済)
 //        「未設定(null)」は廃止し、常に「把握前」を既定とする
 function onRankingRegisteredChange(sel) {
   const code = sel.dataset.code;
   if (!code || !productCache[code]) return;
-  // v6.93: 項目定義から動的に(ユーザー追加項目にも対応)
+  // v6.94: 項目定義から動的に(ユーザー追加項目にも対応)
   const newKey = _rdFind('reg', sel.value) ? sel.value : 'unregistered';
   const newVal = _rdRegValueFromKey(newKey);
   const oldVal = productCache[code].rankingRegistered;
@@ -6658,7 +6661,7 @@ function onRankingRegisteredChange(sel) {
   _touchUpdatedAt(code);
   _rdList('reg').forEach(d => sel.classList.remove(d.selCls));
   sel.classList.remove('ranking-reg-unset', 'rd-custom');
-  sel.setAttribute('style', _rdStyle('reg', newKey, 'unregistered'));   // v6.93
+  sel.setAttribute('style', _rdStyle('reg', newKey, 'unregistered'));   // v6.94
   sel.title = '対応内容: ' + _rdLabel('reg', newKey);
   const _rCls = _rdSelCls('reg', newKey, 'unregistered');
   if (_rCls) sel.classList.add(_rCls);
@@ -6670,7 +6673,7 @@ function onRankingRegisteredChange(sel) {
 // v6.20 互換: 旧 onRankingPlacedChange は onRankingRegisteredChange に転送(既存レンダリング後の変更を吸収)
 function onRankingPlacedChange(sel) { onRankingRegisteredChange(sel); }
 
-// ── v6.93: 幅の数値入力 ──
+// ── v6.94: 幅の数値入力 ──
 // 入力中(input)は範囲内のときだけ即反映。確定時(change/blur)に最小/最大へ丸める。
 function _onColWidthInput(e) {
   const el = e.currentTarget;
@@ -6777,7 +6780,7 @@ async function _onResizeMouseUp(e) {
   // 最終幅を _columnWidths に反映(mousemove では毎回書き込まないためここでまとめて)
   if (!_columnWidths) _columnWidths = _defaultColumnWidths();
   _columnWidths[s.colId] = s.pendingW;
-  _syncColWidthInputs(s.colId, null); // v6.93: ドラッグ結果を数値欄にも反映
+  _syncColWidthInputs(s.colId, null); // v6.94: ドラッグ結果を数値欄にも反映
 
   const handle = s.handle;
   if (handle) handle.classList.remove('dragging');
@@ -6788,7 +6791,7 @@ async function _onResizeMouseUp(e) {
   _scheduleColWidthSave();
 }
 
-// v6.93: ドラッグ / 数値入力の両方から呼ぶ共通の保存デバウンス(GitHub連打防止)
+// v6.94: ドラッグ / 数値入力の両方から呼ぶ共通の保存デバウンス(GitHub連打防止)
 function _scheduleColWidthSave() {
   if (_colWidthSaveTimer) clearTimeout(_colWidthSaveTimer);
   _colWidthSaveTimer = setTimeout(async () => {
@@ -7021,20 +7024,20 @@ async function init() {
   loadMonthlySalesCache();
   // v6.13: 列幅をローカルデフォルトで即適用(GitHub取得は非同期で上書き)
   initColumnWidths();
-  initRankingDefs();   // v6.93: 項目定義(localStorageキャッシュ)を先に適用
+  initRankingDefs();   // v6.94: 項目定義(localStorageキャッシュ)を先に適用
   if (localStorage.getItem('github_pat')) {
     _setSaveStatus('saving', '📥 GitHubから読込中...');
     await loadFromGitHub();
     // v6.13: 列幅設定もGitHubから読み込み
     await loadColumnWidthsFromGitHub();
-    await loadRankingDefsFromGitHub();   // v6.93
+    await loadRankingDefsFromGitHub();   // v6.94
     _setSaveStatus('saved');
   }
   // v6.22: 旧 rankingPlaced → 新 rankingRegistered に自動引き継ぎ
   _migrateRankingPlacedToRegistered();
-  _migrateRemoveRankingDateTime(); // v6.93
-  _migrateNullRegisteredToUnplaced(); // v6.93
-  _migrateNullTypeAndKind();          // v6.93
+  _migrateRemoveRankingDateTime(); // v6.94
+  _migrateNullRegisteredToUnplaced(); // v6.94
+  _migrateNullTypeAndKind();          // v6.94
   // v6.23: デフォルトで編集モードON → body class とボタンラベルを合わせる
   if (_bulkEditModeOn) {
     document.body.classList.add('bulk-edit-mode');
@@ -7046,28 +7049,28 @@ async function init() {
     }
   }
   _loadSalesMonth();
-  _renderRankingFilterButtons();   // v6.93: フィルタボタンを項目定義から生成
-  _renderBulkApplySelects();       // v6.93: 一括変更パネルの選択肢を生成
+  _renderRankingFilterButtons();   // v6.94: フィルタボタンを項目定義から生成
+  _renderBulkApplySelects();       // v6.94: 一括変更パネルの選択肢を生成
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
-  console.log('[reviewcheck] v6.93 initialized');
+  console.log('[reviewcheck] v6.94 initialized');
 }
 
 // v6.22: 旧 rankingPlaced (v6.20) を新 rankingRegistered (v6.22) に引き継ぎ
 // - 商品ごとに rankingRegistered が未設定 かつ rankingPlaced に値がある場合のみコピー
 // - 既に rankingRegistered が入っている商品は上書きしない(冪等)
 // - rankingPlaced は削除せず残しておく(誤爆時のロールバック用、次回保存で GitHub 側にも残る)
-// v6.93: rankingDateTime(ランキング欄の「日時」)を廃止。
+// v6.94: rankingDateTime(ランキング欄の「日時」)を廃止。
 //   どこからも参照されていない書き込み専用フィールドで、入っていた値も不要と確認済み。
 //   入力欄を消しただけだと保存JSONに残り続けるので、起動時に1回だけ掃除する。
 //   ※ 万一戻したくなった場合、GitHub のコミット履歴から復元できます。
-// v6.93: 対応内容が未設定(null/undefined/不正値)の商品を「把握前-正確な日時」(false)に統一する。
+// v6.94: 対応内容が未設定(null/undefined/不正値)の商品を「把握前-正確な日時」(false)に統一する。
 //   「未設定」という状態を廃止したため、データ側も揃えておく。
-// v6.93: 状態(rankingType)/ランキングタイプ(rankingKind)の「未設定」を廃止。
+// v6.94: 状態(rankingType)/ランキングタイプ(rankingKind)の「未設定」を廃止。
 //   状態の未設定 → 獲得前(pending) / ランキングタイプの未設定 → 不要(not_needed) に寄せる。
 function _migrateNullTypeAndKind() {
-  const validTypes = _rdList('type').map(d => d.key);   // v6.93: 項目定義から
+  const validTypes = _rdList('type').map(d => d.key);   // v6.94: 項目定義から
   const validKinds = _rdList('kind').map(d => d.key);
   let t = 0, k = 0;
   for (const p of Object.values(productCache || {})) {
@@ -7086,7 +7089,7 @@ function _migrateNullRegisteredToUnplaced() {
   let migrated = 0;
   for (const p of Object.values(productCache || {})) {
     if (!p || typeof p !== 'object') continue;
-    // v6.93: 項目定義にある値かどうかで判定
+    // v6.94: 項目定義にある値かどうかで判定
     const v = p.rankingRegistered;
     const valid = (v === true || v === false || (typeof v === 'string' && _rdFind('reg', v)));
     if (!valid) { p.rankingRegistered = false; migrated++; }
