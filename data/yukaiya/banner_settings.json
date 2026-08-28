@@ -29,13 +29,14 @@
           "lineHeight": 100,
           "maxLines": 1,
           "breakOn": "",
-          "dateFormat": "ymd_ja_dpad",
+          "letterSpacing": 0,
           "fontFamily": "小塚明朝 Pr6N",
           "gradOn": false,
           "gradColor2": "#a00000",
           "strokeOn": true,
           "strokeColor": "#ffffff",
-          "strokeWidth": 4
+          "strokeWidth": 4,
+          "dateFormat": "ymd_ja_dpad"
         },
         {
           "id": "unit",
@@ -54,13 +55,14 @@
           "lineHeight": 60,
           "maxLines": 1,
           "breakOn": "",
-          "dateFormat": "ymd_ja_dpad",
+          "letterSpacing": 0,
           "fontFamily": "小塚明朝 Pr6N",
           "gradOn": false,
           "gradColor2": "#a00000",
           "strokeOn": true,
           "strokeColor": "#ffffff",
-          "strokeWidth": 4
+          "strokeWidth": 4,
+          "dateFormat": "ymd_ja_dpad"
         },
         {
           "id": "date",
@@ -79,13 +81,14 @@
           "lineHeight": 22,
           "maxLines": 1,
           "breakOn": "",
-          "dateFormat": "ymd_ja_dpad",
+          "letterSpacing": 0,
           "fontFamily": "小塚明朝 Pr6N",
           "gradOn": false,
           "gradColor2": "#402818",
           "strokeOn": false,
           "strokeColor": "#ffffff",
-          "strokeWidth": 3
+          "strokeWidth": 3,
+          "dateFormat": "ymd_ja_dpad"
         },
         {
           "id": "avg",
@@ -104,13 +107,14 @@
           "lineHeight": 240,
           "maxLines": 1,
           "breakOn": "",
-          "dateFormat": "ymd_ja_dpad",
+          "letterSpacing": -4,
           "fontFamily": "小塚明朝 Pr6N",
           "gradOn": true,
-          "gradColor2": "#db2724",
+          "gradColor2": "#ec2727",
           "strokeOn": true,
           "strokeColor": "#ffffff",
-          "strokeWidth": 6
+          "strokeWidth": 6,
+          "dateFormat": "ymd_ja_dpad"
         }
       ],
       "sparkles": [
