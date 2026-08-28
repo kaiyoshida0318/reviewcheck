@@ -95,8 +95,8 @@
           "prefix": "",
           "suffix": "",
           "x": 370,
-          "y": 227,
-          "size": 270,
+          "y": 220,
+          "size": 280,
           "color": "#c80000",
           "align": "center",
           "weight": "bold",
@@ -142,7 +142,7 @@
         }
       ],
       "id": "p1",
-      "name": "既定"
+      "name": "4桁件数"
     }
   ]
 }
