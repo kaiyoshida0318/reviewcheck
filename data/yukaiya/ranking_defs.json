@@ -38,14 +38,14 @@
     },
     {
       "key": "past",
-      "icon": "📦",
+      "icon": "⛔",
       "label": "過去のまま放置",
       "bg": "#f3e8ff",
       "fg": "#6a1b9a"
     },
     {
       "key": "false_kept",
-      "icon": "⚠",
+      "icon": "⛔",
       "label": "虚偽のまま放置",
       "bg": "#ffebee",
       "fg": "#b71c1c"
