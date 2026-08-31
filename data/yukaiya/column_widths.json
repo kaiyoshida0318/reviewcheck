@@ -25,7 +25,7 @@
     "name": "left",
     "ranking": "left",
     "yearMonth": "center",
-    "sales": "left",
+    "sales": "center",
     "review": "center",
     "image": "center",
     "selimg": "center",
