@@ -20,8 +20,8 @@
   },
   "aligns": {
     "updatedAt": "center",
-    "code": "left",
-    "itemNumber": "left",
+    "code": "center",
+    "itemNumber": "center",
     "name": "center",
     "ranking": "left",
     "yearMonth": "center",
