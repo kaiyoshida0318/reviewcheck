@@ -35,7 +35,8 @@
       "icon": "✅",
       "label": "獲得済",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32"
+      "fg": "#2e7d32",
+      "sep": true
     },
     {
       "key": "past",
@@ -86,7 +87,8 @@
       "icon": "✅",
       "label": "変更完了",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32"
+      "fg": "#2e7d32",
+      "sep": true
     },
     {
       "key": "stale",
@@ -116,7 +118,8 @@
       "icon": "✅",
       "label": "変更完了",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32"
+      "fg": "#2e7d32",
+      "sep": true
     },
     {
       "key": "stale",
