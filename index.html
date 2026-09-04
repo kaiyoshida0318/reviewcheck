@@ -1263,7 +1263,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.90</span>
+    <span class="build-date">v7.91</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
@@ -6596,7 +6596,7 @@ const RANKING_DEF_GROUPS = [
 ];
 const RANKING_DEFS_DEFAULT = {
   type: [
-    { key:'pending',      icon:'🎯', label:'獲得前',               selCls:'ranking-type-pending',      optCls:'opt-type-pending',      badgeCls:'pending', bg:'#fff9c4', fg:'#827717' },
+    { key:'pending',      icon:'🎯', label:'伝令ちゃん追加前',       selCls:'ranking-type-pending',      optCls:'opt-type-pending',      badgeCls:'pending', bg:'#fff9c4', fg:'#827717' },
     { key:'watch_added',  icon:'👁', label:'伝令ちゃん追加済',       selCls:'ranking-type-watch-added',  optCls:'opt-type-watch-added',  badgeCls:'watch-added', bg:'#e8eaf6', fg:'#3949ab' },
     { key:'rank_ready',   icon:'🆗', label:'ランキング登録可能',     selCls:'ranking-type-rank-ready',   optCls:'opt-type-rank-ready',   badgeCls:'rank-ready', bg:'#e1f5fe', fg:'#0277bd' },
     { key:'rank_done',    icon:'⏳', label:'ランキング済レビュー前', selCls:'ranking-type-rank-done',    optCls:'opt-type-rank-done',    badgeCls:'rank-done', bg:'#fce4ec', fg:'#c2185b' },
@@ -6663,6 +6663,9 @@ function _rdCloneDefaults() {
 const RD_RENAMED_LABELS = {
   past:        { from: '過去のまま放置', to: '昔のまま放置' },
   unnecessary: { from: '不必要',        to: 'SKIP', icon: '⏭' },   // v7.87
+  // v7.90: 「獲得前」は伝令ちゃんに入れる前の状態なので名前をはっきりさせる。
+  //   from は複数書ける。手で「追加前」に直してあった場合もここで拾って合わせる。
+  pending:     { from: ['獲得前', '追加前'], to: '伝令ちゃん追加前' },
 };
 function _rdRenameOldDefaults(cfg) {
   if (!cfg) return cfg;
@@ -6670,10 +6673,14 @@ function _rdRenameOldDefaults(cfg) {
     if (!Array.isArray(cfg[g])) continue;
     for (const item of cfg[g]) {
       const r = item && RD_RENAMED_LABELS[item.key];
-      if (r && typeof item.label === 'string' && item.label.trim() === r.from) {
+      if (!r || typeof item.label !== 'string') continue;
+      // v7.90: from は文字列でも配列でもよい
+      const froms = Array.isArray(r.from) ? r.from : [r.from];
+      const cur = item.label.trim();
+      if (froms.indexOf(cur) >= 0) {
         item.label = r.to;
         if (r.icon) item.icon = r.icon;
-        console.log(`[rankingDefs] 旧名称を置き換え: ${r.from} → ${r.to}`);
+        console.log(`[rankingDefs] 旧名称を置き換え: ${cur} → ${r.to}`);
       }
     }
   }
