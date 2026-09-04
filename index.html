@@ -178,8 +178,8 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 /* v7.62: 一括変更パネルの選択欄はモードで出し分け
    1枚目作成用 = 状態 + ランキングタイプ / 2枚目作成用 = 状態 + 2枚目変更 */
 #bulkApplyTag, #bulkApplyTitle { display: none; }
-body.mode-diff #bulkApplyTag { display: inline-block; }
-body.mode-diff #bulkApplyKind { display: none; }
+body.mode-diff #bulkApplyTag , body.mode-third #bulkApplyTag { display: inline-block; }
+body.mode-diff #bulkApplyKind , body.mode-third #bulkApplyKind { display: none; }
 /* v7.62: タイトル修正用は 状態 + タイトル変更 */
 body.mode-title #bulkApplyTitle { display: inline-block; }
 body.mode-title #bulkApplyKind { display: none; }
@@ -274,14 +274,14 @@ body.mode-basic .col-select { display: none; }
 .image-count-badge { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 10px; background: #fff; color: #6a1b9a; font-size: 10px; font-weight: 700; min-width: 16px; text-align: center; }
 /* v6.31: 画像下の選択帯(画像と同じ幅、1枚目作成用モードのみ表示、CSSで制御) */
 .img-select-band { display: none; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 4px 0; font-size: 10px; text-align: center; background: #fff; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s; color: var(--text2); font-weight: 500; }
-body.mode-ranking .img-select-band , body.mode-third .img-select-band { display: block; }
+body.mode-ranking .img-select-band { display: block; }
 .img-select-band:hover { background: #f7f5f0; border-color: #b4b2a9; }
 /* v6.34: 選択済みは紫ベタ塗り+白字で視認性強化 */
 .img-select-band.img-selected { background: #6a1b9a; border-color: #6a1b9a; color: #fff; font-weight: 700; }
 .img-select-band.img-selected:hover { background: #4a1370; border-color: #4a1370; }
 /* v6.37: 画像下のラジオ式選択帯(商品ごとに1枚だけ選択)。1枚目作成用モードのみ表示 */
 .img-radio-band { display: none; box-sizing: border-box; width: 100%; margin-top: 4px; padding: 4px 0; font-size: 10px; text-align: center; background: #fff; border: 1.5px solid var(--border2); border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.1s; color: var(--text2); font-weight: 500; align-items: center; justify-content: center; gap: 5px; }
-body.mode-ranking .img-radio-band , body.mode-third .img-radio-band { display: flex; }
+body.mode-ranking .img-radio-band { display: flex; }
 /* v7.62: 画像の下に出す差し替え日 */
 .img-date { margin-top: 3px; font-family: 'DM Mono', monospace; font-size: 9px; line-height: 1.3; color: var(--text3); text-align: center; white-space: nowrap; }
 .img-date .img-date-empty { color: var(--border2); }
@@ -292,7 +292,7 @@ body.mode-ranking .img-radio-band , body.mode-third .img-radio-band { display: f
 .img-radio-band.img-radio-selected .img-radio-dot { background: #fff; border-color: #fff; }
 /* v7.62: 「選択」帯の下の小さな説明リンク。帯と同じく1枚目作成用モードでのみ表示 */
 .img-radio-help { display: none; width: 100%; margin-top: 2px; padding: 0; background: none; border: none; font-family: inherit; font-size: 9px; line-height: 1.4; color: var(--text3); text-decoration: underline; text-underline-offset: 1px; cursor: pointer; text-align: center; }
-body.mode-ranking .img-radio-help , body.mode-third .img-radio-help { display: block; }
+body.mode-ranking .img-radio-help { display: block; }
 .img-radio-help:hover { color: #6a1b9a; }
 /* 説明モーダルの中身 */
 .imgsel-help-list { margin: 10px 0 0; padding-left: 1.1em; font-size: 13px; line-height: 1.85; }
@@ -383,8 +383,8 @@ body.mode-ranking .img-radio-help , body.mode-third .img-radio-help { display: b
    ただし反映確認/対応済の固定幅レイアウトでは崩れ防止のため非表示にする。 */
 .product-table .col-updated { width: var(--col-updatedAt-w, 92px); font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text2); text-align: center; display: none; }
 /* v7.62: 更新日時は1枚目作成用と2枚目作成用で表示(基本モードは出さない) */
-body.mode-ranking .product-table .col-updated, body.mode-third .product-table .col-updated,
-body.mode-diff .product-table .col-updated { display: table-cell; }
+body.mode-ranking .product-table .col-updated,
+body.mode-diff .product-table .col-updated , body.mode-third .product-table .col-updated { display: table-cell; }
 /* v7.62: 年 / 月-日 / 時:分 の3行表示 */
 .product-table .col-updated .upd-year { display: block; line-height: 1.3; color: var(--text3); font-size: 9px; }
 .product-table .col-updated .upd-date { display: block; line-height: 1.3; font-weight: 600; color: var(--text2); }
@@ -500,7 +500,7 @@ body.mode-basic .col-make1 { display: none; }
 /* 「選択画像の右下(拡大)」は1枚目作成用モードで常に最右列に表示する
    (2枚目作成/2枚目変更/確認 列はランキングモードでは非表示のため、この列がいちばん右になる)。 */
 .product-table .col-crop { width: var(--col-crop-w, 292px); display: none; }
-body.mode-ranking .product-table .col-crop , body.mode-third .product-table .col-crop { display: table-cell; }
+body.mode-ranking .product-table .col-crop { display: table-cell; }
 .selimg-wrap { width: 84px; height: 84px; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #fff; cursor: pointer; }
 .selimg-name { margin-top: 3px; font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text2); word-break: break-all; user-select: all; }
 .selimg-empty { font-size: 11px; color: var(--text3); }
@@ -511,8 +511,8 @@ body.mode-ranking .product-table .col-crop , body.mode-third .product-table .col
 .crop-hint { margin-top: 3px; font-size: 10px; font-weight: 600; color: var(--text3); }
 /* v7.62: 閲覧モードのランキング詳細は省略せず、必要なだけ折り返して全文表示する。
    (以前は1行固定 + 先頭「…」省略だったため、カテゴリ階層が読めなかった) */
-body.mode-ranking .product-table .col-ranking , body.mode-third .product-table .col-ranking { white-space: normal; overflow: visible; text-overflow: clip; }
-body.mode-ranking .product-table .col-ranking .rank-detail , body.mode-third .product-table .col-ranking .rank-detail {
+body.mode-ranking .product-table .col-ranking { white-space: normal; overflow: visible; text-overflow: clip; }
+body.mode-ranking .product-table .col-ranking .rank-detail {
   display: block;
   max-width: 100%;
   margin: 2px 0;
@@ -847,26 +847,26 @@ body.mode-basic .col-diff-onscreen,
 body.mode-basic .col-diff-result,
 body.mode-basic .col-diff-growth { display: none; }
 /* 2枚目作成用モード: ランキング・年月を非表示、差異用3列は表示 */
-body.mode-diff .col-ranking,
+body.mode-diff .col-ranking, body.mode-third .col-ranking,
 /* v7.62: 2枚目作成用では1枚目作成列は使わないので出さない
    (1枚目作成用モードで2枚目作成列を隠しているのと同じ考え方) */
-body.mode-diff .col-make1,
-body.mode-diff .col-yearmonth { display: none; }
+body.mode-diff .col-make1, body.mode-third .col-make1,
+body.mode-diff .col-yearmonth , body.mode-third .col-yearmonth { display: none; }
 /* 1枚目作成用モード: 差異用3列・2枚目作成・2枚目変更・確認 を非表示、ランキング/年月は表示 */
 /* v6.17.1: 売上列も非表示に */
-body.mode-ranking .col-diff-onscreen, body.mode-third .col-diff-onscreen,
-body.mode-ranking .col-diff-result, body.mode-third .col-diff-result,
-body.mode-ranking .col-diff-growth, body.mode-third .col-diff-growth,
-body.mode-ranking .col-sales, body.mode-third .col-sales,
+body.mode-ranking .col-diff-onscreen,
+body.mode-ranking .col-diff-result,
+body.mode-ranking .col-diff-growth,
+body.mode-ranking .col-sales,
 /* v7.62: 1枚目作成用モードでは2枚目変更フィルタ自体を出さない */
-body.mode-ranking .tag-filter-row , body.mode-third .tag-filter-row { display: none; }
-body.mode-ranking .col-tags, body.mode-third .col-tags,
-body.mode-ranking .col-make2, body.mode-third .col-make2,
-body.mode-ranking .col-yearmonth, body.mode-third .col-yearmonth,/* v7.62: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
-body.mode-ranking .col-action , body.mode-third .col-action { display: none; }
+body.mode-ranking .tag-filter-row { display: none; }
+body.mode-ranking .col-tags,
+body.mode-ranking .col-make2,
+body.mode-ranking .col-yearmonth,/* v7.62: 年月日列は全画面で非表示(日時は各行のランキング欄に入力) */
+body.mode-ranking .col-action { display: none; }
 /* v6.17.2: 1枚目作成用モードではランキング列を折り返し表示(全文見えるように) */
 /* v6.17.3: 文字サイズを少し大きく(11px→13px) */
-body.mode-ranking .product-table .col-ranking , body.mode-third .product-table .col-ranking {
+body.mode-ranking .product-table .col-ranking {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -889,7 +889,7 @@ body.mode-ranking .product-table .col-ranking , body.mode-third .product-table .
 .product-table .table-img-cell { width: 90px; height: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; position: relative; }
 .product-table .table-img-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
 /* v6.55: 1枚目作成用モードでは3枚の画像の高さをそろえる(セルいっぱいに敷き詰める) */
-body.mode-ranking .product-table .table-img-cell img , body.mode-third .product-table .table-img-cell img { object-fit: cover; }
+body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .product-table .table-img-cell.empty { display: flex; align-items: center; justify-content: center; cursor: default; font-size: 9px; color: var(--text3); }
 .product-table .table-review { display: flex; flex-direction: column; gap: 2px; }
 .product-table .table-review-line1 { display: flex; align-items: center; gap: 4px; }
@@ -1191,7 +1191,7 @@ body.resize-mode .col-align-btns { display: flex; }
       <!-- v7.62: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
       <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="2枚目作成用モード(画面上件数を入力してレビュー差を確認し、2枚目を作る)">🔍 2枚目作成用</button>
-      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目作成用モード(中身は1枚目作成用と同じ)">🥉 3枚目作成用</button>
+      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目作成用モード(中身は2枚目作成用と同じ)">🥉 3枚目作成用</button>
       <button class="view-toggle-btn" id="modeToggleTitle" onclick="setTableMode('title')" title="タイトル修正用モード(楽天側の現在のタイトルを見ながら商品名を直す)">✏ タイトル修正用</button>
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
     </div>
@@ -3187,13 +3187,13 @@ function renderProducts() {
     }
     // v7.62: 状態フィルタ(rankingType)。未設定は「獲得前」に寄せて判定
     // v7.62: 状態フィルタは1枚目作成用・2枚目作成用・タイトル修正用で効かせる
-    if ((tableMode === 'ranking' || tableMode === 'third' || tableMode === 'diff' || tableMode === 'title') && currentRankingFilter !== 'all') {
+    if ((tableMode === 'ranking' || tableMode === 'diff' || tableMode === 'third' || tableMode === 'title') && currentRankingFilter !== 'all') {
       const t = p.rankingType || 'pending';   // v7.62: 未設定は「獲得前」
       if (t !== currentRankingFilter) return false;
     }
     // v7.62: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
     // v7.62: ランキングタイプは1枚目作成用とタイトル修正用で効かせる
-    if ((tableMode === 'ranking' || tableMode === 'third' || tableMode === 'title') && currentRankingKindFilter !== 'all') {
+    if ((tableMode === 'ranking' || tableMode === 'title') && currentRankingKindFilter !== 'all') {
       const k = p.rankingKind || 'not_needed';   // v7.62: 未設定は「不要」
       if (k !== currentRankingKindFilter) return false;
     }
@@ -6007,8 +6007,9 @@ function _loadViewMode() { /* removed in v6.4 */ }
 // ── テーブル表示モード(1枚目作成用/2枚目作成用/基本) ──
 // v6.17: 3モード対応。列の表示/非表示は body の class で CSS 制御。
 const TABLE_MODE_KEY = 'reviewcheck_table_mode';
-// v7.62: third(3枚目作成用)は ranking(1枚目作成用) と同じ見た目・同じ挙動。
+// v7.62: third(3枚目作成用)は diff(2枚目作成用)と同じ見た目・同じ挙動。
 //   列表示のCSSと、モードで分岐しているJSの条件に third を並べて足してある。
+//   将来3枚目だけ変えたくなったら、その行だけ third を外せばよい。
 const VALID_MODES = ['basic', 'diff', 'ranking', 'third', 'title'];
 // v7.62: モードID → 切替ボタンのid(2か所で同じ処理をしていたのでまとめた)
 const MODE_BTN_IDS = { basic: 'modeToggleBasic', diff: 'modeToggleDiff', ranking: 'modeToggleRanking', third: 'modeToggleThird', title: 'modeToggleTitle' };
@@ -6026,7 +6027,7 @@ function setTableMode(mode) {
   //   このモードは「入力済みの件数が多い商品から確認する」使い方なので、
   //   毎回ヘッダーを押し直す手間をなくす。
   //   同じモードを押し直したときは今の並びを尊重する(切り替えたときだけ適用)。
-  if (mode === 'diff' && tableMode !== 'diff') {
+  if ((mode === 'diff' || mode === 'third') && tableMode !== mode) {
     currentSortKey = 'onscreen';
     currentSortDir = 'desc';
   }
@@ -6046,7 +6047,7 @@ function _loadTableMode() {
   const saved = localStorage.getItem(TABLE_MODE_KEY);
   const mode = VALID_MODES.includes(saved) ? saved : 'basic';
   // v7.62: 起動時に2枚目作成用モードだったときも同じ並びで始める
-  if (mode === 'diff') {
+  if (mode === 'diff' || mode === 'third') {
     currentSortKey = 'onscreen';
     currentSortDir = 'desc';
   }
@@ -6088,7 +6089,7 @@ function _updateRankingExportBtnVisibility() {
   // v7.62: フィルタごとの出し分けを廃止。1枚目作成用モードなら常に一括変更パネルを表示する
   //   (どのフィルタからでも、任意の項目へまとめて変更できるようにしたため)
   // v7.62: 1枚目作成用と2枚目作成用の両方で「選択商品を一括変更」を出す
-  btnGroup.style.display = (tableMode === 'ranking' || tableMode === 'third' || tableMode === 'diff' || tableMode === 'title') ? '' : 'none';
+  btnGroup.style.display = (tableMode === 'ranking' || tableMode === 'diff' || tableMode === 'third' || tableMode === 'title') ? '' : 'none';
   _syncBulkApplyUI();
 }
 function _updateRankingFilterVisibility() {
@@ -6097,8 +6098,8 @@ function _updateRankingFilterVisibility() {
   // v7.62: 「状態」は1枚目作成用と2枚目作成用の両方で使う。
   //   「ランキングタイプ」は1枚目作成用だけ。
   //   表示していないフィルタは 'all' に戻す(見えない条件で絞られるのを避けるため)。
-  const showType = (tableMode === 'ranking' || tableMode === 'third' || tableMode === 'diff' || tableMode === 'title');
-  const showKind = (tableMode === 'ranking' || tableMode === 'third' || tableMode === 'title');
+  const showType = (tableMode === 'ranking' || tableMode === 'diff' || tableMode === 'third' || tableMode === 'title');
+  const showKind = (tableMode === 'ranking' || tableMode === 'title');
   if (group1) group1.style.display = showType ? '' : 'none';
   if (group3) group3.style.display = showKind ? '' : 'none';
   if (!showType && currentRankingFilter !== 'all') {
@@ -6998,8 +6999,8 @@ function toggleRowSelection(code, checked) {
 // v7.62: そのモードで実際に使う欄だけを対象にする
 //   (出ていない欄に値が残ったまま適用されるのを防ぐため、対象外は空に戻す)
 function _bulkApplyIdsForMode() {
-  if (tableMode === 'ranking' || tableMode === 'third') return ['bulkApplyType', 'bulkApplyKind'];
-  if (tableMode === 'diff')    return ['bulkApplyType', 'bulkApplyTag'];
+  if (tableMode === 'ranking') return ['bulkApplyType', 'bulkApplyKind'];
+  if (tableMode === 'diff' || tableMode === 'third') return ['bulkApplyType', 'bulkApplyTag'];
   if (tableMode === 'title')   return ['bulkApplyType', 'bulkApplyTitle'];
   return [];
 }
