@@ -69,6 +69,14 @@
       "fg": "#78716c"
     },
     {
+      "key": "__hot__",
+      "icon": "🔥",
+      "label": "獲得前-200以上",
+      "bg": "#fff0f0",
+      "fg": "#c62828",
+      "fixed": true
+    },
+    {
       "key": "changing",
       "icon": "🛠",
       "label": "変更中",
@@ -111,7 +119,15 @@
       "icon": "⬜",
       "label": "獲得前",
       "bg": "#f5f4ee",
-      "fg": "#78716c",
+      "fg": "#78716c"
+    },
+    {
+      "key": "__hot__",
+      "icon": "🔥",
+      "label": "獲得前-3件以上",
+      "bg": "#fff0f0",
+      "fg": "#c62828",
+      "fixed": true,
       "sep": true
     },
     {
