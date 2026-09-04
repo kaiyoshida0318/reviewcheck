@@ -201,10 +201,14 @@ body.mode-third .tag-filter-row { display: none; }
 body.mode-diff #bulkApplyTag { display: inline-block; }
 /* v7.87: 3枚目作成用は 状態 + 3枚目変更 */
 body.mode-third #bulkApplyThird { display: inline-block; }
-/* v7.87: 基本では「状態」を「1枚目変更」と呼ぶ(中身は同じ rankingType) */
-.lbl-first { display: none; }
-body.mode-basic .lbl-first { display: inline; }
-body.mode-basic .lbl-status { display: none; }
+/* v7.89: 「状態」は 基本 / 1枚目作成用 / 2枚目作成用 / 3枚目作成用 では
+   「🖼 1枚目変更」と呼ぶ(中身は同じ rankingType)。2枚目変更・3枚目変更と
+   名前をそろえて、3行を見比べられるようにするため。
+   「📊 状態:」のままにするのはタイトル修正用だけ。 */
+.lbl-status { display: none; }
+.lbl-first { display: inline; }
+body.mode-title .lbl-status { display: inline; }
+body.mode-title .lbl-first { display: none; }
 /* v7.87: 基本は 状態 + 2枚目変更 + 3枚目変更 */
 body.mode-basic #bulkApplyTag,
 body.mode-basic #bulkApplyThird { display: inline-block; }
@@ -1259,7 +1263,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.89</span>
+    <span class="build-date">v7.90</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
@@ -1359,7 +1363,7 @@ body.resize-mode .col-align-btns { display: flex; }
         </div>
         <!-- v6.57: ランキングタイプ(新規: リアルタイム/デイリー/ウィークリー/2冠/3冠) -->
         <div class="toolbar-group ranking-filter-group" id="rankingKindFilterGroup" style="display:none">
-          <span class="toolbar-label">🏆 ランキングタイプ:</span>
+          <span class="toolbar-label">🏆 ランクタイプ:</span>
         </div>
         <!-- v7.87: 2枚目変更フィルタ。「状態」の下に1行使って並べる
              (1枚目作成用モードではCSSで非表示) -->
@@ -1376,7 +1380,7 @@ body.resize-mode .col-align-btns { display: flex; }
             <div class="export-block-body">
               <select class="bulk-apply-select" id="bulkApplyType" onchange="_syncBulkApplyUI()" title="状態をまとめて変更">
               </select>
-              <select class="bulk-apply-select" id="bulkApplyKind" onchange="_syncBulkApplyUI()" title="ランキングタイプをまとめて変更">
+              <select class="bulk-apply-select" id="bulkApplyKind" onchange="_syncBulkApplyUI()" title="ランクタイプをまとめて変更">
               </select>
               <!-- v7.87: 2枚目作成用モードで出す欄。1枚目作成用ではランキングタイプが出る -->
               <!-- v7.87: タイトル修正用モードで出す欄 -->
@@ -1515,7 +1519,7 @@ body.resize-mode .col-align-btns { display: flex; }
       <button type="button" class="rd-size-btn" id="rdCompactBtn" onclick="toggleRankingDefsCompact()" title="小さくして、後ろの表を見ながら編集できるようにします">⇕ 小さく表示</button>
     </div>
     <p class="rd-help" style="font-size:12px;color:var(--text2);margin-bottom:14px">
-      <strong>状態(1枚目変更) / ランキングタイプ / 2枚目変更 / 3枚目変更</strong>の
+      <strong>1枚目変更(状態) / ランクタイプ / 2枚目変更 / 3枚目変更</strong>の
       <strong>アイコン / 名前 / 配色 / 並び順</strong>を変更できます。<br>
       <strong>-↓</strong> を押すと<strong>その行の下で区切られ</strong>、上部のフィルタでそこに縦線が入ります。<strong>1グループにつき2本まで</strong>引けます(3本目を押すと、いちばん上の区切りが外れます)。3つの行で同じ位置に線が来るので見比べやすくなります。<br>
       <span style="color:var(--text3)">※ 🔥 の項目は「絞り込み専用の内数」です。並べ替えと区切りだけ変えられ、名前・アイコン・配色は固定です。<br>
@@ -1584,7 +1588,7 @@ body.resize-mode .col-align-btns { display: flex; }
       <!-- v7.87: 項目編集 -->
       <button class="menu-action-btn" onclick="closeSetupMenuModal();openRankingDefsModal()">
         <div class="action-title"><span class="action-title-icon">🏷</span><span>項目編集</span></div>
-        <div class="action-desc">「状態」「ランキングタイプ」「対応内容」の各項目のアイコン・名前・背景色・文字色・並び順を変更できます。並び順はフィルタのボタンとドロップダウンの両方に反映されます。設定はGitHubに保存され、全PCで共有されます(店舗別)。</div>
+        <div class="action-desc">「1枚目変更(状態)」「ランクタイプ」「2枚目変更」「3枚目変更」の各項目のアイコン・名前・背景色・文字色・並び順を変更できます。並び順はフィルタのボタンとドロップダウンの両方に反映されます。設定はGitHubに保存され、全PCで共有されます(店舗別)。</div>
       </button>
       <!-- v6.13: 列幅設定 -->
       <button class="menu-action-btn" onclick="closeSetupMenuModal();openColWidthsModal()">
@@ -1724,11 +1728,11 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="edit-section-title" style="margin-top:18px">🏆 ランキング情報</div>
         <div class="edit-ranking-2col" style="margin-bottom:12px">
           <div class="modal-field" style="margin-bottom:0">
-            <label class="modal-label">状態</label>
+            <label class="modal-label">1枚目変更(状態)</label>
             <select class="modal-input" id="productEditRankingType"></select>
           </div>
           <div class="modal-field" style="margin-bottom:0">
-            <label class="modal-label">ランキングタイプ</label>
+            <label class="modal-label">ランクタイプ</label>
             <select class="modal-input" id="productEditRankingKind"></select>
           </div>
         </div>
@@ -4254,7 +4258,7 @@ function _renderTableRow(code) {
         <select class="bulk-ranking-type-select ${typeCls}" style="${_rdStyle('type', vType, 'pending')}" data-code="${_escape(code)}" onchange="onRankingTypeChange(this)" title="状態: ${_escape(_rankingTypeLabel(vType))}">
           ${_rdOptions('type', vType)}
         </select>
-        <select class="bulk-ranking-kind-select ${kindCls}" style="${_rdStyle('kind', vKind, 'not_needed')}" data-code="${_escape(code)}" onchange="onRankingKindChange(this)" title="ランキングタイプ: ${_escape(_rankingKindLabel(vKind))}">
+        <select class="bulk-ranking-kind-select ${kindCls}" style="${_rdStyle('kind', vKind, 'not_needed')}" data-code="${_escape(code)}" onchange="onRankingKindChange(this)" title="ランクタイプ: ${_escape(_rankingKindLabel(vKind))}">
           ${_rdOptions('kind', vKind)}
         </select>
         </div>
@@ -6586,7 +6590,7 @@ function _escape(s) {
 // ══════════════════════════════════════════════════════════════════════
 const RANKING_DEF_GROUPS = [
   { group: 'type',  title: '📊 状態 / 1枚目変更' },
-  { group: 'kind',  title: '🏆 ランキングタイプ' },
+  { group: 'kind',  title: '🏆 ランクタイプ' },
   { group: 'tag',   title: '🖼 2枚目変更' },
   { group: 'third', title: '🖼 3枚目変更' },
 ];
@@ -6856,7 +6860,7 @@ function _renderBulkApplySelects() {
   // v7.87: 基本モードでは表の列名に合わせて「1枚目変更」と表示する(中身は同じ rankingType)
   const specs = [
     { id: 'bulkApplyType', group: 'type', head: (tableMode === 'basic') ? '1枚目変更：変更しない' : '📊 状態: 変更しない' },
-    { id: 'bulkApplyKind', group: 'kind', head: '🏆 ランキングタイプ: 変更しない' },
+    { id: 'bulkApplyKind', group: 'kind', head: '🏆 ランクタイプ: 変更しない' },
   ];
   for (const sp of specs) {
     const el = document.getElementById(sp.id);
@@ -7572,7 +7576,7 @@ function applyBulkRankingChange() {
   }
   const parts = [];
   if (tVal) parts.push('　状態 → ' + (tVal === '__clear__' ? '未設定' : _rankingTypeLabel(tVal)));
-  if (kVal) parts.push('　ランキングタイプ → ' + (kVal === '__clear__' ? '未設定' : _rankingKindLabel(kVal)));
+  if (kVal) parts.push('　ランクタイプ → ' + (kVal === '__clear__' ? '未設定' : _rankingKindLabel(kVal)));
   if (gVal) parts.push('　2枚目変更 → ' + gSel.options[gSel.selectedIndex].textContent.trim());
   if (sVal) parts.push('　' + sSel.options[sSel.selectedIndex].textContent.trim());
   if (wVal) parts.push('　3枚目変更 → ' + wSel.options[wSel.selectedIndex].textContent.trim());
@@ -9862,7 +9866,7 @@ function onRankingKindChange(sel) {
   _rdList('kind').forEach(d => sel.classList.remove(d.selCls));
   sel.classList.remove('ranking-kind-unset', 'rd-custom');
   sel.setAttribute('style', _rdStyle('kind', newVal, 'not_needed'));   // v7.87
-  sel.title = 'ランキングタイプ: ' + _rankingKindLabel(newVal);
+  sel.title = 'ランクタイプ: ' + _rankingKindLabel(newVal);
   const _kCls = _rdSelCls('kind', newVal, 'not_needed');
   if (_kCls) sel.classList.add(_kCls);
   _flashCell(sel.closest('td'));
