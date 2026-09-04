@@ -13,9 +13,10 @@
     {
       "key": "pending",
       "icon": "✔",
-      "label": "追加前",
+      "label": "伝令ちゃん追加前",
       "bg": "#f5f4ee",
-      "fg": "#78716c"
+      "fg": "#78716c",
+      "sep": true
     },
     {
       "key": "watch_added",
@@ -60,12 +61,21 @@
       "icon": "✔",
       "label": "獲得前",
       "bg": "#f5f4ee",
-      "fg": "#78716c"
+      "fg": "#78716c",
+      "sep": true
+    },
+    {
+      "key": "__hot3__",
+      "icon": "🔥",
+      "label": "獲得前-3件以上",
+      "bg": "#fff0f0",
+      "fg": "#c62828",
+      "fixed": true
     },
     {
       "key": "__hot__",
       "icon": "🔥",
-      "label": "獲得前-200以上",
+      "label": "獲得前-上昇200%",
       "bg": "#fff0f0",
       "fg": "#c62828",
       "fixed": true
@@ -113,7 +123,8 @@
       "icon": "✔",
       "label": "獲得前",
       "bg": "#f5f4ee",
-      "fg": "#78716c"
+      "fg": "#78716c",
+      "sep": true
     },
     {
       "key": "__hot__",
