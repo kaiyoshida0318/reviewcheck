@@ -4,8 +4,9 @@
       "rank_ready",
       "review_ready"
     ],
-    "kind": [],
-    "reg": []
+    "tag": [],
+    "third": [],
+    "kind": []
   },
   "type": [
     {
@@ -38,8 +39,8 @@
     },
     {
       "key": "past",
-      "icon": "⛔",
-      "label": "過去のまま放置",
+      "icon": "📦",
+      "label": "昔のまま放置",
       "bg": "#f3e8ff",
       "fg": "#6a1b9a"
     },
@@ -51,18 +52,85 @@
       "fg": "#b71c1c"
     },
     {
-      "key": "remake",
-      "icon": "🔁",
-      "label": "再制作予定",
-      "bg": "#e0f2f1",
+      "key": "unnecessary",
+      "icon": "⏭",
+      "label": "SKIP",
+      "bg": "#eceff1",
+      "fg": "#546e7a"
+    }
+  ],
+  "tag": [
+    {
+      "key": "none",
+      "icon": "⬜",
+      "label": "獲得前",
+      "bg": "#f5f4ee",
+      "fg": "#78716c"
+    },
+    {
+      "key": "changing",
+      "icon": "🛠",
+      "label": "変更中",
+      "bg": "#fff3e0",
+      "fg": "#e65100"
+    },
+    {
+      "key": "enough",
+      "icon": "👍",
+      "label": "十分な件数",
+      "bg": "#e2f4f6",
       "fg": "#00838f"
     },
     {
-      "key": "unnecessary",
-      "icon": "🚫",
-      "label": "不必要",
-      "bg": "#eceff1",
-      "fg": "#546e7a"
+      "key": "skip",
+      "icon": "⏭",
+      "label": "SKIP",
+      "bg": "#e7f1fb",
+      "fg": "#1976d2"
+    },
+    {
+      "key": "changed",
+      "icon": "✅",
+      "label": "変更完了",
+      "bg": "#e8f5e9",
+      "fg": "#2e7d32"
+    },
+    {
+      "key": "stale",
+      "icon": "📦",
+      "label": "昔のまま放置",
+      "bg": "#fbeeee",
+      "fg": "#a32d2d"
+    }
+  ],
+  "third": [
+    {
+      "key": "none",
+      "icon": "⬜",
+      "label": "獲得前",
+      "bg": "#f5f4ee",
+      "fg": "#78716c"
+    },
+    {
+      "key": "skip",
+      "icon": "⏭",
+      "label": "SKIP",
+      "bg": "#e7f1fb",
+      "fg": "#1976d2"
+    },
+    {
+      "key": "changed",
+      "icon": "✅",
+      "label": "変更完了",
+      "bg": "#e8f5e9",
+      "fg": "#2e7d32"
+    },
+    {
+      "key": "stale",
+      "icon": "📦",
+      "label": "昔のまま放置",
+      "bg": "#fbeeee",
+      "fg": "#a32d2d"
     }
   ],
   "kind": [
@@ -105,51 +173,6 @@
       "key": "not_needed",
       "icon": "🚫",
       "label": "不要",
-      "bg": "#eceff1",
-      "fg": "#546e7a"
-    }
-  ],
-  "reg": [
-    {
-      "key": "unregistered",
-      "icon": "⏳",
-      "label": "把握前-正確な日時",
-      "bg": "#fff3cd",
-      "fg": "#6d4c00"
-    },
-    {
-      "key": "in_progress",
-      "icon": "🎨",
-      "label": "対応中-画像制作",
-      "bg": "#ffe0b2",
-      "fg": "#e65100"
-    },
-    {
-      "key": "review",
-      "icon": "🔎",
-      "label": "対応中-画像反映確認",
-      "bg": "#f3e5f5",
-      "fg": "#7b1fa2"
-    },
-    {
-      "key": "registered",
-      "icon": "✓",
-      "label": "対応済-エビデンス付",
-      "bg": "#e8f4fd",
-      "fg": "#0d47a1"
-    },
-    {
-      "key": "custom_1",
-      "icon": "🚫",
-      "label": "放置",
-      "bg": "#eceff1",
-      "fg": "#546e7a",
-      "custom": true
-    },
-    {
-      "key": "not_needed",
-      "icon": "🚫",
-      "label": "対応不要",
       "bg": "#eceff1",
       "fg": "#546e7a"
     }
