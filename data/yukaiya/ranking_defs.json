@@ -12,7 +12,7 @@
     {
       "key": "pending",
       "icon": "✔",
-      "label": "獲得前",
+      "label": "追加前",
       "bg": "#f5f4ee",
       "fg": "#78716c"
     },
