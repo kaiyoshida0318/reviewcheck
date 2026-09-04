@@ -55,8 +55,8 @@
       "key": "unnecessary",
       "icon": "⏭",
       "label": "SKIP",
-      "bg": "#eceff1",
-      "fg": "#546e7a"
+      "bg": "#e7f1fb",
+      "fg": "#1976d2"
     }
   ],
   "tag": [
@@ -82,13 +82,6 @@
       "fg": "#00838f"
     },
     {
-      "key": "skip",
-      "icon": "⏭",
-      "label": "SKIP",
-      "bg": "#e7f1fb",
-      "fg": "#1976d2"
-    },
-    {
       "key": "changed",
       "icon": "✅",
       "label": "変更完了",
@@ -101,6 +94,13 @@
       "label": "昔のまま放置",
       "bg": "#fbeeee",
       "fg": "#a32d2d"
+    },
+    {
+      "key": "skip",
+      "icon": "⏭",
+      "label": "SKIP",
+      "bg": "#e7f1fb",
+      "fg": "#1976d2"
     }
   ],
   "third": [
@@ -112,13 +112,6 @@
       "fg": "#78716c"
     },
     {
-      "key": "skip",
-      "icon": "⏭",
-      "label": "SKIP",
-      "bg": "#e7f1fb",
-      "fg": "#1976d2"
-    },
-    {
       "key": "changed",
       "icon": "✅",
       "label": "変更完了",
@@ -131,6 +124,13 @@
       "label": "昔のまま放置",
       "bg": "#fbeeee",
       "fg": "#a32d2d"
+    },
+    {
+      "key": "skip",
+      "icon": "⏭",
+      "label": "SKIP",
+      "bg": "#e7f1fb",
+      "fg": "#1976d2"
     }
   ],
   "kind": [
