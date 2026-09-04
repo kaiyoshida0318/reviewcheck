@@ -13,8 +13,8 @@
       "key": "pending",
       "icon": "🎯",
       "label": "獲得前",
-      "bg": "#fff9c4",
-      "fg": "#827717"
+      "bg": "#f5f4ee",
+      "fg": "#78716c"
     },
     {
       "key": "watch_added",
@@ -28,29 +28,22 @@
       "icon": "⏳",
       "label": "ランキング済レビュー前",
       "bg": "#fce4ec",
-      "fg": "#c2185b"
+      "fg": "#c2185b",
+      "sep": true
     },
     {
       "key": "acquired",
       "icon": "✅",
-      "label": "獲得済",
+      "label": "変更完了",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32",
-      "sep": true
+      "fg": "#2e7d32"
     },
     {
       "key": "past",
       "icon": "📦",
       "label": "昔のまま放置",
-      "bg": "#f3e8ff",
-      "fg": "#6a1b9a"
-    },
-    {
-      "key": "false_kept",
-      "icon": "⛔",
-      "label": "虚偽のまま放置",
-      "bg": "#ffebee",
-      "fg": "#b71c1c"
+      "bg": "#fbeeee",
+      "fg": "#a32d2d"
     },
     {
       "key": "unnecessary",
@@ -58,6 +51,13 @@
       "label": "SKIP",
       "bg": "#e7f1fb",
       "fg": "#1976d2"
+    },
+    {
+      "key": "false_kept",
+      "icon": "⛔",
+      "label": "虚偽のまま放置",
+      "bg": "#ffebee",
+      "fg": "#b71c1c"
     }
   ],
   "tag": [
@@ -80,15 +80,15 @@
       "icon": "👍",
       "label": "十分な件数",
       "bg": "#e2f4f6",
-      "fg": "#00838f"
+      "fg": "#00838f",
+      "sep": true
     },
     {
       "key": "changed",
       "icon": "✅",
       "label": "変更完了",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32",
-      "sep": true
+      "fg": "#2e7d32"
     },
     {
       "key": "stale",
@@ -111,15 +111,15 @@
       "icon": "⬜",
       "label": "獲得前",
       "bg": "#f5f4ee",
-      "fg": "#78716c"
+      "fg": "#78716c",
+      "sep": true
     },
     {
       "key": "changed",
       "icon": "✅",
       "label": "変更完了",
       "bg": "#e8f5e9",
-      "fg": "#2e7d32",
-      "sep": true
+      "fg": "#2e7d32"
     },
     {
       "key": "stale",
