@@ -81,14 +81,7 @@
       "icon": "🛠",
       "label": "変更中",
       "bg": "#fff3e0",
-      "fg": "#e65100"
-    },
-    {
-      "key": "enough",
-      "icon": "👍",
-      "label": "十分な件数",
-      "bg": "#e2f4f6",
-      "fg": "#00838f",
+      "fg": "#e65100",
       "sep": true
     },
     {
@@ -111,6 +104,13 @@
       "label": "SKIP",
       "bg": "#e7f1fb",
       "fg": "#1976d2"
+    },
+    {
+      "key": "enough",
+      "icon": "👍",
+      "label": "十分な件数",
+      "bg": "#e2f4f6",
+      "fg": "#00838f"
     }
   ],
   "third": [
