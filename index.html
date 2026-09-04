@@ -1259,7 +1259,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.88</span>
+    <span class="build-date">v7.89</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
@@ -5850,7 +5850,7 @@ function _growthPct(p) {
   const diff = (p.reviewCount || 0) - onScreen;
   return (diff / (onScreen === 0 ? 1 : onScreen)) * 100;
 }
-// v7.87: 「変更前-200以上」に当てはまるか(変更前 かつ 上昇率200%以上)
+// v7.88: 「獲得前-上昇200%」に当てはまるか(獲得前 かつ 上昇率200%以上)
 const GROWTH_HOT_MIN = 200;
 function _isHotUntouched(p) {
   if (!p || _getActiveTagKey(p.tags) !== '') return false;
@@ -6605,8 +6605,8 @@ const RANKING_DEFS_DEFAULT = {
   // v7.87: 2枚目変更。key 'none' は「何も付いていない状態」(データ上は tags={})
   tag: [
     // v7.87: 内数(絞り込み専用)。並べ替えと区切りだけ変えられる。名前・アイコン・配色は固定
-    { key:'__hot__',  icon:'🔥', label:'獲得前-200以上', bg:'#fff0f0', fg:'#c62828', fixed:true },
-    // v7.87: 件数差異での内数。上の「-200以上」と同じ扱い(絞り込み専用・名前と配色は固定)
+    { key:'__hot__',  icon:'🔥', label:'獲得前-上昇200%', bg:'#fff0f0', fg:'#c62828', fixed:true },
+    // v7.88: 件数差異での内数。上の「-上昇200%」と同じ扱い(絞り込み専用・名前と配色は固定)
     { key:'__hot3__', icon:'🔥', label:'獲得前-3件以上', bg:'#fff0f0', fg:'#c62828', fixed:true },
     { key:'none',     icon:'⬜', label:'獲得前',       bg:'#f5f4ee', fg:'#78716c' },
     { key:'changing', icon:'🛠', label:'変更中',       bg:'#fff3e0', fg:'#e65100' },
@@ -6712,7 +6712,13 @@ function _rdApplyConfig(cfg) {
       if (!base && !item.custom) continue;   // 既定にない & カスタム印もない = 未知キーなので無視
       seen[item.key] = true;
       if (base) {
-        out.push(Object.assign({}, base, {
+        // v7.88: fixed(内数)は名前・アイコン・配色を編集できない項目なので、
+        //   保存済みの値ではなく必ず本体の定義を使う。こうしておけば、あとで
+        //   名前を変えたときに古い保存データが残っていても勝手に巻き戻らない。
+        //   ユーザーが動かせるのは並び順と区切りだけ。
+        out.push(Object.assign({}, base, base.fixed ? {
+          sep: !!item.sep,
+        } : {
           sep: !!item.sep,   // v7.87: 区切り位置は保存された値を優先(既定の位置は上書きされる)
           icon: (typeof item.icon === 'string') ? item.icon.slice(0, 4) : base.icon,
           label: (typeof item.label === 'string' && item.label.trim()) ? item.label.trim().slice(0, 40) : base.label,
