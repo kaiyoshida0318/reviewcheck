@@ -888,10 +888,14 @@ body.mode-title .product-table .col-ranking {
 .curtitle-copy.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
 .curtitle-empty { font-size: 11px; color: var(--text3); }
 .curtitle-note { display: block; margin-top: 2px; font-size: 9px; color: var(--border2); }
-/* v7.87: ランキング欄の「伝令ちゃん」リンク */
-.denrei-btn { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-size: 10px; font-weight: 700; text-align: center; white-space: nowrap; color: #0d47a1; background: #eaf2fb; border: 1px solid #a8cbee; border-radius: var(--radius-sm); text-decoration: none !important; cursor: pointer; transition: all 0.1s; }
-.denrei-btn:hover { background: #0d47a1; color: #fff !important; border-color: #0d47a1; }
-body.bulk-edit-mode .col-ranking .denrei-btn { pointer-events: auto; }
+/* v7.88: ランキング欄の「伝令ちゃんを開く」リンク。見た目は商品名の下の
+   「🛒 商品ページを開く」(.product-link-btn)に合わせる。行の頭から始めたいので
+   親を display:block の1行にして、ボタン自体は中身の幅に収める。 */
+.denrei-btn-row { display: block; }
+.denrei-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); text-decoration: none !important; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.denrei-btn:hover { background: #0d47a1; color: #fff !important; border-color: #0d47a1; text-decoration: none !important; }
+body.bulk-edit-mode .col-ranking .denrei-btn { pointer-events: auto; color: var(--text2); }
+body.bulk-edit-mode .col-ranking .denrei-btn:hover { color: #fff !important; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 body.mode-title .title-status-select { display: block; }
@@ -1255,7 +1259,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.87</span>
+    <span class="build-date">v7.88</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
@@ -4254,7 +4258,7 @@ function _renderTableRow(code) {
           ${_rdOptions('kind', vKind)}
         </select>
         </div>
-        ${_renderDenreiBtn(code)}
+        ${_renderDenreiBtn(code, p)}
         ${_renderTitleStatusSelect(code, p.titleStatus)}
       </div>`;
     cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM-DD" title="年月日(2025-08-07 や 2025/8/7 など)、または年月まで(2025-08)">`;
@@ -4274,7 +4278,7 @@ function _renderTableRow(code) {
     const parts = [];
     if (typeBadge) parts.push(typeBadge);
     if (kindBadge) parts.push(kindBadge);
-    parts.push(_renderDenreiBtn(code));
+    parts.push(_renderDenreiBtn(code, p));
     parts.push(`<div class="rank-detail">${_escape(p.ranking || '')}</div>`);
     parts.push(_renderTitleStatusSelect(code, p.titleStatus));
     cellRanking    = parts.join('');
@@ -5904,15 +5908,34 @@ const TITLE_STATUS_OPTS = [
 const TITLE_STATUS_KEYS = ['applying', 'rank1', 'crown3', 'nochange'];
 function _titleStatusKey(v) { return TITLE_STATUS_KEYS.includes(v) ? v : ''; }
 /*
- * v7.87: ランキング欄の「伝令ちゃん」ボタン。
+ * v7.88: ランキング欄の「伝令ちゃんを開く」ボタン。
  *   ランキング伝令ちゃんの、その商品のページを新規タブで開く。
  *   URLは1枚目作成ボタンと同じ MAKE1_URL を使うので、変えるときはそこ1か所だけ直せばよい。
+ *
+ *   出す商品を絞る条件は下の DENREI_SHOW_KEYS だけで決まる。増やしたい状態が
+ *   出てきたら、この表にキーを足すだけでよい(他は触らなくていい)。
+ *     type  … 状態(基本モードでは「1枚目変更」) … p.rankingType
+ *     tag   … 2枚目変更 … p.tags
+ *     third … 3枚目変更 … p.thirdStatus
  */
-function _renderDenreiBtn(code) {
+const DENREI_SHOW_KEYS = {
+  type:  ['watch_added'],   // 👁 伝令ちゃん追加済
+  tag:   ['changed'],       // ✅ 変更完了(2枚目変更)
+  third: [],                // 3枚目変更では出さない
+};
+function _isDenreiVisible(p) {
+  if (!p) return false;
+  if (DENREI_SHOW_KEYS.type.includes(p.rankingType || 'pending')) return true;
+  if (DENREI_SHOW_KEYS.tag.includes(_getActiveTagKey(p.tags) || 'none')) return true;
+  if (DENREI_SHOW_KEYS.third.includes(_thirdKey(p.thirdStatus) || 'none')) return true;
+  return false;
+}
+function _renderDenreiBtn(code, p) {
+  if (!_isDenreiVisible(p)) return '';
   const url = _make1Url(code);
   if (!url) return '';
-  return `<a class="denrei-btn" href="${_escape(url)}" target="_blank" rel="noopener"`
-    + ` title="ランキング伝令ちゃんでこの商品を開く(${_escape(code)})">🔔 伝令ちゃん</a>`;
+  return `<div class="denrei-btn-row"><a class="denrei-btn" href="${_escape(url)}" target="_blank" rel="noopener"`
+    + ` title="ランキング伝令ちゃんでこの商品を開く(${_escape(code)})">🔔 伝令ちゃんを開く</a></div>`;
 }
 
 function _renderTitleStatusSelect(code, cur) {
