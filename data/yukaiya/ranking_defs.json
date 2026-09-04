@@ -2,6 +2,7 @@
   "removed": {
     "type": [
       "rank_ready",
+      "rank_done",
       "review_ready"
     ],
     "tag": [],
@@ -21,14 +22,7 @@
       "icon": "👁",
       "label": "伝令ちゃん追加済",
       "bg": "#e8eaf6",
-      "fg": "#3949ab"
-    },
-    {
-      "key": "rank_done",
-      "icon": "⏳",
-      "label": "ランキング済レビュー前",
-      "bg": "#fce4ec",
-      "fg": "#c2185b",
+      "fg": "#3949ab",
       "sep": true
     },
     {
