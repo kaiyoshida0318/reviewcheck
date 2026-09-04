@@ -11,7 +11,7 @@
   "type": [
     {
       "key": "pending",
-      "icon": "🎯",
+      "icon": "✔",
       "label": "獲得前",
       "bg": "#f5f4ee",
       "fg": "#78716c"
@@ -63,7 +63,7 @@
   "tag": [
     {
       "key": "none",
-      "icon": "⬜",
+      "icon": "✔",
       "label": "獲得前",
       "bg": "#f5f4ee",
       "fg": "#78716c"
@@ -116,7 +116,7 @@
   "third": [
     {
       "key": "none",
-      "icon": "⬜",
+      "icon": "✔",
       "label": "獲得前",
       "bg": "#f5f4ee",
       "fg": "#78716c"
