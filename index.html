@@ -915,6 +915,16 @@ body.mode-title2 .product-table .col-ranking { white-space: normal; overflow: vi
 .ttail-input.is-manual { border-color: #1976d2; background: #f4f9ff; }
 .ttail-empty { display: block; margin-top: 4px; font-size: 10px; color: var(--text3); }
 body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
+/* v7.96: タイトル末尾変更の下に並べる2つのドロップダウン */
+.ttail-select { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+.ttail-select.to-none { color: var(--text3); }
+.ttail-select.to-ok   { color: #2e7d32; background: #e8f5e9; border-color: rgba(46,125,50,0.3); }
+.ttail-select.to-ng   { color: #c62828; background: #ffebee; border-color: rgba(198,40,40,0.35); }
+.ttail-select.tw-none { color: var(--text3); }
+.ttail-select.tw-wip  { color: #e65100; background: #fff3e0; border-color: rgba(230,81,0,0.3); }
+/* 手で選び直した並び順は、左に印を出して自動判定と区別する */
+.ttail-select.ttail-order.is-manual { box-shadow: inset 3px 0 0 #1976d2; }
+body.bulk-edit-mode .col-ranking .ttail-select { pointer-events: auto; }
 /* v7.95: ヘッダーの3つの並べ替えボタン */
 .ttail-sort-buttons { display: flex; gap: 2px; margin-top: 3px; }
 .ttail-sort-buttons .review-sort-btn { flex: 1 1 0; justify-content: center; padding: 2px 3px; font-size: 10px; }
@@ -1281,7 +1291,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.95</span>
+    <span class="build-date">v7.96</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -6098,6 +6108,92 @@ function _tailSlotValue(p, key) {
   if (ov !== null) return ov;
   return _tailAutoSlots(p)[key] || '';
 }
+/*
+ * v7.96: タイトル末尾変更の下に置く2つのドロップダウン。
+ *
+ *   上(並び順) … 3つの欄に入っている型番が、その左からの順番どおりに
+ *     タイトルへ並んでいるかを見る。中身は自動で決まるが、手で選び直すこともできる
+ *     (手で選ぶと、その値が保存されて自動判定より優先される)。
+ *       なし         … 欄がすべて空(比べるものがない)
+ *       順番問題なし … 欄の型番が全部タイトルにあり、左からの順番どおりに並んでいる
+ *       順番問題有り … タイトルに無い型番がある、または並び順が違う
+ *   下(対応) … 手で付ける印。対応なし / 対応中。
+ */
+const TTAIL_ORDER_OPTS = [
+  { key: 'none', label: 'なし',         cls: 'to-none' },
+  { key: 'ok',   label: '順番問題なし', cls: 'to-ok' },
+  { key: 'ng',   label: '順番問題有り', cls: 'to-ng' },
+];
+const TTAIL_WORK_OPTS = [
+  { key: '',    label: '対応なし', cls: 'tw-none' },
+  { key: 'wip', label: '対応中',   cls: 'tw-wip' },
+];
+// タイトルを語に分けて半角へそろえたもの(並び順を見るのに使う)
+function _titleTokens(title) {
+  return String(title || '').trim().split(/[\s\u3000]+/).filter(Boolean).map(_toHalfWidth);
+}
+/*
+ * 自動判定。欄の値がタイトルの何語目にあるかを調べ、
+ * 左の欄ほど前に来ているか(位置が増えていくか)を見る。
+ */
+function _tailOrderAuto(p) {
+  const vals = TTAIL_SLOTS.map(sl => _tailSlotValue(p, sl.key)).filter(v => v);
+  if (!vals.length) return 'none';
+  const toks = _titleTokens(p && p.apiTitle);
+  let prev = -1;
+  for (const v of vals) {
+    const at = toks.indexOf(_toHalfWidth(v));
+    if (at < 0) return 'ng';        // タイトルに無い
+    if (at <= prev) return 'ng';    // 前の欄より後ろに来ていない = 順番が違う
+    prev = at;
+  }
+  return 'ok';
+}
+function _tailOrderValue(p) {
+  const ov = p && typeof p.tailOrder === 'string' ? p.tailOrder : null;
+  if (ov !== null && TTAIL_ORDER_OPTS.some(o => o.key === ov)) return ov;
+  return _tailOrderAuto(p);
+}
+function _tailOrderCls(k) { const o = TTAIL_ORDER_OPTS.find(x => x.key === k); return o ? o.cls : 'to-none'; }
+function _tailWorkCls(k) { const o = TTAIL_WORK_OPTS.find(x => x.key === k); return o ? o.cls : 'tw-none'; }
+function onTailOrderChange(sel) {
+  const code = sel.dataset.code;
+  const p = productCache[code];
+  if (!p) return;
+  const val = sel.value;
+  // 自動判定と同じものを選んだときは手動指定を外す(以後タイトルに追従する)
+  if (val === _tailOrderAuto(p)) delete p.tailOrder;
+  else p.tailOrder = val;
+  sel.className = 'ttail-select ttail-order ' + _tailOrderCls(val)
+    + (typeof p.tailOrder === 'string' ? ' is-manual' : '');
+  _touchUpdatedAt(code);
+  _flashCell(sel.closest('td'));
+  saveCache();
+  scheduleGitHubSave();
+}
+function onTailWorkChange(sel) {
+  const code = sel.dataset.code;
+  const p = productCache[code];
+  if (!p) return;
+  const val = sel.value;
+  if (!val) delete p.tailWork; else p.tailWork = val;
+  sel.className = 'ttail-select ttail-work ' + _tailWorkCls(val);
+  _touchUpdatedAt(code);
+  _flashCell(sel.closest('td'));
+  saveCache();
+  scheduleGitHubSave();
+}
+// 型番の欄をいじったら、自動判定のままの行はその場で判定し直す
+function _syncTailOrderSelect(code) {
+  const p = productCache[code];
+  const sel = document.querySelector(`.ttail-order[data-code="${CSS.escape(code)}"]`);
+  if (!p || !sel) return;
+  if (typeof p.tailOrder === 'string') return;   // 手動指定があるならそのまま
+  const k = _tailOrderAuto(p);
+  sel.value = k;
+  sel.className = 'ttail-select ttail-order ' + _tailOrderCls(k);
+}
+
 function onTailCodeChange(input) {
   const code = input.dataset.code;
   const key = input.dataset.slot;
@@ -6112,6 +6208,7 @@ function onTailCodeChange(input) {
   else p.tailCodes[key] = val;
   if (!Object.keys(p.tailCodes).length) delete p.tailCodes;
   input.classList.toggle('is-manual', !!(p.tailCodes && typeof p.tailCodes[key] === 'string'));
+  _syncTailOrderSelect(code);   // v7.96: 並び順の自動判定をやり直す
   _touchUpdatedAt(code);
   _flashCell(input.closest('td'));
   saveCache();
@@ -6136,7 +6233,24 @@ function _renderTitleTailCell(code, p) {
   }
   html += '</div>';
   if (!api) html += `<div class="ttail-empty">タイトル未取得<span class="curtitle-note">次回の商品データ取得で入ります</span></div>`;
-  return html + _renderTitleStatusSelect(code, p.titleStatus);
+  // v7.96: 上 = 並び順(自動判定・手で上書き可) / 下 = 対応
+  const ok = _tailOrderValue(p);
+  const manualOrder = typeof p.tailOrder === 'string';
+  html += `<select class="ttail-select ttail-order ${_tailOrderCls(ok)}${manualOrder ? ' is-manual' : ''}"`
+    + ` data-code="${_escape(code)}" onchange="onTailOrderChange(this)"`
+    + ` title="3つの欄の型番が、左からの順番どおりにタイトルへ並んでいるか">`;
+  for (const o of TTAIL_ORDER_OPTS) {
+    html += `<option value="${_escape(o.key)}"${ok === o.key ? ' selected' : ''}>${_escape(o.label)}</option>`;
+  }
+  html += `</select>`;
+  const wk = (p && typeof p.tailWork === 'string') ? p.tailWork : '';
+  html += `<select class="ttail-select ttail-work ${_tailWorkCls(wk)}"`
+    + ` data-code="${_escape(code)}" onchange="onTailWorkChange(this)" title="タイトル末尾の対応状況">`;
+  for (const o of TTAIL_WORK_OPTS) {
+    html += `<option value="${_escape(o.key)}"${wk === o.key ? ' selected' : ''}>${_escape(o.label)}</option>`;
+  }
+  html += `</select>`;
+  return html;
 }
 
 /*
