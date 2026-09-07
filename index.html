@@ -207,16 +207,16 @@ body.mode-third #bulkApplyThird { display: inline-block; }
    「📊 状態:」のままにするのはタイトル修正用だけ。 */
 .lbl-status { display: none; }
 .lbl-first { display: inline; }
-body.mode-title .lbl-status { display: inline; }
-body.mode-title .lbl-first { display: none; }
+body.mode-titleish .lbl-status { display: inline; }
+body.mode-titleish .lbl-first { display: none; }
 /* v7.87: 基本は 状態 + 2枚目変更 + 3枚目変更 */
 body.mode-basic #bulkApplyTag,
 body.mode-basic #bulkApplyThird { display: inline-block; }
 body.mode-basic #bulkApplyKind { display: none; }
 body.mode-diff #bulkApplyKind , body.mode-third #bulkApplyKind { display: none; }
 /* v7.87: タイトル修正用は 状態 + タイトル変更 */
-body.mode-title #bulkApplyTitle { display: inline-block; }
-body.mode-title #bulkApplyKind { display: none; }
+body.mode-titleish #bulkApplyTitle { display: inline-block; }
+body.mode-titleish #bulkApplyKind { display: none; }
 /* v7.87: col-select は基本モードだけ非表示。1枚目作成用と2枚目作成用では表示する */
 /* v7.87: 基本でもチェックボックスを出す(まとめて変更できるように) */
 /* v6.31: 2ブロック構成のエクスポート群 */
@@ -820,13 +820,13 @@ body.bulk-edit-mode .col-name a { pointer-events: none; color: var(--text); text
 .toolbar-stat-group { margin-left: auto; }
 /* v7.87: タイトル修正用の2行は、状態・ランキングタイプと同じく左端から1行ずつ使う */
 .title-filter-row { display: none; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
-body.mode-title .title-filter-row { display: flex; flex-basis: 100%; align-items: center; }
+body.mode-titleish .title-filter-row { display: flex; flex-basis: 100%; align-items: center; }
 .tfq-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 10px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; cursor: pointer; white-space: nowrap; transition: all 0.12s; }
 .tfq-chip:hover { background: var(--surface2); }
 .tfq-chip.active { background: #0d47a1; border-color: #0d47a1; color: #fff; }
 /* v7.87: タイトルの状態で絞り込む行。左端から1行使う */
 .title-status-row { display: none; }
-body.mode-title .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+body.mode-titleish .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
 .tsf-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: all 0.12s; }
 .tsf-btn:hover { background: var(--surface2); }
 .tsf-btn .tsf-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); font-weight: 400; display: inline-block; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -862,22 +862,22 @@ body.mode-title .title-status-row { display: flex; flex-basis: 100%; align-items
    それ以外は隠す。col-updated / col-selimg / col-crop は既定で非表示なのでここには書かない。 */
 .product-table .col-curtitle { width: var(--col-currentTitle-w, 320px); display: none; vertical-align: top; }
 .product-table .col-curtitle { text-align: var(--col-currentTitle-align, left); }
-body.mode-title .product-table .col-curtitle { display: table-cell; }
-body.mode-title .col-yearmonth,
-body.mode-title .col-sales,
-body.mode-title .col-review,
-body.mode-title .col-make1,
-body.mode-title .col-make1b,
-body.mode-title .col-make2,
-body.mode-title .col-diff-onscreen,
-body.mode-title .col-diff-result,
-body.mode-title .col-diff-growth,
-body.mode-title .col-tags,
-body.mode-title .col-action { display: none; }
+body.mode-titleish .product-table .col-curtitle { display: table-cell; }
+body.mode-titleish .col-yearmonth,
+body.mode-titleish .col-sales,
+body.mode-titleish .col-review,
+body.mode-titleish .col-make1,
+body.mode-titleish .col-make1b,
+body.mode-titleish .col-make2,
+body.mode-titleish .col-diff-onscreen,
+body.mode-titleish .col-diff-result,
+body.mode-titleish .col-diff-growth,
+body.mode-titleish .col-tags,
+body.mode-titleish .col-action { display: none; }
 /* 上のフィルタ群はこのモードでは使わない */
-body.mode-title .tag-filter-row { display: none; }
+body.mode-titleish .tag-filter-row { display: none; }
 /* ランキング欄は折り返して全文見せる(1枚目作成用と同じ扱い) */
-body.mode-title .product-table .col-ranking {
+body.mode-titleish .product-table .col-ranking {
   white-space: normal; overflow: visible; text-overflow: clip; word-break: break-word;
   line-height: 1.4; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: var(--text);
 }
@@ -902,7 +902,7 @@ body.bulk-edit-mode .col-ranking .denrei-btn { pointer-events: auto; color: var(
 body.bulk-edit-mode .col-ranking .denrei-btn:hover { color: #fff !important; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
-body.mode-title .title-status-select { display: block; }
+body.mode-titleish .title-status-select { display: block; }
 .title-status-select.ts-todo   { color: var(--text3); background: var(--surface); }
 .title-status-select.ts-applying { color: #0d47a1; background: #eaf2fb; border-color: #a8cbee; }
 .title-status-select.ts-rank1  { color: #b26a00; background: #fff6e0; border-color: #f0cf94; }
@@ -1263,13 +1263,15 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.91</span>
+    <span class="build-date">v7.92</span>
     <div class="view-toggle">
-      <!-- v7.87: よく使う順に並べ替え(1枚目作成用 → 2枚目作成用 → 基本) -->
-      <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目作成用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目作成用</button>
-      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="2枚目作成用モード(画面上件数を入力してレビュー差を確認し、2枚目を作る)">🔍 2枚目作成用</button>
-      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目作成用モード(中身は2枚目作成用と同じ)">🥉 3枚目作成用</button>
-      <button class="view-toggle-btn" id="modeToggleTitle" onclick="setTableMode('title')" title="タイトル修正用モード(楽天側の現在のタイトルを見ながら商品名を直す)">✏ タイトル修正用</button>
+      <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
+      <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
+      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="2枚目用モード(画面上件数を入力してレビュー差を確認し、2枚目を作る)">🔍 2枚目用</button>
+      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目用モード(中身は2枚目用と同じ)">🥉 3枚目用</button>
+      <button class="view-toggle-btn" id="modeToggleTitle" onclick="setTableMode('title')" title="タイトル先頭用モード(楽天側の現在のタイトルを見ながらタイトルの先頭を直す)">✏ タイトル先頭用</button>
+      <!-- v7.92: タイトル末尾用。中身は今のところタイトル先頭用と同じ -->
+      <button class="view-toggle-btn" id="modeToggleTitle2" onclick="setTableMode('title2')" title="タイトル末尾用モード(今はタイトル先頭用と同じ表示)">✏ タイトル末尾用</button>
       <button class="view-toggle-btn active" id="modeToggleBasic" onclick="setTableMode('basic')" title="基本表示">📋 基本</button>
     </div>
     <div class="zoom-control">
@@ -1385,12 +1387,12 @@ body.resize-mode .col-align-btns { display: flex; }
               <!-- v7.87: 2枚目作成用モードで出す欄。1枚目作成用ではランキングタイプが出る -->
               <!-- v7.87: タイトル修正用モードで出す欄 -->
               <select class="bulk-apply-select" id="bulkApplyTitle" onchange="_syncBulkApplyUI()" title="タイトルのランキング表記をまとめて変更">
-                <option value="">タイトル：変更しない</option>
-                <option value="__todo__">タイトル：取得前</option>
-                <option value="applying">タイトル：獲得反映中</option>
-                <option value="rank1">タイトル：1位</option>
-                <option value="crown3">タイトル：3冠</option>
-                <option value="nochange">タイトル：変更不要</option>
+                <option value="">冠：変更しない</option>
+                <option value="__todo__">冠：取得前</option>
+                <option value="applying">冠：獲得反映中</option>
+                <option value="rank1">冠：1位</option>
+                <option value="crown3">冠：3冠</option>
+                <option value="nochange">冠：変更不要</option>
               </select>
               <!-- v7.87: 選択肢は項目編集の設定から作る(_renderBulkApplySelects) -->
               <select class="bulk-apply-select" id="bulkApplyTag" onchange="_syncBulkApplyUI()" title="2枚目変更をまとめて変更"></select>
@@ -3225,7 +3227,7 @@ function renderProducts() {
 
     // v7.87: 2枚目変更フィルタ。他のフィルタと素直に重ねる(以前は他を全部無視していた)
     // v7.87: タイトル修正用の「現在のタイトル」検索
-    if (tableMode === 'title') {
+    if (_isTitleMode()) {
       // v7.87: タイトルの状態での絞り込み
       if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
       const _t = String(p.apiTitle || '').toLowerCase();
@@ -3285,7 +3287,7 @@ function renderProducts() {
     }
     // v7.87: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
     // v7.87: ランキングタイプは1枚目作成用とタイトル修正用で効かせる
-    if ((tableMode === 'ranking' || tableMode === 'title') && currentRankingKindFilter !== 'all') {
+    if ((tableMode === 'ranking' || _isTitleMode()) && currentRankingKindFilter !== 'all') {
       const k = p.rankingKind || 'not_needed';   // v7.87: 未設定は「不要」
       if (k !== currentRankingKindFilter) return false;
     }
@@ -3789,7 +3791,7 @@ function _renderTitleStatusRow(codes) {
     counts[_titleStatusKey(p.titleStatus) || 'todo']++;
     total++;
   }
-  let html = `<span class="toolbar-label">🏷 タイトル状態:</span>`;
+  let html = `<span class="toolbar-label">🏷 冠状態:</span>`;
   html += `<button type="button" class="tsf-btn${currentTitleStatusFilter === null ? ' active' : ''}" onclick="setTitleStatusFilter(null)" title="絞り込みを解除">全体 <span class="tsf-count">(${total})</span></button>`;
   for (const o of TITLE_STATUS_OPTS) {
     const k = o.key || 'todo';
@@ -5902,11 +5904,11 @@ function _tagKeys() { return _rdList('tag').filter(d => !d.fixed).map(d => d.key
  *   他のモードでは邪魔になるだけなので隠している。
  */
 const TITLE_STATUS_OPTS = [
-  { key: '',         label: 'タイトル：取得前' },
-  { key: 'applying', label: 'タイトル：獲得反映中' },
-  { key: 'rank1',    label: 'タイトル：1位' },
-  { key: 'crown3',   label: 'タイトル：3冠' },
-  { key: 'nochange', label: 'タイトル：変更不要' },
+  { key: '',         label: '冠：取得前' },
+  { key: 'applying', label: '冠：獲得反映中' },
+  { key: 'rank1',    label: '冠：1位' },
+  { key: 'crown3',   label: '冠：3冠' },
+  { key: 'nochange', label: '冠：変更不要' },
 ];
 // v7.87: 未知の値(旧 'done' など)は「取得前」として扱う
 const TITLE_STATUS_KEYS = ['applying', 'rank1', 'crown3', 'nochange'];
@@ -6332,9 +6334,16 @@ const TABLE_MODE_KEY = 'reviewcheck_table_mode';
 // v7.87: third(3枚目作成用)は diff(2枚目作成用)と同じ見た目・同じ挙動。
 //   列表示のCSSと、モードで分岐しているJSの条件に third を並べて足してある。
 //   将来3枚目だけ変えたくなったら、その行だけ third を外せばよい。
-const VALID_MODES = ['basic', 'diff', 'ranking', 'third', 'title'];
+// v7.92: title(タイトル先頭用) と title2(タイトル末尾用)。
+//   中身は今のところ同じ。CSSは body.mode-titleish にまとめてあるので、
+//   将来どちらかだけ変えたくなったら body.mode-title / body.mode-title2 で
+//   個別のルールを足せばよい。JS側の分岐は _isTitleMode() 1か所に集約。
+const VALID_MODES = ['basic', 'diff', 'ranking', 'third', 'title', 'title2'];
 // v7.87: モードID → 切替ボタンのid(2か所で同じ処理をしていたのでまとめた)
-const MODE_BTN_IDS = { basic: 'modeToggleBasic', diff: 'modeToggleDiff', ranking: 'modeToggleRanking', third: 'modeToggleThird', title: 'modeToggleTitle' };
+const MODE_BTN_IDS = { basic: 'modeToggleBasic', diff: 'modeToggleDiff', ranking: 'modeToggleRanking', third: 'modeToggleThird', title: 'modeToggleTitle', title2: 'modeToggleTitle2' };
+// v7.92: タイトル系モード(先頭用/末尾用)かどうか。分岐はすべてこれを通す。
+const TITLE_MODES = ['title', 'title2'];
+function _isTitleMode(m) { return TITLE_MODES.includes(m || tableMode); }
 function _applyModeUI(mode) {
   for (const m of VALID_MODES) {
     const el = document.getElementById(MODE_BTN_IDS[m]);
@@ -6342,6 +6351,8 @@ function _applyModeUI(mode) {
   }
   document.body.classList.remove(...VALID_MODES.map(m => 'mode-' + m));
   document.body.classList.add('mode-' + mode);
+  // v7.92: タイトル先頭用/末尾用で共通のCSSを当てるための目印
+  document.body.classList.toggle('mode-titleish', _isTitleMode(mode));
 }
 function setTableMode(mode) {
   if (!VALID_MODES.includes(mode)) mode = 'basic';
@@ -6425,7 +6436,7 @@ function _updateRankingFilterVisibility() {
   //   「ランキングタイプ」は1枚目作成用だけ。
   //   表示していないフィルタは 'all' に戻す(見えない条件で絞られるのを避けるため)。
   const showType = true;   // v7.87: 状態(基本では「1枚目変更」)はどのモードでも出す
-  const showKind = (tableMode === 'ranking' || tableMode === 'title');
+  const showKind = (tableMode === 'ranking' || _isTitleMode());
   if (group1) group1.style.display = showType ? '' : 'none';
   if (group3) group3.style.display = showKind ? '' : 'none';
   if (!showType && currentRankingFilter !== 'all') {
@@ -6449,7 +6460,7 @@ function _updateRankingFilterVisibility() {
 function _passesBaseFiltersForCount(code, p, search) {
   // v7.87: 2枚目変更フィルタも他と同じように重ねる(表示側と条件をそろえる)
   // v7.87: タイトル修正用の「現在のタイトル」検索
-  if (tableMode === 'title') {
+  if (_isTitleMode()) {
     // v7.87: タイトルの状態での絞り込み
     if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
     const _t = String(p.apiTitle || '').toLowerCase();
@@ -6864,9 +6875,10 @@ function _renderRankingFilterButtons() {
 
 // ══ v7.87: 一括変更パネルの選択肢を項目定義から生成 ══
 function _renderBulkApplySelects() {
-  // v7.87: 基本モードでは表の列名に合わせて「1枚目変更」と表示する(中身は同じ rankingType)
+  // v7.92: 上のフィルタ行の見出しと同じ呼び方にそろえる(中身は同じ rankingType)。
+  //   タイトル先頭用/末尾用だけ「状態」、それ以外は「1枚目変更」。
   const specs = [
-    { id: 'bulkApplyType', group: 'type', head: (tableMode === 'basic') ? '1枚目変更：変更しない' : '📊 状態: 変更しない' },
+    { id: 'bulkApplyType', group: 'type', head: _isTitleMode() ? '📊 状態：変更しない' : '1枚目変更：変更しない' },
     { id: 'bulkApplyKind', group: 'kind', head: '🏆 ランクタイプ: 変更しない' },
   ];
   for (const sp of specs) {
@@ -7540,7 +7552,7 @@ function _bulkApplyIdsForMode() {
   if (tableMode === 'ranking') return ['bulkApplyType', 'bulkApplyKind'];
   if (tableMode === 'diff')    return ['bulkApplyType', 'bulkApplyTag'];
   if (tableMode === 'third')   return ['bulkApplyType', 'bulkApplyThird'];
-  if (tableMode === 'title')   return ['bulkApplyType', 'bulkApplyTitle'];
+  if (_isTitleMode())          return ['bulkApplyType', 'bulkApplyTitle'];
   // v7.87: 基本は全体を見る場所なので、1枚目(状態) / 2枚目変更 / 3枚目変更 をまとめて変えられる
   if (tableMode === 'basic')   return ['bulkApplyType', 'bulkApplyTag', 'bulkApplyThird'];
   return [];
