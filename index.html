@@ -825,8 +825,22 @@ body.mode-titleish .title-filter-row { display: flex; flex-basis: 100%; align-it
 .tfq-chip:hover { background: var(--surface2); }
 .tfq-chip.active { background: #0d47a1; border-color: #0d47a1; color: #fff; }
 /* v7.87: タイトルの状態で絞り込む行。左端から1行使う */
+/* v7.97: 冠状態はタイトル先頭用だけ。末尾用では出さない */
 .title-status-row { display: none; }
-body.mode-titleish .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+body.mode-title .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+/* v7.97: タイトル末尾用の絞り込み2行(並び順 / 対応)。冠状態と同じ見た目 */
+.tail-order-row, .tail-work-row { display: none; }
+body.mode-title2 .tail-order-row,
+body.mode-title2 .tail-work-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+/* v7.97: 末尾用では 状態 / ランクタイプ の行も出さない */
+body.mode-title2 #rankingFilterGroup,
+body.mode-title2 #rankingKindFilterGroup { display: none !important; }
+.tsf-btn.to-ok { color: #2e7d32; border-color: rgba(46,125,50,0.4); }
+.tsf-btn.to-ok.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+.tsf-btn.to-ng { color: #c62828; border-color: rgba(198,40,40,0.45); }
+.tsf-btn.to-ng.active { background: #c62828; border-color: #c62828; color: #fff; }
+.tsf-btn.tw-wip { color: #e65100; border-color: rgba(230,81,0,0.4); }
+.tsf-btn.tw-wip.active { background: #e65100; border-color: #e65100; color: #fff; }
 .tsf-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: all 0.12s; }
 .tsf-btn:hover { background: var(--surface2); }
 .tsf-btn .tsf-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); font-weight: 400; display: inline-block; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -1291,7 +1305,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.96</span>
+    <span class="build-date">v7.97</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1402,6 +1416,9 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="toolbar-group third-filter-row" id="thirdFilterRow"></div>
         <!-- v7.87: タイトル修正用。状態・ランキングタイプの下に1行ずつ積む -->
         <div class="toolbar-group title-status-row" id="titleStatusRow"></div>
+        <!-- v7.97: タイトル末尾用の絞り込み(並び順 / 対応)。このモードだけ出す -->
+        <div class="toolbar-group tail-order-row" id="tailOrderRow"></div>
+        <div class="toolbar-group tail-work-row" id="tailWorkRow"></div>
         <div class="toolbar-group title-filter-row" id="titleFilterRow"></div>
         <!-- v7.87: 選択商品の一括変更パネル。状態/ランキングタイプを好きな組み合わせでまとめて変更する -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
@@ -3261,8 +3278,11 @@ function renderProducts() {
     // v7.87: 2枚目変更フィルタ。他のフィルタと素直に重ねる(以前は他を全部無視していた)
     // v7.87: タイトル修正用の「現在のタイトル」検索
     if (_isTitleMode()) {
-      // v7.87: タイトルの状態での絞り込み
-      if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
+      // v7.97: タイトル末尾用は並び順 / 対応で絞り込む(冠状態は先頭用だけ)
+      if (tableMode === 'title2') {
+        if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
+        if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
+      } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
       const _t = String(p.apiTitle || '').toLowerCase();
       // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
       if (titleExceptOn) {
@@ -3704,6 +3724,7 @@ function renderSidebar() {
   // v7.87: タイトル修正用の絞り込み行も同じタイミングで描き直す
   _renderTitleFilterRow();
   _renderTitleStatusRow(codes);
+  _renderTailFilterRows(codes);   // v7.97: タイトル末尾用の並び順 / 対応
   _renderThirdFilterRow(codes);
   // v7.87: 3行の縦線を同じ位置にそろえる(中身が変わるたびに測り直す)
   _syncFilterRowDividers();
@@ -3852,6 +3873,58 @@ function _renderTitleStatusRow(codes) {
           + `${_escape(o.label)} <span class="tsf-count">(${counts[k] || 0})</span></button>`;
   }
   box.innerHTML = html;
+}
+/* ══ v7.97: タイトル末尾用の絞り込み(並び順 / 対応) ══════════════════════
+ *   冠状態の行と同じ作り。null = 全体。
+ *   件数は「通常」の商品だけを数える(無視は対象外)。
+ */
+let currentTailOrderFilter = null;   // null | 'none' | 'ok' | 'ng'
+let currentTailWorkFilter = null;    // null | '' (対応なし) | 'wip'
+function setTailOrderFilter(k) {
+  currentTailOrderFilter = (currentTailOrderFilter === k) ? null : k;
+  renderProducts();
+}
+function setTailWorkFilter(k) {
+  currentTailWorkFilter = (currentTailWorkFilter === k) ? null : k;
+  renderProducts();
+}
+function _tailWorkKey(p) { return (p && typeof p.tailWork === 'string' && p.tailWork) ? p.tailWork : ''; }
+// 1行ぶんのボタンを作る(2行で同じ形なのでまとめてある)
+function _renderTailFilterRow(boxId, label, opts, counts, total, cur, fnName) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  let html = `<span class="toolbar-label">${label}</span>`;
+  html += `<button type="button" class="tsf-btn${cur === null ? ' active' : ''}" onclick="${fnName}(null)" title="絞り込みを解除">全体 <span class="tsf-count">(${total})</span></button>`;
+  for (const o of opts) {
+    const k = o.key;
+    html += `<button type="button" class="tsf-btn ${o.cls}${cur === k ? ' active' : ''}" onclick="${fnName}(${JSON.stringify(k)})" title="${_escape(o.label)}の商品だけ表示(もう一度押すと解除)">`
+          + `${_escape(o.label)} <span class="tsf-count">(${counts[k] || 0})</span></button>`;
+  }
+  box.innerHTML = html;
+}
+function _renderTailFilterRows(codes) {
+  // v7.97: この2行はタイトル末尾用でしか出さない。判定は毎回タイトルを読み直すので、
+  //   他のモードでは数えずに空にしておく(描き直しのたびの無駄をなくす)。
+  if (tableMode !== 'title2') {
+    const a = document.getElementById('tailOrderRow');
+    const b = document.getElementById('tailWorkRow');
+    if (a) a.innerHTML = '';
+    if (b) b.innerHTML = '';
+    return;
+  }
+  const oc = {}, wc = {};
+  TTAIL_ORDER_OPTS.forEach(o => { oc[o.key] = 0; });
+  TTAIL_WORK_OPTS.forEach(o => { wc[o.key] = 0; });
+  let total = 0;
+  for (const code of (codes || Object.keys(productCache))) {
+    const p = productCache[code];
+    if (!p || p.status === 'ignore') continue;
+    oc[_tailOrderValue(p)] = (oc[_tailOrderValue(p)] || 0) + 1;
+    wc[_tailWorkKey(p)] = (wc[_tailWorkKey(p)] || 0) + 1;
+    total++;
+  }
+  _renderTailFilterRow('tailOrderRow', '🔢 並び順:', TTAIL_ORDER_OPTS, oc, total, currentTailOrderFilter, 'setTailOrderFilter');
+  _renderTailFilterRow('tailWorkRow', '🛠 対応:', TTAIL_WORK_OPTS, wc, total, currentTailWorkFilter, 'setTailWorkFilter');
 }
 function setTitleQuery(q) {
   // 同じ語をもう一度押したら解除
@@ -6654,6 +6727,10 @@ function setTableMode(mode) {
   }
   // v7.87: 3枚目変更フィルタは3枚目作成用でしか出さないので、離れたら解除する
   if (mode !== 'third' && mode !== 'basic') currentThirdTag = null;
+  // v7.97: 並び順 / 対応 はタイトル末尾用だけの絞り込み
+  if (mode !== 'title2') { currentTailOrderFilter = null; currentTailWorkFilter = null; }
+  // v7.97: 冠状態はタイトル先頭用だけの絞り込み
+  if (mode !== 'title') currentTitleStatusFilter = null;
   tableMode = mode;
   localStorage.setItem(TABLE_MODE_KEY, mode);
   _applyModeUI(mode);
@@ -6723,8 +6800,9 @@ function _updateRankingFilterVisibility() {
   // v7.87: 「状態」は1枚目作成用と2枚目作成用の両方で使う。
   //   「ランキングタイプ」は1枚目作成用だけ。
   //   表示していないフィルタは 'all' に戻す(見えない条件で絞られるのを避けるため)。
-  const showType = true;   // v7.87: 状態(基本では「1枚目変更」)はどのモードでも出す
-  const showKind = (tableMode === 'ranking' || _isTitleMode());
+  // v7.97: タイトル末尾用は 並び順 / 対応 だけを使うので、状態とランクタイプは出さない
+  const showType = (tableMode !== 'title2');
+  const showKind = (tableMode === 'ranking' || tableMode === 'title');
   if (group1) group1.style.display = showType ? '' : 'none';
   if (group3) group3.style.display = showKind ? '' : 'none';
   if (!showType && currentRankingFilter !== 'all') {
@@ -6749,8 +6827,11 @@ function _passesBaseFiltersForCount(code, p, search) {
   // v7.87: 2枚目変更フィルタも他と同じように重ねる(表示側と条件をそろえる)
   // v7.87: タイトル修正用の「現在のタイトル」検索
   if (_isTitleMode()) {
-    // v7.87: タイトルの状態での絞り込み
-    if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
+    // v7.97: タイトル末尾用は並び順 / 対応で絞り込む(冠状態は先頭用だけ)
+    if (tableMode === 'title2') {
+      if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
+      if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
+    } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
     const _t = String(p.apiTitle || '').toLowerCase();
     // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
     if (titleExceptOn) {
