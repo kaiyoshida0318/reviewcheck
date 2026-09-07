@@ -953,9 +953,10 @@ body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
 .ttail-select.ttail-order.is-manual { box-shadow: inset 3px 0 0 #1976d2; }
 body.bulk-edit-mode .col-ranking .ttail-select { pointer-events: auto; }
 /* v7.95: ヘッダーの3つの並べ替えボタン */
-/* v8.01: 4つになったので2つずつ折り返す(1行に詰めると文字が切れるため) */
-.ttail-sort-buttons { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; row-gap: 2px; }
-.ttail-sort-buttons .review-sort-btn { flex: 1 1 40%; justify-content: center; padding: 2px 3px; font-size: 10px; white-space: nowrap; }
+/* v8.02: 4つを必ず横1列に並べる。折り返さないぶん文字は小さく、余白は詰める */
+.ttail-sort-buttons { display: flex; gap: 1px; margin-top: 3px; flex-wrap: nowrap; }
+.ttail-sort-buttons .review-sort-btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: 2px 1px; font-size: 9px; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; }
+.ttail-sort-buttons .sort-indicator { font-size: 8px; margin-left: 1px; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 body.mode-titleish .title-status-select { display: block; }
@@ -1319,7 +1320,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.01</span>
+    <span class="build-date">v8.02</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
