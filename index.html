@@ -140,9 +140,16 @@ body.mode-third .tag-filter-row { display: none; }
 .tf-nosep { flex: 1; }
 .tf-divider { flex-shrink: 0; align-self: stretch; width: 0; margin: 0 4px; border-left: 2px solid var(--border2); }
 /* v7.87: 1枚目/2枚目/3枚目の見出し幅をそろえて、ボタンの開始位置を縦に揃える */
+/* v7.97: 冠状態・並び順・対応・タイトル検索の行も同じ幅に入れて、
+   どのモードでもボタンの開始位置が縦にそろうようにする */
 .ranking-filter-group > .toolbar-label,
 .tag-filter-row > .toolbar-label,
-.third-filter-row > .toolbar-label { flex-shrink: 0; min-width: 104px; }
+.third-filter-row > .toolbar-label,
+.title-status-row > .toolbar-label,
+.tail-order-row > .toolbar-label,
+.tail-work-row > .toolbar-label,
+.tail-code-row > .toolbar-label,
+.title-filter-row > .toolbar-label { flex-shrink: 0; min-width: 104px; }
 .tag-filter-row { gap: 6px; flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }
 /* v7.87: 3行のボタンは同じ作り。配色は --c(文字/選択時の背景) と --cb(枠) で受け取る。
    クラスの付け外しだけで選択の見た目が変わるので、描き直しの有無で差が出ない。 */
@@ -828,10 +835,16 @@ body.mode-titleish .title-filter-row { display: flex; flex-basis: 100%; align-it
 /* v7.97: 冠状態はタイトル先頭用だけ。末尾用では出さない */
 .title-status-row { display: none; }
 body.mode-title .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
-/* v7.97: タイトル末尾用の絞り込み2行(並び順 / 対応)。冠状態と同じ見た目 */
-.tail-order-row, .tail-work-row { display: none; }
+/* v7.97: タイトル末尾用の絞り込み(並び順 / 対応 / 型番)。冠状態と同じ見た目 */
+.tail-order-row, .tail-work-row, .tail-code-row { display: none; }
 body.mode-title2 .tail-order-row,
-body.mode-title2 .tail-work-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+body.mode-title2 .tail-work-row,
+body.mode-title2 .tail-code-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+/* v8.00: 型番の行はボタンが多いので、3つのかたまりに小さな見出しを付けて区切る */
+.tcf-group-label { display: inline-flex; align-items: center; margin-left: 6px; padding-left: 8px; border-left: 2px solid var(--border2); font-size: 10px; font-weight: 700; color: var(--text3); white-space: nowrap; }
+.tcf-group-label:first-of-type { margin-left: 0; padding-left: 0; border-left: 0; }
+.tsf-btn.tc-btn { padding: 4px 8px; font-family: 'DM Mono', monospace; }
+.tsf-btn.tc-btn .tsf-count { min-width: 26px; }
 /* v7.97: 末尾用では 状態 / ランクタイプ の行も出さない */
 body.mode-title2 #rankingFilterGroup,
 body.mode-title2 #rankingKindFilterGroup { display: none !important; }
@@ -1305,7 +1318,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.97</span>
+    <span class="build-date">v8.00</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1419,6 +1432,8 @@ body.resize-mode .col-align-btns { display: flex; }
         <!-- v7.97: タイトル末尾用の絞り込み(並び順 / 対応)。このモードだけ出す -->
         <div class="toolbar-group tail-order-row" id="tailOrderRow"></div>
         <div class="toolbar-group tail-work-row" id="tailWorkRow"></div>
+        <!-- v8.00: 型番そのもので絞り込む行(RPR / プレ内容 / PKT・NP) -->
+        <div class="toolbar-group tail-code-row" id="tailCodeRow"></div>
         <div class="toolbar-group title-filter-row" id="titleFilterRow"></div>
         <!-- v7.87: 選択商品の一括変更パネル。状態/ランキングタイプを好きな組み合わせでまとめて変更する -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
@@ -1488,8 +1503,8 @@ body.resize-mode .col-align-btns { display: flex; }
               <th class="col-ranking sortable" onclick="onRankingHeadClick()" id="sortHeader-ranking" title="クリックで並べ替え"><span class="hdr-ranking">ランキング（1枚目変更） <span class="sort-indicator" id="sortInd-ranking"></span></span><span class="hdr-tail">タイトル末尾変更
                 <span class="ttail-sort-buttons">
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailA')" id="sortBtn-tailA" title="RPR系で並べ替え">RPR<span class="sort-indicator" id="sortInd-tailA"></span></span>
-                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailB')" id="sortBtn-tailB" title="RP1〜RP7で並べ替え">RP1-7<span class="sort-indicator" id="sortInd-tailB"></span></span>
-                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="PK・NP系で並べ替え">PK/NP<span class="sort-indicator" id="sortInd-tailC"></span></span>
+                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailB')" id="sortBtn-tailB" title="プレ内容(RP1〜RP7)で並べ替え">プレ内容<span class="sort-indicator" id="sortInd-tailB"></span></span>
+                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="PKT・NP系で並べ替え">PKT/NP<span class="sort-indicator" id="sortInd-tailC"></span></span>
                 </span></span></th>
               <!-- v7.87: 楽天側の現在のタイトル(タイトル修正用モードでのみ表示) -->
               <th class="col-curtitle sortable" onclick="setSortKey('currentTitle')" id="sortHeader-currentTitle" title="楽天側の現在のタイトル。クリックで並べ替え(未取得は常に末尾)">現在のタイトル <span class="sort-indicator" id="sortInd-currentTitle"></span></th>
@@ -3282,6 +3297,7 @@ function renderProducts() {
       if (tableMode === 'title2') {
         if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
         if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
+        if (!_passesTailCodeFilter(p)) return false;   // v8.00: 型番での絞り込み
       } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
       const _t = String(p.apiTitle || '').toLowerCase();
       // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
@@ -3725,6 +3741,7 @@ function renderSidebar() {
   _renderTitleFilterRow();
   _renderTitleStatusRow(codes);
   _renderTailFilterRows(codes);   // v7.97: タイトル末尾用の並び順 / 対応
+  _renderTailCodeRow(codes);      // v8.00: 型番での絞り込み
   _renderThirdFilterRow(codes);
   // v7.87: 3行の縦線を同じ位置にそろえる(中身が変わるたびに測り直す)
   _syncFilterRowDividers();
@@ -3889,6 +3906,78 @@ function setTailWorkFilter(k) {
   renderProducts();
 }
 function _tailWorkKey(p) { return (p && typeof p.tailWork === 'string' && p.tailWork) ? p.tailWork : ''; }
+
+/* ══ v8.00: 型番そのもので絞り込む行 ═══════════════════════════════════════
+ *   3つのかたまり(欄ごと)に分かれていて、かたまりごとに1つ選べる。
+ *   別のかたまりの選択とは重ねてかかる(並び順・対応の行と同じ考え方)。
+ *     RPR      … 左の欄にある値をそのまま並べる(データにある値から作る)
+ *     プレ内容 … RP1〜RP7 の決め打ち
+ *     PKT/NP   … 前方一致(PKT2-2F は PKT に入る)
+ *   増やしたいときは items か mode を変えればよい。
+ */
+const TTAIL_CODE_FILTERS = [
+  { slot: 'a', label: 'RPR',      mode: 'auto',   items: [] },
+  { slot: 'b', label: 'プレ内容', mode: 'exact',  items: ['RP1', 'RP2', 'RP3', 'RP4', 'RP5', 'RP6', 'RP7'] },
+  { slot: 'c', label: 'PKT/NP',   mode: 'prefix', items: ['PKT', 'NP'] },
+];
+const TTAIL_CODE_AUTO_MAX = 8;   // データから作るボタンの上限
+let currentTailCodeFilter = { a: null, b: null, c: null };
+function setTailCodeFilter(slot, k) {
+  if (!(slot in currentTailCodeFilter)) return;
+  currentTailCodeFilter[slot] = (currentTailCodeFilter[slot] === k) ? null : k;
+  renderProducts();
+}
+function clearTailCodeFilter() {
+  currentTailCodeFilter = { a: null, b: null, c: null };
+  renderProducts();
+}
+function _tailCodeHit(p, slot, k) {
+  const v = _tailSlotValue(p, slot);
+  if (!v) return false;
+  const g = TTAIL_CODE_FILTERS.find(x => x.slot === slot);
+  return (g && g.mode === 'prefix') ? v.indexOf(k) === 0 : v === k;
+}
+function _passesTailCodeFilter(p) {
+  for (const g of TTAIL_CODE_FILTERS) {
+    const k = currentTailCodeFilter[g.slot];
+    if (k !== null && !_tailCodeHit(p, g.slot, k)) return false;
+  }
+  return true;
+}
+function _renderTailCodeRow(codes) {
+  const box = document.getElementById('tailCodeRow');
+  if (!box) return;
+  if (tableMode !== 'title2') { box.innerHTML = ''; return; }
+  const list = (codes || Object.keys(productCache)).filter(c => {
+    const p = productCache[c];
+    return p && p.status !== 'ignore';
+  });
+  // 「RPR」のかたまりは、実際に入っている値からボタンを作る
+  const autoVals = {};
+  for (const c of list) {
+    const v = _tailSlotValue(productCache[c], 'a');
+    if (v) autoVals[v] = (autoVals[v] || 0) + 1;
+  }
+  const autoList = Object.keys(autoVals).sort((x, y) => x.localeCompare(y, 'en', { numeric: true }))
+    .slice(0, TTAIL_CODE_AUTO_MAX);
+  const anyOn = TTAIL_CODE_FILTERS.some(g => currentTailCodeFilter[g.slot] !== null);
+  let html = `<span class="toolbar-label">🏷 型番:</span>`;
+  html += `<button type="button" class="tsf-btn${anyOn ? '' : ' active'}" onclick="clearTailCodeFilter()" title="型番の絞り込みをすべて解除">全体 <span class="tsf-count">(${list.length})</span></button>`;
+  for (const g of TTAIL_CODE_FILTERS) {
+    const items = (g.mode === 'auto') ? autoList : g.items;
+    html += `<span class="tcf-group-label">${_escape(g.label)}</span>`;
+    for (const k of items) {
+      let n = 0;
+      for (const c of list) if (_tailCodeHit(productCache[c], g.slot, k)) n++;
+      const on = currentTailCodeFilter[g.slot] === k;
+      html += `<button type="button" class="tsf-btn tc-btn${on ? ' active' : ''}"`
+        + ` onclick="setTailCodeFilter('${_escape(g.slot)}','${_escape(k)}')"`
+        + ` title="${_escape(g.label)} が ${_escape(k)} の商品だけ表示(もう一度押すと解除)">`
+        + `${_escape(k)} <span class="tsf-count">(${n})</span></button>`;
+    }
+  }
+  box.innerHTML = html;
+}
 // 1行ぶんのボタンを作る(2行で同じ形なのでまとめてある)
 function _renderTailFilterRow(boxId, label, opts, counts, total, cur, fnName) {
   const box = document.getElementById(boxId);
@@ -3897,7 +3986,7 @@ function _renderTailFilterRow(boxId, label, opts, counts, total, cur, fnName) {
   html += `<button type="button" class="tsf-btn${cur === null ? ' active' : ''}" onclick="${fnName}(null)" title="絞り込みを解除">全体 <span class="tsf-count">(${total})</span></button>`;
   for (const o of opts) {
     const k = o.key;
-    html += `<button type="button" class="tsf-btn ${o.cls}${cur === k ? ' active' : ''}" onclick="${fnName}(${JSON.stringify(k)})" title="${_escape(o.label)}の商品だけ表示(もう一度押すと解除)">`
+    html += `<button type="button" class="tsf-btn ${o.cls}${cur === k ? ' active' : ''}" onclick="${fnName}('${_escape(k)}')" title="${_escape(o.label)}の商品だけ表示(もう一度押すと解除)">`
           + `${_escape(o.label)} <span class="tsf-count">(${counts[k] || 0})</span></button>`;
   }
   box.innerHTML = html;
@@ -6157,8 +6246,8 @@ function _titleTail(title) { return _titleTailList(title).join(' '); }
  */
 const TTAIL_SLOTS = [
   { key: 'a', label: 'RPR',   ph: 'RPR',     hint: 'RPR・RPP など(RP+英字)', test: t => /^RP[A-Z]+$/.test(t) },
-  { key: 'b', label: 'RP1-7', ph: 'RP1',     hint: 'RP1〜RP7 など(RP+数字)', test: t => /^RP[0-9]+$/.test(t) },
-  { key: 'c', label: 'PK/NP', ph: 'PKT2-2F', hint: 'PK・NP で始まる型番',    test: t => /^(PK|NP)/.test(t) },
+  { key: 'b', label: 'プレ内容', ph: 'RP1',     hint: 'RP1〜RP7 など(RP+数字)', test: t => /^RP[0-9]+$/.test(t) },
+  { key: 'c', label: 'PKT/NP',  ph: 'PKT2-2F', hint: 'PKT・NP で始まる型番',   test: t => /^(PK|NP)/.test(t) },
 ];
 const TTAIL_SORT_KEYS = TTAIL_SLOTS.map(sl => 'tail' + sl.key.toUpperCase());
 // タイトルから取り出した型番を、条件の合う欄へ順に入れる(先に埋まった欄は上書きしない)
@@ -6728,7 +6817,11 @@ function setTableMode(mode) {
   // v7.87: 3枚目変更フィルタは3枚目作成用でしか出さないので、離れたら解除する
   if (mode !== 'third' && mode !== 'basic') currentThirdTag = null;
   // v7.97: 並び順 / 対応 はタイトル末尾用だけの絞り込み
-  if (mode !== 'title2') { currentTailOrderFilter = null; currentTailWorkFilter = null; }
+  if (mode !== 'title2') {
+    currentTailOrderFilter = null;
+    currentTailWorkFilter = null;
+    currentTailCodeFilter = { a: null, b: null, c: null };   // v8.00
+  }
   // v7.97: 冠状態はタイトル先頭用だけの絞り込み
   if (mode !== 'title') currentTitleStatusFilter = null;
   tableMode = mode;
@@ -6831,6 +6924,7 @@ function _passesBaseFiltersForCount(code, p, search) {
     if (tableMode === 'title2') {
       if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
       if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
+      if (!_passesTailCodeFilter(p)) return false;   // v8.00: 型番での絞り込み
     } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
     const _t = String(p.apiTitle || '').toLowerCase();
     // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
