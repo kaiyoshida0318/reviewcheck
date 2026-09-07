@@ -942,6 +942,11 @@ body.mode-title2 .product-table .col-ranking { white-space: normal; overflow: vi
 .ttail-input.is-manual { border-color: #1976d2; background: #f4f9ff; }
 .ttail-empty { display: block; margin-top: 4px; font-size: 10px; color: var(--text3); }
 body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
+/* v8.03: 4つの欄をまとめてコピーするボタン。下のドロップダウンと同じ幅で並べる */
+.ttail-copy { display: block; width: 100%; box-sizing: border-box; margin-top: 5px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; text-align: center; white-space: nowrap; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.1s; }
+.ttail-copy:hover { background: #1976d2; color: #fff; border-color: #1976d2; }
+.ttail-copy.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+body.bulk-edit-mode .col-ranking .ttail-copy { pointer-events: auto; }
 /* v7.96: タイトル末尾変更の下に並べる2つのドロップダウン */
 .ttail-select { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 .ttail-select.to-none { color: var(--text3); }
@@ -955,7 +960,7 @@ body.bulk-edit-mode .col-ranking .ttail-select { pointer-events: auto; }
 /* v7.95: ヘッダーの3つの並べ替えボタン */
 /* v8.02: 4つを必ず横1列に並べる。折り返さないぶん文字は小さく、余白は詰める */
 .ttail-sort-buttons { display: flex; gap: 1px; margin-top: 3px; flex-wrap: nowrap; }
-.ttail-sort-buttons .review-sort-btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: 2px 1px; font-size: 9px; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; }
+.ttail-sort-buttons .review-sort-btn { flex: 1 1 auto; min-width: 0; justify-content: center; padding: 2px 1px; font-size: 9px; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; }
 .ttail-sort-buttons .sort-indicator { font-size: 8px; margin-left: 1px; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
@@ -1320,7 +1325,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.02</span>
+    <span class="build-date">v8.04</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1507,7 +1512,7 @@ body.resize-mode .col-align-btns { display: flex; }
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailA')" id="sortBtn-tailA" title="RPR系で並べ替え">RPR<span class="sort-indicator" id="sortInd-tailA"></span></span>
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailB')" id="sortBtn-tailB" title="プレ内容(RP1〜RP7)で並べ替え">プレ内容<span class="sort-indicator" id="sortInd-tailB"></span></span>
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailM')" id="sortBtn-tailM" title="マニュアル(-MN- など)で並べ替え">マニュアル<span class="sort-indicator" id="sortInd-tailM"></span></span>
-                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="PKT・NP系で並べ替え">PKT/NP<span class="sort-indicator" id="sortInd-tailC"></span></span>
+                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="配送法(TAK・PKT・NP系)で並べ替え">配送法<span class="sort-indicator" id="sortInd-tailC"></span></span>
                 </span></span></th>
               <!-- v7.87: 楽天側の現在のタイトル(タイトル修正用モードでのみ表示) -->
               <th class="col-curtitle sortable" onclick="setSortKey('currentTitle')" id="sortHeader-currentTitle" title="楽天側の現在のタイトル。クリックで並べ替え(未取得は常に末尾)">現在のタイトル <span class="sort-indicator" id="sortInd-currentTitle"></span></th>
@@ -3923,7 +3928,7 @@ const TTAIL_CODE_FILTERS = [
   { slot: 'b', label: 'プレ内容', mode: 'exact',  items: ['RP1', 'RP2', 'RP3', 'RP4', 'RP5', 'RP6', 'RP7'] },
   // v8.01: マニュアル。どんな値が来るか決め打ちできないのでデータから作る
   { slot: 'm', label: 'マニュアル', mode: 'auto', items: [] },
-  { slot: 'c', label: 'PKT/NP',   mode: 'prefix', items: ['PKT', 'NP'] },
+  { slot: 'c', label: '配送法',   mode: 'prefix', items: ['TAK', 'PKT', 'NP'] },
 ];
 const TTAIL_CODE_AUTO_MAX = 8;   // データから作るボタンの上限
 // 初期値は TTAIL_SLOTS と同じキー。ここは読み込み順の都合で直書き
@@ -6260,7 +6265,8 @@ const TTAIL_SLOTS = [
   { key: 'b', label: 'プレ内容', ph: 'RP1',   hint: 'RP1〜RP7 など(RP+数字)', test: t => /^RP[0-9]+$/.test(t) },
   // v8.01: マニュアル。-MN- のように前がハイフンで始まる語をここへ入れる
   { key: 'm', label: 'マニュアル', ph: '-MN-', hint: '-MN- などハイフンで始まる語', test: t => /^-/.test(t) },
-  { key: 'c', label: 'PKT/NP',   ph: 'PKT2',  hint: 'PKT・NP で始まる型番',   test: t => /^(PK|NP)/.test(t) },
+  // v8.04: 配送法。TAK・PKT・NP で始まる語。コピー(上部をコピー)からは外す
+  { key: 'c', label: '配送法',   ph: 'PKT2',  hint: 'TAK・PKT・NP で始まる型番', test: t => /^(TAK|PK|NP)/.test(t), noCopy: true },
 ];
 // 欄の初期値(絞り込みの状態を作るのに使う)。欄を増やしてもここは直さなくてよい
 function _emptyTailCodeFilter() { const o = {}; TTAIL_SLOTS.forEach(sl => { o[sl.key] = null; }); return o; }
@@ -6410,6 +6416,9 @@ function _renderTitleTailCell(code, p) {
   }
   html += '</div>';
   if (!api) html += `<div class="ttail-empty">タイトル未取得<span class="curtitle-note">次回の商品データ取得で入ります</span></div>`;
+  // v8.03: 4つの欄の中身をまとめてコピーするボタン(並び順の上)
+  html += `<button type="button" class="ttail-copy" data-code="${_escape(code)}"`
+    + ` onclick="copyTailCodes(this)" title="配送法をのぞいた欄の型番を、左から順にスペース区切りでコピーします">📋 配送法以外コピー</button>`;
   // v7.96: 上 = 並び順(自動判定・手で上書き可) / 下 = 対応
   const ok = _tailOrderValue(p);
   const manualOrder = typeof p.tailOrder === 'string';
@@ -6445,6 +6454,63 @@ function _renderCurrentTitleCell(code, p) {
     + `<button type="button" class="curtitle-copy" data-t="${_escape(api)}" onclick="copyCurrentTitle(this)" title="このタイトルをクリップボードにコピー">📋 コピー</button>`
     + `</div>`;
 }
+/*
+ * v8.04: 上の欄に入っている型番を、左から順に半角スペースでつないでコピーする。
+ *   ただし noCopy が付いた欄(配送法)は入れない。
+ *   例: RPR="" / プレ内容="RP1" / マニュアル="-MN-" / 配送法="PKT3-3F" → 「RP1 -MN-」
+ *   空の欄はとばす。押した時点の値をその場で読み直すので、
+ *   欄を打ち替えた直後でも最新の内容がコピーされる。
+ *   コピーに入れたくない欄を増やすときは TTAIL_SLOTS に noCopy を足すだけでよい。
+ */
+function _tailCodesText(code) {
+  const p = productCache[code];
+  if (!p) return '';
+  return TTAIL_SLOTS.filter(sl => !sl.noCopy).map(sl => _tailSlotValue(p, sl.key)).filter(v => v).join(' ');
+}
+function copyTailCodes(btn) {
+  const code = btn && btn.dataset ? btn.dataset.code : '';
+  const t = _tailCodesText(code);
+  if (!t) { _showToast('コピーする型番がありません', 'error'); return; }
+  _copyTextWithBtn(btn, t, '型番をコピーしました');
+}
+/*
+ * v8.03: クリップボードへの書き込み(ボタンの見た目も一時的に変える)。
+ *   copyCurrentTitle と同じ処理だったので共通化した。
+ *   navigator.clipboard が使えない場面(非セキュアなURLなど)では
+ *   画面外のテキスト欄を経由する昔ながらの方法に落とす。
+ */
+function _copyTextWithBtn(btn, text, okMsg) {
+  const done = (ok) => {
+    if (!ok) { _showToast('コピーに失敗しました', 'error'); return; }
+    const orig = btn.dataset.origLabel || btn.textContent;
+    btn.dataset.origLabel = orig;
+    btn.classList.add('copied');
+    btn.textContent = '✓ コピー';
+    clearTimeout(btn._copyTimer);
+    btn._copyTimer = setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 1400);
+    _showToast(okMsg, 'success');
+  };
+  const legacyCopy = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-1000px;left:-1000px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(ok);
+    } catch (e) { done(false); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => done(true), legacyCopy);
+  } else {
+    legacyCopy();
+  }
+}
+
 function copyCurrentTitle(btn) {
   const t = (btn && btn.dataset && btn.dataset.t) || '';
   if (!t) { _showToast('タイトルが取得できませんでした', 'error'); return; }
