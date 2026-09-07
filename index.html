@@ -900,6 +900,16 @@ body.mode-titleish .product-table .col-ranking {
 .denrei-btn:hover { background: #0d47a1; color: #fff !important; border-color: #0d47a1; text-decoration: none !important; }
 body.bulk-edit-mode .col-ranking .denrei-btn { pointer-events: auto; color: var(--text2); }
 body.bulk-edit-mode .col-ranking .denrei-btn:hover { color: #fff !important; }
+/* v7.93: ランキング列の見出しは、タイトル末尾用のときだけ「タイトル末尾変更」にする */
+.hdr-tail { display: none; }
+body.mode-title2 .hdr-tail { display: inline; }
+body.mode-title2 .hdr-ranking { display: none; }
+/* v7.93: タイトル末尾用のランキング列。型番をそのまま読めるように折り返す */
+body.mode-title2 .product-table .col-ranking { white-space: normal; overflow: visible; text-overflow: clip; }
+.ttail { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--text); word-break: break-all; line-height: 1.35; }
+.ttail-empty { font-size: 11px; color: var(--text3); }
+.ttail-foot { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+body.bulk-edit-mode .col-ranking .curtitle-copy { pointer-events: auto; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 body.mode-titleish .title-status-select { display: block; }
@@ -1263,7 +1273,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v7.92</span>
+    <span class="build-date">v7.93</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1440,7 +1450,7 @@ body.resize-mode .col-align-btns { display: flex; }
               <th class="col-kanri sortable" onclick="setSortKey('code')" id="sortHeader-code">商品管理番号 <span class="sort-indicator" id="sortInd-code"></span></th>
               <th class="col-bangou sortable" onclick="setSortKey('itemNumber')" id="sortHeader-itemNumber">商品番号 <span class="sort-indicator" id="sortInd-itemNumber"></span></th>
               <th class="col-name sortable" onclick="setSortKey('name')" id="sortHeader-name">商品名 <span class="sort-indicator" id="sortInd-name"></span></th>
-              <th class="col-ranking sortable" onclick="setSortKey('ranking')" id="sortHeader-ranking">ランキング（1枚目変更） <span class="sort-indicator" id="sortInd-ranking"></span></th>
+              <th class="col-ranking sortable" onclick="setSortKey(_rankingSortKey())" id="sortHeader-ranking" title="クリックで並べ替え"><span class="hdr-ranking">ランキング（1枚目変更）</span><span class="hdr-tail">タイトル末尾変更</span> <span class="sort-indicator" id="sortInd-ranking"></span></th>
               <!-- v7.87: 楽天側の現在のタイトル(タイトル修正用モードでのみ表示) -->
               <th class="col-curtitle sortable" onclick="setSortKey('currentTitle')" id="sortHeader-currentTitle" title="楽天側の現在のタイトル。クリックで並べ替え(未取得は常に末尾)">現在のタイトル <span class="sort-indicator" id="sortInd-currentTitle"></span></th>
               <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月日 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
@@ -3303,6 +3313,19 @@ function renderProducts() {
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'ranking':    cmp = (pa.ranking || '~~').localeCompare(pb.ranking || '~~', 'ja'); break;
+      case 'titleTail': {
+        // v7.93: タイトル末尾(型番)。空は昇順・降順どちらでも末尾に固定する
+        const sa = _titleTail(pa.apiTitle);
+        const sb = _titleTail(pb.apiTitle);
+        if (!sa && !sb) { cmp = 0; break; }
+        if (!sa || !sb) {
+          const c = !sa ? 1 : -1;
+          cmp = currentSortDir === 'desc' ? -c : c;
+          break;
+        }
+        cmp = sa.localeCompare(sb, 'en', { numeric: true, sensitivity: 'base' });
+        break;
+      }
       case 'currentTitle': {
         // v7.87: 現在のタイトル。未取得(空)は昇順・降順どちらでも末尾に固定する
         const ta = pa.apiTitle || '';
@@ -3446,6 +3469,9 @@ window.addEventListener('resize', _syncStickyHeaderTop);
 // ── 列ヘッダーソート ──
 let currentSortKey = 'code';   // 'code' | 'itemNumber' | 'name' | 'ranking' | 'yearMonth' | 'review' | 'reviewAvg'
 let currentSortDir = 'asc';     // 'asc' | 'desc'
+// v7.93: ランキング列の見出しは、タイトル末尾用では別の中身を出しているので
+//   並べ替えのキーも切り替える。見出し・指標・並べ替えの3か所がここを通る。
+function _rankingSortKey() { return tableMode === 'title2' ? 'titleTail' : 'ranking'; }
 function setSortKey(key) {
   // v6.14: 幅調整モード中はヘッダークリックを列幅変更に使うためソート無効。
   // v6.42: 一括編集(編集中)モードでも並べ替えは許可(編集は即時保存されるため安全。
@@ -3468,7 +3494,9 @@ function _updateSortIndicators() {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
-    if (k === currentSortKey) {
+    // v7.93: ランキング列だけモードでキーが変わる(タイトル末尾用 = titleTail)
+    const effKey = (k === 'ranking') ? _rankingSortKey() : k;
+    if (effKey === currentSortKey) {
       th.classList.add('sort-active');
       ind.textContent = currentSortDir === 'asc' ? '▲' : '▼';
     } else {
@@ -4267,6 +4295,8 @@ function _renderTableRow(code) {
         ${_renderDenreiBtn(code, p)}
         ${_renderTitleStatusSelect(code, p.titleStatus)}
       </div>`;
+    // v7.93: タイトル末尾用では、この欄はタイトルの末尾(型番)を見る場所にする
+    if (tableMode === 'title2') cellRanking = _renderTitleTailCell(code, p);
     cellYearMonth  = `<input type="text" class="bulk-edit-input bulk-edit-yearmonth" data-code="${_escape(code)}" data-field="yearMonth" value="${_escape(vYearMonth)}" onchange="onBulkEditChange(this)" placeholder="YYYY-MM-DD" title="年月日(2025-08-07 や 2025/8/7 など)、または年月まで(2025-08)">`;
   } else {
     cellItemNumber = itemNumberCell;
@@ -4288,6 +4318,8 @@ function _renderTableRow(code) {
     parts.push(`<div class="rank-detail">${_escape(p.ranking || '')}</div>`);
     parts.push(_renderTitleStatusSelect(code, p.titleStatus));
     cellRanking    = parts.join('');
+    // v7.93: タイトル末尾用では、この欄はタイトルの末尾(型番)を見る場所にする
+    if (tableMode === 'title2') cellRanking = _renderTitleTailCell(code, p);
     cellYearMonth  = _escape(p.yearMonth || '');
   }
 
@@ -4320,7 +4352,7 @@ function _renderTableRow(code) {
     <td class="col-kanri">${_escape(code)}</td>
     <td class="col-bangou">${cellItemNumber}</td>
     <td class="col-name">${cellName}</td>
-    <td class="col-ranking" title="${_escape(p.ranking || '')}">${cellRanking}</td>
+    <td class="col-ranking" title="${_escape(tableMode === 'title2' ? (p.apiTitle || '') : (p.ranking || ''))}">${cellRanking}</td>
     <td class="col-curtitle">${_renderCurrentTitleCell(code, p)}</td>
     <td class="col-yearmonth">${cellYearMonth}</td>
     ${selImgCell}
@@ -5963,6 +5995,57 @@ function setTitleStatus(code, v) {
   // 見た目(色)だけ入れ替える。行ごと描き直すと編集中のフォーカスが飛ぶため
   const sel = document.querySelector(`.title-status-select[data-code="${CSS.escape(code)}"]`);
   if (sel) { sel.className = `title-status-select ts-${next || 'todo'}`; _flashCell(sel.closest('td') || sel); }
+}
+
+/*
+ * v7.93: 現在のタイトルの「末尾の英数字だけの部分」を取り出す。
+ *   例:「… レスキューシート 防災毛布 RP2 RPR」→「RP2 RPR」
+ *
+ *   後ろから1語ずつ見ていき、半角英数字(と記号すこし)だけでできた語のあいだは
+ *   取り込み、日本語まじりの語に当たったところで止める。
+ *   楽天のタイトルは全角英数字まじりが多いので、判定の前に半角へそろえる
+ *   (画面に出すのも半角。そのままコピーして使えるようにするため)。
+ *   数字だけで終わっているとき(「… セット 2」など)は型番ではないので空にする。
+ */
+const TTAIL_TOKEN_RE = /^[A-Za-z0-9][A-Za-z0-9\-_.\/+()]*$/;
+function _toHalfWidth(v) {
+  return String(v || '').replace(/[Ａ-Ｚａ-ｚ０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+}
+function _titleTail(title) {
+  const raw = String(title || '').trim();
+  if (!raw) return '';
+  const toks = raw.split(/[\s\u3000]+/).filter(Boolean);
+  const out = [];
+  for (let i = toks.length - 1; i >= 0; i--) {
+    const t = _toHalfWidth(toks[i]);
+    if (!TTAIL_TOKEN_RE.test(t)) break;
+    out.unshift(t);
+  }
+  if (!out.length) return '';
+  // 数字だけなら型番とは考えない
+  if (!out.some(t => /[A-Za-z]/.test(t))) return '';
+  return out.join(' ');
+}
+/*
+ * v7.93: タイトル末尾用モードのランキング列。
+ *   取り出した末尾(型番)を大きく出して、そのままコピーできるようにする。
+ *   下に冠のドロップダウンを置くのは他のタイトルモードと同じ。
+ */
+function _renderTitleTailCell(code, p) {
+  const api = (p && p.apiTitle) || '';
+  const tail = _titleTail(api);
+  let html;
+  if (!api) {
+    html = `<span class="ttail-empty">—<span class="curtitle-note">次回の商品データ取得で入ります</span></span>`;
+  } else if (!tail) {
+    html = `<span class="ttail-empty">（末尾に英数字なし）</span>`;
+  } else {
+    html = `<div class="ttail" title="${_escape(api)}">${_escape(tail)}</div>`
+      + `<div class="ttail-foot">`
+      + `<button type="button" class="curtitle-copy" data-t="${_escape(tail)}" onclick="copyCurrentTitle(this)" title="この末尾をクリップボードにコピー">📋 コピー</button>`
+      + `</div>`;
+  }
+  return html + _renderTitleStatusSelect(code, p.titleStatus);
 }
 
 /*
