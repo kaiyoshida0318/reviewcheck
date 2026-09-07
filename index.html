@@ -934,8 +934,8 @@ body.mode-title2 .hdr-ranking { display: none; }
 /* v7.93: タイトル末尾用のランキング列。型番をそのまま読めるように折り返す */
 body.mode-title2 .product-table .col-ranking { white-space: normal; overflow: visible; text-overflow: clip; }
 /* v7.95: 3つの型番欄。左からRPR系 / RP1-7 / PK・NP系 */
-.ttail-inputs { display: flex; gap: 4px; align-items: center; }
-.ttail-input { flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 4px 5px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 700; text-align: center; letter-spacing: 0.02em; color: var(--text); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); }
+.ttail-inputs { display: flex; gap: 3px; align-items: center; }
+.ttail-input { flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 4px 3px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; text-align: center; letter-spacing: 0.02em; color: var(--text); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); }
 .ttail-input::placeholder { font-weight: 400; color: var(--border2); }
 .ttail-input:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 2px rgba(25,118,210,0.15); }
 /* 手で直した欄は、タイトルから取った値と区別できるようにする */
@@ -953,8 +953,9 @@ body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
 .ttail-select.ttail-order.is-manual { box-shadow: inset 3px 0 0 #1976d2; }
 body.bulk-edit-mode .col-ranking .ttail-select { pointer-events: auto; }
 /* v7.95: ヘッダーの3つの並べ替えボタン */
-.ttail-sort-buttons { display: flex; gap: 2px; margin-top: 3px; }
-.ttail-sort-buttons .review-sort-btn { flex: 1 1 0; justify-content: center; padding: 2px 3px; font-size: 10px; }
+/* v8.01: 4つになったので2つずつ折り返す(1行に詰めると文字が切れるため) */
+.ttail-sort-buttons { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; row-gap: 2px; }
+.ttail-sort-buttons .review-sort-btn { flex: 1 1 40%; justify-content: center; padding: 2px 3px; font-size: 10px; white-space: nowrap; }
 /* タイトル変更(変更前/変更済)。タイトル修正用モードでだけ出す */
 .title-status-select { display: none; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 body.mode-titleish .title-status-select { display: block; }
@@ -1318,7 +1319,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.00</span>
+    <span class="build-date">v8.01</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1504,6 +1505,7 @@ body.resize-mode .col-align-btns { display: flex; }
                 <span class="ttail-sort-buttons">
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailA')" id="sortBtn-tailA" title="RPR系で並べ替え">RPR<span class="sort-indicator" id="sortInd-tailA"></span></span>
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailB')" id="sortBtn-tailB" title="プレ内容(RP1〜RP7)で並べ替え">プレ内容<span class="sort-indicator" id="sortInd-tailB"></span></span>
+                  <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailM')" id="sortBtn-tailM" title="マニュアル(-MN- など)で並べ替え">マニュアル<span class="sort-indicator" id="sortInd-tailM"></span></span>
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="PKT・NP系で並べ替え">PKT/NP<span class="sort-indicator" id="sortInd-tailC"></span></span>
                 </span></span></th>
               <!-- v7.87: 楽天側の現在のタイトル(タイトル修正用モードでのみ表示) -->
@@ -3372,8 +3374,8 @@ function renderProducts() {
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'ranking':    cmp = (pa.ranking || '~~').localeCompare(pb.ranking || '~~', 'ja'); break;
-      case 'tailA': case 'tailB': case 'tailC': {
-        // v7.95: タイトル末尾の3つの欄。空は昇順・降順どちらでも末尾に固定する
+      case 'tailA': case 'tailB': case 'tailM': case 'tailC': {
+        // v7.95: タイトル末尾の各欄。空は昇順・降順どちらでも末尾に固定する
         const slotKey = currentSortKey.slice(4).toLowerCase();
         const sa = _tailSlotValue(pa, slotKey);
         const sb = _tailSlotValue(pb, slotKey);
@@ -3567,7 +3569,7 @@ function _updateSortIndicators() {
     }
   });
   // レビュー列の2ボタン(件数 / 評価)
-  ['review', 'reviewAvg', 'tailA', 'tailB', 'tailC'].forEach(k => {
+  ['review', 'reviewAvg', 'tailA', 'tailB', 'tailM', 'tailC'].forEach(k => {
     const btn = document.getElementById('sortBtn-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!btn || !ind) return;
@@ -3918,17 +3920,21 @@ function _tailWorkKey(p) { return (p && typeof p.tailWork === 'string' && p.tail
 const TTAIL_CODE_FILTERS = [
   { slot: 'a', label: 'RPR',      mode: 'auto',   items: [] },
   { slot: 'b', label: 'プレ内容', mode: 'exact',  items: ['RP1', 'RP2', 'RP3', 'RP4', 'RP5', 'RP6', 'RP7'] },
+  // v8.01: マニュアル。どんな値が来るか決め打ちできないのでデータから作る
+  { slot: 'm', label: 'マニュアル', mode: 'auto', items: [] },
   { slot: 'c', label: 'PKT/NP',   mode: 'prefix', items: ['PKT', 'NP'] },
 ];
 const TTAIL_CODE_AUTO_MAX = 8;   // データから作るボタンの上限
-let currentTailCodeFilter = { a: null, b: null, c: null };
+// 初期値は TTAIL_SLOTS と同じキー。ここは読み込み順の都合で直書き
+// (TTAIL_SLOTS はこの下で定義されるため、ここから呼ぶと初期化前になる)
+let currentTailCodeFilter = { a: null, b: null, m: null, c: null };
 function setTailCodeFilter(slot, k) {
   if (!(slot in currentTailCodeFilter)) return;
   currentTailCodeFilter[slot] = (currentTailCodeFilter[slot] === k) ? null : k;
   renderProducts();
 }
 function clearTailCodeFilter() {
-  currentTailCodeFilter = { a: null, b: null, c: null };
+  currentTailCodeFilter = _emptyTailCodeFilter();
   renderProducts();
 }
 function _tailCodeHit(p, slot, k) {
@@ -3952,19 +3958,23 @@ function _renderTailCodeRow(codes) {
     const p = productCache[c];
     return p && p.status !== 'ignore';
   });
-  // 「RPR」のかたまりは、実際に入っている値からボタンを作る
-  const autoVals = {};
-  for (const c of list) {
-    const v = _tailSlotValue(productCache[c], 'a');
-    if (v) autoVals[v] = (autoVals[v] || 0) + 1;
+  // v8.01: mode:'auto' のかたまりは、実際に入っている値からボタンを作る
+  const autoLists = {};
+  for (const g of TTAIL_CODE_FILTERS) {
+    if (g.mode !== 'auto') continue;
+    const vals = {};
+    for (const c of list) {
+      const v = _tailSlotValue(productCache[c], g.slot);
+      if (v) vals[v] = (vals[v] || 0) + 1;
+    }
+    autoLists[g.slot] = Object.keys(vals).sort((x, y) => x.localeCompare(y, 'en', { numeric: true }))
+      .slice(0, TTAIL_CODE_AUTO_MAX);
   }
-  const autoList = Object.keys(autoVals).sort((x, y) => x.localeCompare(y, 'en', { numeric: true }))
-    .slice(0, TTAIL_CODE_AUTO_MAX);
   const anyOn = TTAIL_CODE_FILTERS.some(g => currentTailCodeFilter[g.slot] !== null);
   let html = `<span class="toolbar-label">🏷 型番:</span>`;
   html += `<button type="button" class="tsf-btn${anyOn ? '' : ' active'}" onclick="clearTailCodeFilter()" title="型番の絞り込みをすべて解除">全体 <span class="tsf-count">(${list.length})</span></button>`;
   for (const g of TTAIL_CODE_FILTERS) {
-    const items = (g.mode === 'auto') ? autoList : g.items;
+    const items = (g.mode === 'auto') ? (autoLists[g.slot] || []) : g.items;
     html += `<span class="tcf-group-label">${_escape(g.label)}</span>`;
     for (const k of items) {
       let n = 0;
@@ -6245,10 +6255,14 @@ function _titleTail(title) { return _titleTailList(title).join(' '); }
  *   すべてこの表から作られる。
  */
 const TTAIL_SLOTS = [
-  { key: 'a', label: 'RPR',   ph: 'RPR',     hint: 'RPR・RPP など(RP+英字)', test: t => /^RP[A-Z]+$/.test(t) },
-  { key: 'b', label: 'プレ内容', ph: 'RP1',     hint: 'RP1〜RP7 など(RP+数字)', test: t => /^RP[0-9]+$/.test(t) },
-  { key: 'c', label: 'PKT/NP',  ph: 'PKT2-2F', hint: 'PKT・NP で始まる型番',   test: t => /^(PK|NP)/.test(t) },
+  { key: 'a', label: 'RPR',      ph: 'RPR',   hint: 'RPR・RPP など(RP+英字)', test: t => /^RP[A-Z]+$/.test(t) },
+  { key: 'b', label: 'プレ内容', ph: 'RP1',   hint: 'RP1〜RP7 など(RP+数字)', test: t => /^RP[0-9]+$/.test(t) },
+  // v8.01: マニュアル。-MN- のように前がハイフンで始まる語をここへ入れる
+  { key: 'm', label: 'マニュアル', ph: '-MN-', hint: '-MN- などハイフンで始まる語', test: t => /^-/.test(t) },
+  { key: 'c', label: 'PKT/NP',   ph: 'PKT2',  hint: 'PKT・NP で始まる型番',   test: t => /^(PK|NP)/.test(t) },
 ];
+// 欄の初期値(絞り込みの状態を作るのに使う)。欄を増やしてもここは直さなくてよい
+function _emptyTailCodeFilter() { const o = {}; TTAIL_SLOTS.forEach(sl => { o[sl.key] = null; }); return o; }
 const TTAIL_SORT_KEYS = TTAIL_SLOTS.map(sl => 'tail' + sl.key.toUpperCase());
 // タイトルから取り出した型番を、条件の合う欄へ順に入れる(先に埋まった欄は上書きしない)
 function _tailAutoSlots(p) {
@@ -6820,7 +6834,7 @@ function setTableMode(mode) {
   if (mode !== 'title2') {
     currentTailOrderFilter = null;
     currentTailWorkFilter = null;
-    currentTailCodeFilter = { a: null, b: null, c: null };   // v8.00
+    currentTailCodeFilter = _emptyTailCodeFilter();   // v8.00
   }
   // v7.97: 冠状態はタイトル先頭用だけの絞り込み
   if (mode !== 'title') currentTitleStatusFilter = null;
