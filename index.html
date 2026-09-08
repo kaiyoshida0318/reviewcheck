@@ -942,11 +942,24 @@ body.mode-title2 .product-table .col-ranking { white-space: normal; overflow: vi
 .ttail-input.is-manual { border-color: #1976d2; background: #f4f9ff; }
 .ttail-empty { display: block; margin-top: 4px; font-size: 10px; color: var(--text3); }
 body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
-/* v8.03: 4つの欄をまとめてコピーするボタン。下のドロップダウンと同じ幅で並べる */
-.ttail-copy { display: block; width: 100%; box-sizing: border-box; margin-top: 5px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; text-align: center; white-space: nowrap; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.1s; }
+/* v8.05: 左=見た目確認 / 右=適切なタイトルでコピー の2つを横に並べる */
+.ttail-btn-row { display: flex; gap: 3px; margin-top: 5px; }
+.ttail-copy { flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 4px 3px; font-family: inherit; font-size: 9px; font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; letter-spacing: -0.02em; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.1s; }
 .ttail-copy:hover { background: #1976d2; color: #fff; border-color: #1976d2; }
 .ttail-copy.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+.ttail-preview-btn:hover { background: #6a1b9a; border-color: #6a1b9a; }
 body.bulk-edit-mode .col-ranking .ttail-copy { pointer-events: auto; }
+/* v8.05: 見た目確認モーダルの中身 */
+.tpv-row { margin-bottom: 12px; }
+.tpv-label { font-size: 11px; font-weight: 700; color: var(--text3); margin-bottom: 4px; }
+.tpv-box { padding: 10px 12px; font-size: 13px; line-height: 1.6; word-break: break-all; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); }
+.tpv-box.is-after { background: #e8f5e9; border-color: rgba(46,125,50,0.35); color: #1b5e20; font-weight: 600; }
+.tpv-box.is-empty { color: var(--text3); font-weight: 400; }
+.tpv-arrow { text-align: center; font-size: 18px; color: var(--text3); margin: -4px 0 8px; }
+/* 付け直す部分だけ色を変えて、どこが変わったか一目で分かるようにする */
+.tpv-added { background: #fff3c4; border-radius: 3px; padding: 0 3px; }
+.tpv-removed { color: #c62828; text-decoration: line-through; }
+.tpv-note { font-size: 11px; color: var(--text2); margin-top: 10px; }
 /* v7.96: タイトル末尾変更の下に並べる2つのドロップダウン */
 .ttail-select { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 6px; font-family: inherit; font-size: 10px; font-weight: 600; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
 .ttail-select.to-none { color: var(--text3); }
@@ -1325,7 +1338,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.04</span>
+    <span class="build-date">v8.05</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1637,6 +1650,22 @@ body.resize-mode .col-align-btns { display: flex; }
     </div>
     <div class="modal-actions" style="margin-top:16px">
       <button class="modal-btn save" onclick="closeImgSelectHelp()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- v8.05: タイトル末尾の「見た目確認」モーダル -->
+<div class="modal-overlay" id="tailPreviewModal" onclick="if(event.target===this)closeTailPreview()">
+  <div class="modal" style="max-width:720px">
+    <h3 style="margin-top:0">👁 タイトルの見た目確認</h3>
+    <p style="font-size:12px;color:var(--text2);margin-top:-4px;margin-bottom:14px">
+      現在のタイトルから<strong>末尾の型番（配送法もふくむ）を取りのぞき</strong>、そのうしろに
+      <strong>タイトル末尾変更の欄（配送法以外）</strong>をつなぎ直したものが「変更後」です。
+    </p>
+    <div id="tailPreviewBody"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="modal-btn" onclick="closeTailPreview()">閉じる</button>
+      <button class="modal-btn save" id="tailPreviewCopyBtn" onclick="copyTailFixedTitleFromModal(this)">📋 変更後をコピー</button>
     </div>
   </div>
 </div>
@@ -6416,9 +6445,13 @@ function _renderTitleTailCell(code, p) {
   }
   html += '</div>';
   if (!api) html += `<div class="ttail-empty">タイトル未取得<span class="curtitle-note">次回の商品データ取得で入ります</span></div>`;
-  // v8.03: 4つの欄の中身をまとめてコピーするボタン(並び順の上)
-  html += `<button type="button" class="ttail-copy" data-code="${_escape(code)}"`
-    + ` onclick="copyTailCodes(this)" title="配送法をのぞいた欄の型番を、左から順にスペース区切りでコピーします">📋 配送法以外コピー</button>`;
+  // v8.05: 左=見た目確認(モーダル) / 右=適切なタイトルをそのままコピー
+  html += `<div class="ttail-btn-row">`
+    + `<button type="button" class="ttail-copy ttail-preview-btn" data-code="${_escape(code)}"`
+    + ` onclick="openTailPreview('${_escape(code)}')" title="元のタイトルと、型番を付け直したあとのタイトルを見比べます">👁 見た目確認</button>`
+    + `<button type="button" class="ttail-copy" data-code="${_escape(code)}"`
+    + ` onclick="copyTailFixedTitle(this)" title="型番を付け直したタイトルを、モーダルを開かずにそのままコピーします">適切なタイトルでコピー</button>`
+    + `</div>`;
   // v7.96: 上 = 並び順(自動判定・手で上書き可) / 下 = 対応
   const ok = _tailOrderValue(p);
   const manualOrder = typeof p.tailOrder === 'string';
@@ -6467,6 +6500,92 @@ function _tailCodesText(code) {
   if (!p) return '';
   return TTAIL_SLOTS.filter(sl => !sl.noCopy).map(sl => _tailSlotValue(p, sl.key)).filter(v => v).join(' ');
 }
+/*
+ * v8.05: 現在のタイトルから、末尾の型番をぜんぶ取りのぞく。
+ *   うしろから1語ずつ見て、型番の形(_isTailCode)であるあいだ削る。
+ *   残った部分は元の文字列をそのまま切り出すので、途中の空白は変わらない。
+ */
+function _stripTailCodes(title) {
+  let t = String(title || '').replace(/[\s\u3000]+$/, '');
+  for (let guard = 0; guard < 20; guard++) {
+    const m = /[\s\u3000]+([^\s\u3000]+)$/.exec(t);
+    if (!m || !_isTailCode(m[1])) break;
+    t = t.slice(0, m.index).replace(/[\s\u3000]+$/, '');
+  }
+  return t;
+}
+// 取りのぞかれる部分(表示で見せる用)
+function _removedTailCodes(title) {
+  const raw = String(title || '').trim();
+  const base = _stripTailCodes(raw);
+  return raw.slice(base.length).trim();
+}
+/*
+ * v8.05: 「適切なタイトル」= 型番を取りのぞいたタイトル + 配送法以外の欄。
+ *   配送法(PKTなど)はタイトルに載せないので、付け直す側にも入らない。
+ */
+function _tailFixedTitle(code) {
+  const p = productCache[code];
+  if (!p) return '';
+  const base = _stripTailCodes(p.apiTitle || '');
+  const codes = _tailCodesText(code);
+  if (!base) return codes;
+  return codes ? (base + ' ' + codes) : base;
+}
+function copyTailFixedTitle(btn) {
+  const code = btn && btn.dataset ? btn.dataset.code : '';
+  const t = _tailFixedTitle(code);
+  if (!t) { _showToast('タイトルが取得できていません', 'error'); return; }
+  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました');
+}
+
+/* ══ v8.05: 見た目確認モーダル ═══════════════════════════════════════════
+ *   元のタイトルと、型番を付け直したあとのタイトルを上下に並べて見せる。
+ *   消える部分は取り消し線、付け足す部分は色付きにして、違いが分かるようにする。
+ */
+let _tailPreviewCode = null;
+function openTailPreview(code) {
+  const p = productCache[code];
+  if (!p) return;
+  _tailPreviewCode = code;
+  const raw = String(p.apiTitle || '').trim();
+  const base = _stripTailCodes(raw);
+  const removed = _removedTailCodes(raw);
+  const codes = _tailCodesText(code);
+  const after = _tailFixedTitle(code);
+  const box = document.getElementById('tailPreviewBody');
+  if (box) {
+    let html = '';
+    html += `<div class="tpv-row"><div class="tpv-label">元のタイトル</div>`
+      + `<div class="tpv-box${raw ? '' : ' is-empty'}">`
+      + (raw ? `${_escape(base)}${removed ? ' <span class="tpv-removed">' + _escape(removed) + '</span>' : ''}`
+             : '（まだ取得できていません）')
+      + `</div></div>`;
+    html += `<div class="tpv-arrow">↓</div>`;
+    html += `<div class="tpv-row"><div class="tpv-label">変更後のタイトル</div>`
+      + `<div class="tpv-box is-after${after ? '' : ' is-empty'}">`
+      + (after ? `${_escape(base)}${codes ? ' <span class="tpv-added">' + _escape(codes) + '</span>' : ''}`
+               : '（中身がありません）')
+      + `</div></div>`;
+    const parts = TTAIL_SLOTS.map(sl => {
+      const v = _tailSlotValue(p, sl.key);
+      return `${_escape(sl.label)}：${v ? _escape(v) : '—'}${sl.noCopy ? '（タイトルには入れません）' : ''}`;
+    });
+    html += `<div class="tpv-note">${parts.join(' ／ ')}</div>`;
+    box.innerHTML = html;
+  }
+  document.getElementById('tailPreviewModal').classList.add('open');
+}
+function closeTailPreview() {
+  document.getElementById('tailPreviewModal').classList.remove('open');
+  _tailPreviewCode = null;
+}
+function copyTailFixedTitleFromModal(btn) {
+  const t = _tailFixedTitle(_tailPreviewCode);
+  if (!t) { _showToast('コピーする内容がありません', 'error'); return; }
+  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました');
+}
+
 function copyTailCodes(btn) {
   const code = btn && btn.dataset ? btn.dataset.code : '';
   const t = _tailCodesText(code);
