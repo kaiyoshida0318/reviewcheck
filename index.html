@@ -149,6 +149,7 @@ body.mode-third .tag-filter-row { display: none; }
 .tail-order-row > .toolbar-label,
 .tail-work-row > .toolbar-label,
 .tail-code-row > .toolbar-label,
+.tail-copy-row > .toolbar-label,
 .title-filter-row > .toolbar-label { flex-shrink: 0; min-width: 104px; }
 .tag-filter-row { gap: 6px; flex-wrap: wrap; row-gap: 6px; flex-basis: 100%; }
 /* v7.87: 3行のボタンは同じ作り。配色は --c(文字/選択時の背景) と --cb(枠) で受け取る。
@@ -836,10 +837,11 @@ body.mode-titleish .title-filter-row { display: flex; flex-basis: 100%; align-it
 .title-status-row { display: none; }
 body.mode-title .title-status-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
 /* v7.97: タイトル末尾用の絞り込み(並び順 / 対応 / 型番)。冠状態と同じ見た目 */
-.tail-order-row, .tail-work-row, .tail-code-row { display: none; }
+.tail-order-row, .tail-work-row, .tail-code-row, .tail-copy-row { display: none; }
 body.mode-title2 .tail-order-row,
 body.mode-title2 .tail-work-row,
-body.mode-title2 .tail-code-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+body.mode-title2 .tail-code-row,
+body.mode-title2 .tail-copy-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
 /* v8.00: 型番の行はボタンが多いので、3つのかたまりに小さな見出しを付けて区切る */
 .tcf-group-label { display: inline-flex; align-items: center; margin-left: 6px; padding-left: 8px; border-left: 2px solid var(--border2); font-size: 10px; font-weight: 700; color: var(--text3); white-space: nowrap; }
 .tcf-group-label:first-of-type { margin-left: 0; padding-left: 0; border-left: 0; }
@@ -949,6 +951,18 @@ body.bulk-edit-mode .col-ranking .ttail-input { pointer-events: auto; }
 .ttail-copy.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
 .ttail-preview-btn:hover { background: #6a1b9a; border-color: #6a1b9a; }
 body.bulk-edit-mode .col-ranking .ttail-copy { pointer-events: auto; }
+/* v8.06: コピー履歴の印。消すまで残る */
+.ttail-copied { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.ttail-copied:empty { display: none; }
+.ttail-copied-badge { flex: 1 1 auto; min-width: 0; padding: 3px 6px; font-size: 9px; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #2e7d32; background: #e8f5e9; border: 1px solid rgba(46,125,50,0.35); border-radius: var(--radius-sm); }
+.ttail-copied-x { flex: 0 0 auto; padding: 3px 5px; font-family: inherit; font-size: 9px; font-weight: 700; line-height: 1; color: var(--text3); background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); cursor: pointer; }
+.ttail-copied-x:hover { background: #c62828; border-color: #c62828; color: #fff; }
+body.bulk-edit-mode .col-ranking .ttail-copied-x { pointer-events: auto; }
+.tsf-btn.tcp-done { color: #2e7d32; border-color: rgba(46,125,50,0.4); }
+.tsf-btn.tcp-done.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+.tsf-btn.tcp-todo { color: var(--text2); }
+.tsf-btn.tcp-clear { margin-left: 10px; color: #c62828; border-color: rgba(198,40,40,0.4); }
+.tsf-btn.tcp-clear:hover { background: #c62828; border-color: #c62828; color: #fff; }
 /* v8.05: 見た目確認モーダルの中身 */
 .tpv-row { margin-bottom: 12px; }
 .tpv-label { font-size: 11px; font-weight: 700; color: var(--text3); margin-bottom: 4px; }
@@ -1338,7 +1352,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.05</span>
+    <span class="build-date">v8.06</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1454,6 +1468,8 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="toolbar-group tail-work-row" id="tailWorkRow"></div>
         <!-- v8.00: 型番そのもので絞り込む行(RPR / プレ内容 / PKT・NP) -->
         <div class="toolbar-group tail-code-row" id="tailCodeRow"></div>
+        <!-- v8.06: コピー履歴(コピー済 / 未コピー)の絞り込みと、まとめて消すボタン -->
+        <div class="toolbar-group tail-copy-row" id="tailCopyRow"></div>
         <div class="toolbar-group title-filter-row" id="titleFilterRow"></div>
         <!-- v7.87: 選択商品の一括変更パネル。状態/ランキングタイプを好きな組み合わせでまとめて変更する -->
         <div class="toolbar-group export-blocks" id="rankingExportGroup" style="display:none">
@@ -3335,6 +3351,9 @@ function renderProducts() {
         if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
         if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
         if (!_passesTailCodeFilter(p)) return false;   // v8.00: 型番での絞り込み
+        // v8.06: コピー履歴での絞り込み
+        if (currentTailCopyFilter === 'done' && !_tailCopiedAt(p)) return false;
+        if (currentTailCopyFilter === 'todo' && _tailCopiedAt(p)) return false;
       } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
       const _t = String(p.apiTitle || '').toLowerCase();
       // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
@@ -3779,6 +3798,7 @@ function renderSidebar() {
   _renderTitleStatusRow(codes);
   _renderTailFilterRows(codes);   // v7.97: タイトル末尾用の並び順 / 対応
   _renderTailCodeRow(codes);      // v8.00: 型番での絞り込み
+  _renderTailCopyRow(codes);      // v8.06: コピー履歴
   _renderThirdFilterRow(codes);
   // v7.87: 3行の縦線を同じ位置にそろえる(中身が変わるたびに測り直す)
   _syncFilterRowDividers();
@@ -3963,6 +3983,33 @@ const TTAIL_CODE_AUTO_MAX = 8;   // データから作るボタンの上限
 // 初期値は TTAIL_SLOTS と同じキー。ここは読み込み順の都合で直書き
 // (TTAIL_SLOTS はこの下で定義されるため、ここから呼ぶと初期化前になる)
 let currentTailCodeFilter = { a: null, b: null, m: null, c: null };
+// v8.06: コピー履歴での絞り込み。null=全体 / 'done'=コピー済 / 'todo'=未コピー
+let currentTailCopyFilter = null;
+function setTailCopyFilter(k) {
+  currentTailCopyFilter = (currentTailCopyFilter === k) ? null : k;
+  renderProducts();
+}
+function _renderTailCopyRow(codes) {
+  const box = document.getElementById('tailCopyRow');
+  if (!box) return;
+  if (tableMode !== 'title2') { box.innerHTML = ''; return; }
+  let done = 0, total = 0;
+  for (const c of Object.keys(productCache)) {
+    const p = productCache[c];
+    if (!p || p.status === 'ignore') continue;
+    if (_tailCopiedAt(p)) done++;
+    total++;
+  }
+  const mk = (k, label, n, cls) =>
+    `<button type="button" class="tsf-btn ${cls}${currentTailCopyFilter === k ? ' active' : ''}"`
+    + ` onclick="setTailCopyFilter(${k === null ? 'null' : "'" + k + "'"})"`
+    + ` title="${_escape(label)}の商品だけ表示(もう一度押すと解除)">${_escape(label)} <span class="tsf-count">(${n})</span></button>`;
+  box.innerHTML = `<span class="toolbar-label">📋 コピー履歴:</span>`
+    + mk(null, '全体', total, '')
+    + mk('done', 'コピー済', done, 'tcp-done')
+    + mk('todo', '未コピー', total - done, 'tcp-todo')
+    + `<button type="button" class="tsf-btn tcp-clear" onclick="clearAllTailCopied()" title="コピー履歴をすべて消します(元に戻せません)">🗑 履歴をリセット</button>`;
+}
 function setTailCodeFilter(slot, k) {
   if (!(slot in currentTailCodeFilter)) return;
   currentTailCodeFilter[slot] = (currentTailCodeFilter[slot] === k) ? null : k;
@@ -6452,6 +6499,8 @@ function _renderTitleTailCell(code, p) {
     + `<button type="button" class="ttail-copy" data-code="${_escape(code)}"`
     + ` onclick="copyTailFixedTitle(this)" title="型番を付け直したタイトルを、モーダルを開かずにそのままコピーします">適切なタイトルでコピー</button>`
     + `</div>`;
+  // v8.06: コピー履歴の印(消すまで残る)
+  html += `<div class="ttail-copied" data-code="${_escape(code)}">${_renderTailCopiedMarkHtml(code, p)}</div>`;
   // v7.96: 上 = 並び順(自動判定・手で上書き可) / 下 = 対応
   const ok = _tailOrderValue(p);
   const manualOrder = typeof p.tailOrder === 'string';
@@ -6532,11 +6581,73 @@ function _tailFixedTitle(code) {
   if (!base) return codes;
   return codes ? (base + ' ' + codes) : base;
 }
+/* ══ v8.06: 「適切なタイトルでコピー」の履歴 ═══════════════════════════════
+ *   何をやったか後から分かるように、コピーした日時と、そのとき何をコピーしたかを
+ *   商品ごとに残す。消すまで残り続ける(店舗のデータに保存されるので、
+ *   ページを閉じても別のPCで見ても残る)。
+ *   行の ✕ でその1件を消せる。上部の「📋 コピー履歴」の行からまとめて消すこともできる。
+ */
+function _tailCopiedAt(p) { return (p && typeof p.tailCopiedAt === 'string') ? p.tailCopiedAt : ''; }
+function _tailCopiedLabel(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const z = n => String(n).padStart(2, '0');
+  return `${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+function _markTailCopied(code, text) {
+  const p = productCache[code];
+  if (!p) return;
+  p.tailCopiedAt = new Date().toISOString();
+  p.tailCopiedText = String(text || '');
+  _touchUpdatedAt(code);
+  saveCache();
+  scheduleGitHubSave();
+  _syncTailCopiedMark(code);
+  _renderTailCopyRow();   // 上部の件数も合わせる
+}
+function clearTailCopied(code) {
+  const p = productCache[code];
+  if (!p) return;
+  delete p.tailCopiedAt;
+  delete p.tailCopiedText;
+  _touchUpdatedAt(code);
+  saveCache();
+  scheduleGitHubSave();
+  _syncTailCopiedMark(code);
+  _renderTailCopyRow();
+}
+function clearAllTailCopied() {
+  const n = Object.keys(productCache).filter(c => _tailCopiedAt(productCache[c])).length;
+  if (!n) { _showToast('消すコピー履歴はありません', 'info'); return; }
+  if (!confirm(`コピー履歴 ${n} 件をすべて消します。よろしいですか？`)) return;
+  for (const c of Object.keys(productCache)) {
+    delete productCache[c].tailCopiedAt;
+    delete productCache[c].tailCopiedText;
+  }
+  saveCache();
+  scheduleGitHubSave();
+  renderProducts();
+  _showToast(`コピー履歴 ${n} 件を消しました`, 'success');
+}
+// 行の印だけを描き直す(表全体を描き直すと入力中のフォーカスが飛ぶため)
+function _renderTailCopiedMarkHtml(code, p) {
+  const at = _tailCopiedAt(p);
+  if (!at) return '';
+  const txt = (p && p.tailCopiedText) || '';
+  return `<span class="ttail-copied-badge" title="${_escape(txt || 'コピー済み')}">✓ コピー済 ${_escape(_tailCopiedLabel(at))}</span>`
+    + `<button type="button" class="ttail-copied-x" onclick="clearTailCopied('${_escape(code)}')" title="この商品のコピー履歴を消す">✕</button>`;
+}
+function _syncTailCopiedMark(code) {
+  const box = document.querySelector(`.ttail-copied[data-code="${CSS.escape(code)}"]`);
+  if (!box) return;
+  box.innerHTML = _renderTailCopiedMarkHtml(code, productCache[code]);
+}
+
 function copyTailFixedTitle(btn) {
   const code = btn && btn.dataset ? btn.dataset.code : '';
   const t = _tailFixedTitle(code);
   if (!t) { _showToast('タイトルが取得できていません', 'error'); return; }
-  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました');
+  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました', () => _markTailCopied(code, t));
 }
 
 /* ══ v8.05: 見た目確認モーダル ═══════════════════════════════════════════
@@ -6581,9 +6692,11 @@ function closeTailPreview() {
   _tailPreviewCode = null;
 }
 function copyTailFixedTitleFromModal(btn) {
-  const t = _tailFixedTitle(_tailPreviewCode);
+  const code = _tailPreviewCode;
+  const t = _tailFixedTitle(code);
   if (!t) { _showToast('コピーする内容がありません', 'error'); return; }
-  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました');
+  // v8.06: モーダルから押しても同じように履歴に残す
+  _copyTextWithBtn(btn, t, '変更後のタイトルをコピーしました', () => _markTailCopied(code, t));
 }
 
 function copyTailCodes(btn) {
@@ -6598,9 +6711,10 @@ function copyTailCodes(btn) {
  *   navigator.clipboard が使えない場面(非セキュアなURLなど)では
  *   画面外のテキスト欄を経由する昔ながらの方法に落とす。
  */
-function _copyTextWithBtn(btn, text, okMsg) {
+function _copyTextWithBtn(btn, text, okMsg, onOk) {
   const done = (ok) => {
     if (!ok) { _showToast('コピーに失敗しました', 'error'); return; }
+    if (typeof onOk === 'function') { try { onOk(); } catch (e) { console.warn(e); } }
     const orig = btn.dataset.origLabel || btn.textContent;
     btn.dataset.origLabel = orig;
     btn.classList.add('copied');
@@ -7021,6 +7135,7 @@ function setTableMode(mode) {
     currentTailOrderFilter = null;
     currentTailWorkFilter = null;
     currentTailCodeFilter = _emptyTailCodeFilter();   // v8.00
+    currentTailCopyFilter = null;                    // v8.06
   }
   // v7.97: 冠状態はタイトル先頭用だけの絞り込み
   if (mode !== 'title') currentTitleStatusFilter = null;
@@ -7125,6 +7240,8 @@ function _passesBaseFiltersForCount(code, p, search) {
       if (currentTailOrderFilter !== null && _tailOrderValue(p) !== currentTailOrderFilter) return false;
       if (currentTailWorkFilter !== null && _tailWorkKey(p) !== currentTailWorkFilter) return false;
       if (!_passesTailCodeFilter(p)) return false;   // v8.00: 型番での絞り込み
+      if (currentTailCopyFilter === 'done' && !_tailCopiedAt(p)) return false;
+      if (currentTailCopyFilter === 'todo' && _tailCopiedAt(p)) return false;
     } else if (currentTitleStatusFilter && (_titleStatusKey(p.titleStatus) || 'todo') !== currentTitleStatusFilter) return false;
     const _t = String(p.apiTitle || '').toLowerCase();
     // v7.87: 「右以外」はチップの語がどれも入っていないものだけ
