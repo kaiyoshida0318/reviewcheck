@@ -572,9 +572,10 @@ body.mode-basic .product-table .col-third { display: table-cell; }
 .bn-text-actions .modal-btn { flex: 1; font-size: 10px; padding: 4px 6px; }
 .product-table .col-tags { width: var(--col-tags-w, 160px); }
 /* v8.07: 伝令ちゃんの状態。1枚目用モードでだけ出す */
-.product-table .col-denrei { width: var(--col-denrei-w, 132px); display: none; }
+.product-table .col-denrei { width: var(--col-denrei-w, 150px); display: none; }
 body.mode-ranking .product-table .col-denrei { display: table-cell; }
-.dnr-badge { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 3px 7px; font-size: 10px; font-weight: 700; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: var(--radius-sm); border: 1px solid transparent; }
+/* v8.09: 名前が長いものがあるので折り返しを許す(切れて読めなくなるのを防ぐ) */
+.dnr-badge { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 3px 7px; font-size: 10px; font-weight: 700; line-height: 1.35; white-space: normal; word-break: keep-all; border-radius: var(--radius-sm); border: 1px solid transparent; }
 .dnr-registered { color: #2e7d32; background: #e8f5e9; border-color: rgba(46,125,50,0.35); }
 .dnr-ready      { color: #b26a00; background: #fff8e1; border-color: rgba(178,106,0,0.35); }
 .dnr-before     { color: #78716c; background: #f5f4ee; border-color: var(--border2); }
@@ -1369,7 +1370,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.08</span>
+    <span class="build-date">v8.09</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -6293,12 +6294,14 @@ function _isDenreiVisible(p) {
  *   伝令ちゃん側が本当の持ち主なので、こちらで写しを持つと古い値が残るため。
  */
 const DENREI_API_URL = 'https://ranking-denrei-chan.kaiyoshida0318.workers.dev/api/products';
+// v8.09: 作業の進む順に並べる(獲得前 → 獲得済-登録可能 → 登録済)。
+//   order は上部のボタンの並びと、列見出しでの並べ替えの両方に効く。
 const DENREI_STATES = {
-  registered: { label: 'ツール登録済',       cls: 'dnr-registered', order: 1 },
-  ready:      { label: 'ランキング登録可能', cls: 'dnr-ready',      order: 2 },
-  before:     { label: 'ランキング獲得前',   cls: 'dnr-before',     order: 3 },
-  none:       { label: '伝令ちゃん未登録',   cls: 'dnr-none',       order: 4 },
-  unknown:    { label: '未取得',             cls: 'dnr-unknown',    order: 5 },
+  before:     { label: 'ランキング獲得前',        cls: 'dnr-before',     order: 1 },
+  ready:      { label: 'ランキング獲得済-登録可能', cls: 'dnr-ready',    order: 2 },
+  registered: { label: 'ランキング登録済',        cls: 'dnr-registered', order: 3 },
+  none:       { label: '伝令ちゃん未登録',        cls: 'dnr-none',       order: 4 },
+  unknown:    { label: '未取得',                  cls: 'dnr-unknown',    order: 5 },
 };
 let denreiMap = {};          // 商品管理番号 → { state, targets, achieved }
 let denreiLoadState = 'idle';   // 'idle' | 'loading' | 'ok' | 'error'
@@ -6378,7 +6381,7 @@ function _renderDenreiRow() {
   html += `<button type="button" class="tsf-btn${currentDenreiFilter === null ? ' active' : ''}"`
     + ` onclick="setDenreiFilter(null)" title="絞り込みを解除">全体 <span class="tsf-count">(${total})</span></button>`;
   if (denreiLoadState === 'ok') {
-    for (const k of ['registered', 'ready', 'before', 'none']) {
+    for (const k of ['before', 'ready', 'registered', 'none']) {
       const def = DENREI_STATES[k];
       html += `<button type="button" class="tsf-btn${currentDenreiFilter === k ? ' active' : ''}"`
         + ` onclick="setDenreiFilter('${k}')" title="${_escape(def.label)}の商品だけ表示(もう一度押すと解除)">`
@@ -10354,7 +10357,7 @@ const COLUMN_DEFS = [
   { id: 'itemNumber',  label: '商品番号',     defaultW: 130, min: 60,  align: 'left' },
   { id: 'name',        label: '商品名',       defaultW: 200, min: 80,  align: 'left' },
   { id: 'ranking',     label: 'ランキング（1枚目変更）', defaultW: 200, min: 80,  align: 'left' },
-  { id: 'denrei',      label: '伝令ちゃん',   defaultW: 132, min: 80,  align: 'center' },
+  { id: 'denrei',      label: '伝令ちゃん',   defaultW: 150, min: 80,  align: 'center' },
   { id: 'currentTitle', label: '現在のタイトル', defaultW: 320, min: 120, align: 'left' },
   { id: 'yearMonth',   label: '年月日',       defaultW:  95, min: 60,  align: 'center' },
   { id: 'sales',       label: '売上',         defaultW: 120, min: 60,  align: 'left' },
