@@ -571,6 +571,22 @@ body.mode-basic .product-table .col-third { display: table-cell; }
 .bn-text-actions { display: flex; gap: 6px; margin-top: 8px; }
 .bn-text-actions .modal-btn { flex: 1; font-size: 10px; padding: 4px 6px; }
 .product-table .col-tags { width: var(--col-tags-w, 160px); }
+/* v8.07: 伝令ちゃんの状態。1枚目用モードでだけ出す */
+.product-table .col-denrei { width: var(--col-denrei-w, 132px); display: none; }
+body.mode-ranking .product-table .col-denrei { display: table-cell; }
+.dnr-badge { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 3px 7px; font-size: 10px; font-weight: 700; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: var(--radius-sm); border: 1px solid transparent; }
+.dnr-registered { color: #2e7d32; background: #e8f5e9; border-color: rgba(46,125,50,0.35); }
+.dnr-ready      { color: #b26a00; background: #fff8e1; border-color: rgba(178,106,0,0.35); }
+.dnr-before     { color: #78716c; background: #f5f4ee; border-color: var(--border2); }
+.dnr-none       { color: var(--text3); background: transparent; border-color: var(--border2); border-style: dashed; }
+.dnr-unknown    { color: #c62828; background: #ffebee; border-color: rgba(198,40,40,0.35); }
+.dnr-sub { display: block; margin-top: 2px; font-size: 9px; color: var(--text3); }
+/* v8.07: 上部の取得状況バー(1枚目用モードのみ) */
+.denrei-row { display: none; }
+body.mode-ranking .denrei-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
+.denrei-row > .toolbar-label { flex-shrink: 0; min-width: 104px; }
+.dnr-msg { font-size: 11px; color: var(--text2); }
+.dnr-msg.is-error { color: #c62828; font-weight: 600; }
 /* v7.87: 「選択画像」列は反映確認レイアウト専用だったため、対応内容の廃止に伴い常に非表示。 */
 .product-table .col-selimg { width: var(--col-selimg-w, 104px); display: none; }
 /* 「選択画像の右下(拡大)」は1枚目作成用モードで常に最右列に表示する
@@ -1289,6 +1305,7 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .product-table .col-selimg { text-align: var(--col-selimg-align, left); }
 .product-table .col-crop { text-align: var(--col-crop-align, left); }
 .product-table .col-tags { text-align: var(--col-tags-align, left); }
+.product-table .col-denrei { text-align: var(--col-denrei-align, center); }
 .product-table .col-action { text-align: var(--col-action-align, left); }
 .product-table .col-diff-onscreen { text-align: var(--col-onscreen-align, left); }
 .product-table .col-diff-result { text-align: var(--col-diffResult-align, left); }
@@ -1352,7 +1369,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.06</span>
+    <span class="build-date">v8.07</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -1456,6 +1473,8 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="toolbar-group ranking-filter-group" id="rankingKindFilterGroup" style="display:none">
           <span class="toolbar-label">🏆 ランクタイプ:</span>
         </div>
+        <!-- v8.07: 伝令ちゃんの状態(1枚目用モードのみ) -->
+        <div class="toolbar-group denrei-row" id="denreiRow"></div>
         <!-- v7.87: 2枚目変更フィルタ。「状態」の下に1行使って並べる
              (1枚目作成用モードではCSSで非表示) -->
         <div class="toolbar-group tag-filter-row" id="tagFilterRow"></div>
@@ -1543,6 +1562,8 @@ body.resize-mode .col-align-btns { display: flex; }
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailM')" id="sortBtn-tailM" title="マニュアル(-MN- など)で並べ替え">マニュアル<span class="sort-indicator" id="sortInd-tailM"></span></span>
                   <span class="review-sort-btn" onclick="event.stopPropagation();setSortKey('tailC')" id="sortBtn-tailC" title="配送法(TAK・PKT・NP系)で並べ替え">配送法<span class="sort-indicator" id="sortInd-tailC"></span></span>
                 </span></span></th>
+              <!-- v8.07: ランキング伝令ちゃん側の状態(1枚目用モードでのみ表示) -->
+              <th class="col-denrei sortable" onclick="setSortKey('denrei')" id="sortHeader-denrei" title="ランキング伝令ちゃん側のステータス。クリックで並べ替え">伝令ちゃん <span class="sort-indicator" id="sortInd-denrei"></span></th>
               <!-- v7.87: 楽天側の現在のタイトル(タイトル修正用モードでのみ表示) -->
               <th class="col-curtitle sortable" onclick="setSortKey('currentTitle')" id="sortHeader-currentTitle" title="楽天側の現在のタイトル。クリックで並べ替え(未取得は常に末尾)">現在のタイトル <span class="sort-indicator" id="sortInd-currentTitle"></span></th>
               <th class="col-yearmonth sortable" onclick="setSortKey('yearMonth')" id="sortHeader-yearMonth">年月日 <span class="sort-indicator" id="sortInd-yearMonth"></span></th>
@@ -3411,6 +3432,8 @@ function renderProducts() {
       if (t !== currentRankingFilter) return false;
     }
     // v7.87: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
+    // v8.07: 伝令ちゃんの状態(1枚目用モードのみ)
+    if (tableMode === 'ranking' && currentDenreiFilter && _denreiStateOf(code) !== currentDenreiFilter) return false;
     // v7.87: ランキングタイプは1枚目作成用とタイトル修正用で効かせる
     if ((tableMode === 'ranking' || _isTitleMode()) && currentRankingKindFilter !== 'all') {
       const k = p.rankingKind || 'not_needed';   // v7.87: 未設定は「不要」
@@ -3428,6 +3451,13 @@ function renderProducts() {
       case 'itemNumber': cmp = (pa.itemNumber || '~~').localeCompare(pb.itemNumber || '~~', 'ja'); break;
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'ranking':    cmp = (pa.ranking || '~~').localeCompare(pb.ranking || '~~', 'ja'); break;
+      case 'denrei': {
+        // v8.07: 登録済 → 登録可能 → 獲得前 → 未登録 の順
+        const oa = (DENREI_STATES[_denreiStateOf(a)] || {}).order || 9;
+        const ob = (DENREI_STATES[_denreiStateOf(b)] || {}).order || 9;
+        cmp = oa - ob;
+        break;
+      }
       case 'tailA': case 'tailB': case 'tailM': case 'tailC': {
         // v7.95: タイトル末尾の各欄。空は昇順・降順どちらでも末尾に固定する
         const slotKey = currentSortKey.slice(4).toLowerCase();
@@ -3609,7 +3639,7 @@ function setSortKey(key) {
 function _updateSortIndicators() {
   // v6.10: review/reviewAvg は <th> ではなく内側の <span class="review-sort-btn"> で制御
   // それ以外のキーは従来通り <th id="sortHeader-XX"> で制御
-  ['updatedAt', 'code', 'itemNumber', 'name', 'ranking', 'currentTitle', 'selimg', 'yearMonth', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
+  ['updatedAt', 'code', 'itemNumber', 'name', 'ranking', 'denrei', 'currentTitle', 'selimg', 'yearMonth', 'sales', 'onscreen', 'diff', 'growth'].forEach(k => {
     const th = document.getElementById('sortHeader-' + k);
     const ind = document.getElementById('sortInd-' + k);
     if (!th || !ind) return;
@@ -3799,6 +3829,7 @@ function renderSidebar() {
   _renderTailFilterRows(codes);   // v7.97: タイトル末尾用の並び順 / 対応
   _renderTailCodeRow(codes);      // v8.00: 型番での絞り込み
   _renderTailCopyRow(codes);      // v8.06: コピー履歴
+  _renderDenreiRow();             // v8.07: 伝令ちゃんの状態
   _renderThirdFilterRow(codes);
   // v7.87: 3行の縦線を同じ位置にそろえる(中身が変わるたびに測り直す)
   _syncFilterRowDividers();
@@ -4632,6 +4663,7 @@ function _renderTableRow(code) {
     <td class="col-bangou">${cellItemNumber}</td>
     <td class="col-name">${cellName}</td>
     <td class="col-ranking" title="${_escape(tableMode === 'title2' ? (p.apiTitle || '') : (p.ranking || ''))}">${cellRanking}</td>
+    <td class="col-denrei">${_renderDenreiStatusCell(code)}</td>
     <td class="col-curtitle">${_renderCurrentTitleCell(code, p)}</td>
     <td class="col-yearmonth">${cellYearMonth}</td>
     ${selImgCell}
@@ -6247,6 +6279,123 @@ function _isDenreiVisible(p) {
   if (DENREI_SHOW_KEYS.third.includes(_thirdKey(p.thirdStatus) || 'none')) return true;
   return false;
 }
+/* ══ v8.07: ランキング伝令ちゃんの状態を読む ══════════════════════════════
+ *   伝令ちゃん側の /api/products を1回読んで、商品管理番号(product_code)で
+ *   reviewcheck の商品と突き合わせる。取ってくるのは状態だけ。
+ *
+ *   状態の決め方(伝令ちゃんの画面と同じ考え方):
+ *     ranking_registered が真            → ランキング登録済
+ *     偽で、achieved の対象が1つでもある → ランキング登録可能(獲得したので登録できる)
+ *     偽で、achieved が1つもない         → ランキング獲得前
+ *     APIに居ない商品                     → 伝令ちゃん未登録
+ *
+ *   読み込んだ内容は画面の中だけに置く(GitHubには保存しない)。
+ *   伝令ちゃん側が本当の持ち主なので、こちらで写しを持つと古い値が残るため。
+ */
+const DENREI_API_URL = 'https://ranking-denrei-chan.kaiyoshida0318.workers.dev/api/products';
+const DENREI_STATES = {
+  registered: { label: 'ランキング登録済',   cls: 'dnr-registered', order: 1 },
+  ready:      { label: 'ランキング登録可能', cls: 'dnr-ready',      order: 2 },
+  before:     { label: 'ランキング獲得前',   cls: 'dnr-before',     order: 3 },
+  none:       { label: '伝令ちゃん未登録',   cls: 'dnr-none',       order: 4 },
+  unknown:    { label: '未取得',             cls: 'dnr-unknown',    order: 5 },
+};
+let denreiMap = {};          // 商品管理番号 → { state, targets, achieved }
+let denreiLoadState = 'idle';   // 'idle' | 'loading' | 'ok' | 'error'
+let denreiLoadedAt = '';
+let denreiError = '';
+function _denreiStateOf(code) {
+  if (denreiLoadState !== 'ok') return 'unknown';
+  const d = denreiMap[String(code)];
+  return d ? d.state : 'none';
+}
+function _denreiStateFromItem(it) {
+  const list = Array.isArray(it && it.ranking_status) ? it.ranking_status : [];
+  const achieved = list.filter(x => x && x.status === 'achieved').length;
+  if (it && (it.ranking_registered === true || it.ranking_registered === 1)) return { state: 'registered', achieved, targets: list.length };
+  if (achieved > 0) return { state: 'ready', achieved, targets: list.length };
+  return { state: 'before', achieved, targets: list.length };
+}
+async function fetchDenreiStatus(manual) {
+  if (denreiLoadState === 'loading') return;
+  denreiLoadState = 'loading';
+  denreiError = '';
+  _renderDenreiRow();
+  try {
+    const res = await fetch(DENREI_API_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const items = Array.isArray(json && json.items) ? json.items : [];
+    const map = {};
+    for (const it of items) {
+      const pc = it && it.product_code != null ? String(it.product_code).trim() : '';
+      if (!pc) continue;
+      map[pc] = _denreiStateFromItem(it);
+    }
+    denreiMap = map;
+    denreiLoadState = 'ok';
+    denreiLoadedAt = new Date().toISOString();
+    if (manual) _showToast(`伝令ちゃんの状態を取得しました(${items.length}件)`, 'success');
+  } catch (e) {
+    denreiLoadState = 'error';
+    // 別ドメインへの読み取りなので、止められた場合はここに来る
+    denreiError = String((e && e.message) || e);
+    console.warn('[reviewcheck] 伝令ちゃんの取得に失敗:', e);
+    if (manual) _showToast('伝令ちゃんの状態を取得できませんでした', 'error');
+  }
+  _renderDenreiRow();
+  renderProducts();
+}
+function _renderDenreiStatusCell(code) {
+  const key = _denreiStateOf(code);
+  const def = DENREI_STATES[key] || DENREI_STATES.unknown;
+  const d = denreiMap[String(code)];
+  let sub = '';
+  if (key === 'registered' || key === 'ready' || key === 'before') {
+    sub = `<span class="dnr-sub">獲得 ${d.achieved}/${d.targets}</span>`;
+  } else if (key === 'unknown') {
+    sub = `<span class="dnr-sub">${denreiLoadState === 'loading' ? '読込中' : '取得できていません'}</span>`;
+  }
+  return `<span class="dnr-badge ${def.cls}" title="${_escape(def.label)}">${_escape(def.label)}</span>${sub}`;
+}
+function _renderDenreiRow() {
+  const box = document.getElementById('denreiRow');
+  if (!box) return;
+  const counts = {};
+  Object.keys(DENREI_STATES).forEach(k => { counts[k] = 0; });
+  for (const c of Object.keys(productCache)) {
+    const p = productCache[c];
+    if (!p || p.status === 'ignore') continue;
+    counts[_denreiStateOf(c)]++;
+  }
+  let html = `<span class="toolbar-label">🔔 伝令ちゃん:</span>`;
+  if (denreiLoadState === 'ok') {
+    for (const k of ['registered', 'ready', 'before', 'none']) {
+      const def = DENREI_STATES[k];
+      html += `<button type="button" class="tsf-btn${currentDenreiFilter === k ? ' active' : ''}"`
+        + ` onclick="setDenreiFilter('${k}')" title="${_escape(def.label)}の商品だけ表示(もう一度押すと解除)">`
+        + `${_escape(def.label)} <span class="tsf-count">(${counts[k]})</span></button>`;
+    }
+    html += `<span class="dnr-msg">${_escape(_tailCopiedLabel(denreiLoadedAt))} 時点</span>`;
+  } else if (denreiLoadState === 'loading') {
+    html += `<span class="dnr-msg">読込中…</span>`;
+  } else if (denreiLoadState === 'error') {
+    html += `<span class="dnr-msg is-error">取得できませんでした（${_escape(denreiError)}）。`
+      + `伝令ちゃん側が別ドメインからの読み取りを許していない場合は、Worker の応答に`
+      + ` Access-Control-Allow-Origin を足すと読めるようになります。</span>`;
+  } else {
+    html += `<span class="dnr-msg">未取得</span>`;
+  }
+  html += `<button type="button" class="tsf-btn" onclick="fetchDenreiStatus(true)" title="伝令ちゃん側の状態を取り直します">🔄 更新</button>`;
+  box.innerHTML = html;
+}
+// 伝令ちゃんの状態での絞り込み(1枚目用モードのみ)
+let currentDenreiFilter = null;
+function setDenreiFilter(k) {
+  currentDenreiFilter = (currentDenreiFilter === k) ? null : k;
+  renderProducts();
+}
+
 function _renderDenreiBtn(code, p) {
   if (!_isDenreiVisible(p)) return '';
   const url = _make1Url(code);
@@ -7139,6 +7288,7 @@ function setTableMode(mode) {
   }
   // v7.97: 冠状態はタイトル先頭用だけの絞り込み
   if (mode !== 'title') currentTitleStatusFilter = null;
+  if (mode !== 'ranking') currentDenreiFilter = null;   // v8.07
   tableMode = mode;
   localStorage.setItem(TABLE_MODE_KEY, mode);
   _applyModeUI(mode);
@@ -10195,6 +10345,7 @@ const COLUMN_DEFS = [
   { id: 'itemNumber',  label: '商品番号',     defaultW: 130, min: 60,  align: 'left' },
   { id: 'name',        label: '商品名',       defaultW: 200, min: 80,  align: 'left' },
   { id: 'ranking',     label: 'ランキング（1枚目変更）', defaultW: 200, min: 80,  align: 'left' },
+  { id: 'denrei',      label: '伝令ちゃん',   defaultW: 132, min: 80,  align: 'center' },
   { id: 'currentTitle', label: '現在のタイトル', defaultW: 320, min: 120, align: 'left' },
   { id: 'yearMonth',   label: '年月日',       defaultW:  95, min: 60,  align: 'center' },
   { id: 'sales',       label: '売上',         defaultW: 120, min: 60,  align: 'left' },
@@ -10223,6 +10374,7 @@ const TH_CLASS_TO_COLID = {
   'col-bangou': 'itemNumber',
   'col-name': 'name',
   'col-ranking': 'ranking',
+  'col-denrei': 'denrei',
   'col-curtitle': 'currentTitle',
   'col-yearmonth': 'yearMonth',
   'col-sales': 'sales',
@@ -11074,6 +11226,8 @@ async function init() {
   renderProducts();
   // v6.13: テーブルレンダリング後にリサイズハンドルを取り付け
   attachColumnResizeHandles();
+  // v8.07: 伝令ちゃんの状態は待たずに読む(失敗しても他の表示は止めない)
+  fetchDenreiStatus(false);
   console.log('[reviewcheck] v7.87 initialized');
 }
 
