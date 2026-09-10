@@ -1369,7 +1369,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.07</span>
+    <span class="build-date">v8.08</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -6294,7 +6294,7 @@ function _isDenreiVisible(p) {
  */
 const DENREI_API_URL = 'https://ranking-denrei-chan.kaiyoshida0318.workers.dev/api/products';
 const DENREI_STATES = {
-  registered: { label: 'ランキング登録済',   cls: 'dnr-registered', order: 1 },
+  registered: { label: 'ツール登録済',       cls: 'dnr-registered', order: 1 },
   ready:      { label: 'ランキング登録可能', cls: 'dnr-ready',      order: 2 },
   before:     { label: 'ランキング獲得前',   cls: 'dnr-before',     order: 3 },
   none:       { label: '伝令ちゃん未登録',   cls: 'dnr-none',       order: 4 },
@@ -6368,7 +6368,15 @@ function _renderDenreiRow() {
     if (!p || p.status === 'ignore') continue;
     counts[_denreiStateOf(c)]++;
   }
+  let total = 0;
+  for (const c of Object.keys(productCache)) {
+    const p = productCache[c];
+    if (p && p.status !== 'ignore') total++;
+  }
   let html = `<span class="toolbar-label">🔔 伝令ちゃん:</span>`;
+  // v8.08: いちばん左は「全体」= 絞り込みなし。他の行と同じ並び方にそろえる
+  html += `<button type="button" class="tsf-btn${currentDenreiFilter === null ? ' active' : ''}"`
+    + ` onclick="setDenreiFilter(null)" title="絞り込みを解除">全体 <span class="tsf-count">(${total})</span></button>`;
   if (denreiLoadState === 'ok') {
     for (const k of ['registered', 'ready', 'before', 'none']) {
       const def = DENREI_STATES[k];
@@ -6392,7 +6400,8 @@ function _renderDenreiRow() {
 // 伝令ちゃんの状態での絞り込み(1枚目用モードのみ)
 let currentDenreiFilter = null;
 function setDenreiFilter(k) {
-  currentDenreiFilter = (currentDenreiFilter === k) ? null : k;
+  // v8.08: null は「全体」= 解除。同じボタンをもう一度押したときも解除
+  currentDenreiFilter = (k === null || currentDenreiFilter === k) ? null : k;
   renderProducts();
 }
 
