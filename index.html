@@ -1103,16 +1103,21 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .table-item-number-input { font-family: 'DM Mono', monospace; font-size: 11px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; outline: none; width: 100%; max-width: 120px; }
 
 /* ── View toggle ── */
-.view-toggle { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
-.view-toggle-btn { border: none; background: none; cursor: pointer; padding: 4px 10px; font-size: 11px; color: var(--text2); border-radius: 4px; font-family: inherit; display: flex; align-items: center; gap: 4px; transition: all 0.12s; }
+/* v8.15: 枠つきのボタンが隣とくっつかないように、すこし間をあける */
+.view-toggle { display: flex; align-items: center; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
+/* v8.15: 枠は透明で常に確保しておく(色が付いたときに幅が動かないようにするため) */
+.view-toggle-btn { border: 1px solid transparent; background: none; cursor: pointer; padding: 4px 10px; font-size: 11px; color: var(--text2); border-radius: 4px; font-family: inherit; display: flex; align-items: center; gap: 4px; transition: all 0.12s; }
 .view-toggle-btn:hover { color: var(--text); }
 .view-toggle-btn.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
-/* v8.11: 手をつける商品があるモードは色を変えて、件数を右に出す。
-   選択中かどうかに関係なく目に入るようにしたいので、文字色と枠で示す。 */
+/* v8.11/v8.15: 手をつける商品があるモードは、枠と地色を付けて目立たせる。
+   選択中かどうかに関係なく目に入ってほしいので、文字色だけでなく枠でも示す。 */
 .mode-badge { display: none; }
-.view-toggle-btn.has-alert { color: #bf0000; font-weight: 700; }
-.view-toggle-btn.has-alert .mode-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 4px; margin-left: 2px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1; color: #fff; background: #bf0000; border-radius: 8px; }
-.view-toggle-btn.has-alert.active { background: #fff0f0; color: #bf0000; box-shadow: 0 1px 2px rgba(191,0,0,0.18); }
+.view-toggle-btn.has-alert { color: #bf0000; font-weight: 700; background: #fff0f0; border-color: #e59a9a; box-shadow: 0 0 0 2px rgba(191,0,0,0.10); }
+.view-toggle-btn.has-alert:hover { background: #ffe3e3; border-color: #bf0000; color: #bf0000; }
+/* 高さは他のボタンとそろえたいので16pxのまま。横だけ広げて数字を読みやすくする */
+.view-toggle-btn.has-alert .mode-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 16px; padding: 0 5px; margin-left: 3px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1; color: #fff; background: #bf0000; border-radius: 8px; }
+/* 選択中はさらに強く(白地 + 濃い枠)。今どこを見ているかは分かるままにする */
+.view-toggle-btn.has-alert.active { background: var(--surface); color: #bf0000; border-color: #bf0000; box-shadow: 0 0 0 2px rgba(191,0,0,0.22), 0 1px 2px rgba(0,0,0,0.08); }
 
 /* ── Image strip ── */
 .image-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1386,10 +1391,11 @@ body.resize-mode .col-align-btns { display: flex; }
         <button class="shop-menu-item" style="color:var(--text2);border-top:1px solid var(--border)" onclick="event.stopPropagation();openShopManageModal();closeShopMenu()">⚙ ショップ管理</button>
       </div>
     </div>
+    <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
+    <span class="build-date">v8.15</span>
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.12</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用<span class="mode-badge" id="modeBadgeRanking"></span></button>
@@ -1742,7 +1748,7 @@ body.resize-mode .col-align-btns { display: flex; }
     <div class="status-row">
       <span class="status-row-label">自動取得</span>
       <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
-      <span class="status-row-note">毎日6時の自動取得が最後に動いた時刻です。26時間以上あいていれば黄色、36時間以上なら赤になります。</span>
+      <span class="status-row-note" id="autoFetchDetail">毎日6時の自動取得が最後に動いた時刻です。</span>
     </div>
     <div class="status-row">
       <span class="status-row-label">楽天API</span>
@@ -2569,6 +2575,7 @@ function loadCache() {
       }
       productCache = cleaned;
       _migrateRankingSchema(); // v6.57: 表示前にスキーマ移行(保存はGitHub読込側で実施)
+      _refreshAutoFetchStatus();   // v8.14: 手元のデータからも出し直す
     } else {
       productCache = {};
     }
@@ -2761,18 +2768,61 @@ async function loadFromGitHub() {
       console.log(`[reviewcheck] 月別売上データ ${Object.keys(monthlySales).length}ヶ月分 読込完了`);
     }
     // v6.6: GitHub Actions による自動取得の最終時刻
-    if (parsed.lastAutoFetch) {
-      _updateAutoFetchStatus(parsed.lastAutoFetch);
-    } else {
-      _updateAutoFetchStatus(null);
-    }
+    // v8.14: 印とデータの新しいほうを出す
+    _refreshAutoFetchStatus(parsed.lastAutoFetch || '');
   } catch(e) {
     console.error('[reviewcheck] GitHub読込エラー:', e);
   }
 }
 
+/* ══ v8.14: 「自動取得」の時刻の出しどころ ══════════════════════════════════
+ *   これまでは review_data.json の lastAutoFetch(GitHub Actions が書く印)だけを
+ *   見ていたので、印が書かれなくなると、データ自体は新しいのに古い日時が
+ *   出たままになっていた。
+ *
+ *   そこで、商品ごとの lastFetched のうち一番新しいものと比べて、
+ *   新しいほうを出すようにした。どちらを出しているかは頭の文字で分かる。
+ *     🤖 自動: … lastAutoFetch(自動取得の印)のほう
+ *     📥 取得: … データ内の最終取得時刻のほう(手動取得もここに入る)
+ *   印が書かれていなくても、データが新しければそれが見える。
+ */
+let _lastAutoFetchMarker = '';
+function _newestLastFetched() {
+  let best = '';
+  for (const code of Object.keys(productCache)) {
+    const v = productCache[code] && productCache[code].lastFetched;
+    // ISO文字列は文字の大小がそのまま時系列の前後になる
+    if (typeof v === 'string' && v > best) best = v;
+  }
+  return best;
+}
+function _refreshAutoFetchStatus(marker) {
+  if (marker !== undefined) _lastAutoFetchMarker = marker || '';
+  const data = _newestLastFetched();
+  const mk = _lastAutoFetchMarker;
+  const useData = data && (!mk || data > mk);
+  _updateAutoFetchStatus(useData ? data : mk, useData ? 'data' : 'marker');
+  _renderAutoFetchDetail(mk, data);
+}
+// 状態モーダルに、どこから出した数字なのかを書いておく(原因を追いやすくするため)
+function _renderAutoFetchDetail(marker, data) {
+  const el = document.getElementById('autoFetchDetail');
+  if (!el) return;
+  const f = iso => {
+    if (!iso) return 'なし';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '不正な値';
+    const z = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}/${z(d.getMonth() + 1)}/${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+  };
+  el.innerHTML = `毎日6時の自動取得が最後に動いた時刻です。26時間以上あいていれば黄色、36時間以上なら赤になります。<br>`
+    + `<b>自動取得の印</b>（${_escape(_ghReviewFile())} の lastAutoFetch）: ${_escape(f(marker))}<br>`
+    + `<b>データ内の最終取得</b>（商品 ${Object.keys(productCache).length} 件の lastFetched の最新）: ${_escape(f(data))}<br>`
+    + `新しいほうを上に出しています。印だけが古い場合は、自動取得は動いているけれど印が書かれていない状態です。`;
+}
+
 // ── v6.6: 自動取得ステータス表示更新 ──
-function _updateAutoFetchStatus(isoStr) {
+function _updateAutoFetchStatus(isoStr, src) {
   const el = document.getElementById('autoFetchStatus');
   if (!el) return;
   if (!isoStr) {
@@ -2791,7 +2841,8 @@ function _updateAutoFetchStatus(isoStr) {
   const dd = String(d.getDate()).padStart(2, '0');
   const hh = String(d.getHours()).padStart(2, '0');
   const mi = String(d.getMinutes()).padStart(2, '0');
-  el.textContent = `🤖 自動: ${mm}/${dd} ${hh}:${mi}`;
+  // v8.14: どちらの時刻を出しているかが分かるようにする
+  el.textContent = `${src === 'data' ? '📥 取得' : '🤖 自動'}: ${mm}/${dd} ${hh}:${mi}`;
   // 経過時間で色変化
   const hoursAgo = (Date.now() - d.getTime()) / 36e5;
   el.classList.remove('stale', 'error');
@@ -2991,6 +3042,7 @@ async function fetchAllProductInfo() {
           productCache[code].reviewAvg = item.reviewAverage || 0;
           productCache[code].itemUrl = directItemUrl;
           productCache[code].lastFetched = new Date().toISOString();
+          _refreshAutoFetchStatus();   // v8.14: 取得した時刻を表示に反映
           // レビュー履歴記録(同日は最新で上書き)
           if (!productCache[code].reviewHistory) productCache[code].reviewHistory = {};
           productCache[code].reviewHistory[today] = newReviewCount;
