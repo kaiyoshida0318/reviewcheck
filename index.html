@@ -1392,7 +1392,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.15</span>
+    <span class="build-date">v8.16</span>
   </div>
 
   <div class="header-right">
@@ -3700,18 +3700,45 @@ function renderProducts() {
 
 // v6.42: 表ヘッダー(sticky)の吸着 top を、サイトヘッダー+ツールバーの実高に合わせて設定。
 // ツールバーは mode/フィルタ/画面幅で高さが変わる(折り返し)ため固定値だと裏に隠れてしまう。
+/*
+ * v8.16: 表が画面より横に広いと、ページごと横スクロールできる状態になる。
+ *   ヘッダーとツールバーは position:sticky でも「画面の幅ぶん」しか無いので、
+ *   その右側が地の色のない帯になり、下の行がそこを通って上まで見えていた。
+ *   (「右上が透けて、下の中身がはみ出てくる」状態)
+ *
+ *   そこで、表の右端まで届くように2つの min-width を広げて、帯を地の色で埋める。
+ *   測る前にいったん広げるのをやめるのは、自分で広げた幅が次の測定に
+ *   混ざって、少しずつ伸び続けるのを防ぐため。
+ */
+const STICKY_RIGHT_PAD = 16;   // .container の右padding
+function _syncStickyWidth() {
+  const siteHeader = document.querySelector('header');
+  const toolbar = document.getElementById('toolbar');
+  if (!siteHeader || !toolbar) return;
+  siteHeader.style.minWidth = '';
+  toolbar.style.minWidth = '';
+  const table = document.querySelector('.product-table');
+  if (!table || table.offsetParent === null) return;
+  const need = Math.ceil(table.getBoundingClientRect().right + window.scrollX + STICKY_RIGHT_PAD);
+  if (need <= document.documentElement.clientWidth) return;   // はみ出していなければ何もしない
+  siteHeader.style.minWidth = need + 'px';
+  const tbLeft = toolbar.getBoundingClientRect().left + window.scrollX;
+  toolbar.style.minWidth = Math.max(0, Math.ceil(need - tbLeft)) + 'px';
+}
 function _syncStickyHeaderTop() {
   const toolbar = document.getElementById('toolbar');
   if (!toolbar) return;
   // ツールバーが非表示(データ0件など)のときは既定に戻す
   if (toolbar.offsetParent === null) {
     document.documentElement.style.setProperty('--thead-top', '110px');
+    _syncStickyWidth();   // v8.16
     return;
   }
   const siteHeader = document.querySelector('header');
   const headerH = siteHeader ? siteHeader.offsetHeight : 52; // ツールバーの sticky top と一致
   const top = headerH + toolbar.offsetHeight;
   document.documentElement.style.setProperty('--thead-top', top + 'px');
+  _syncStickyWidth();   // v8.16: 横にはみ出したぶんも地の色で埋める
 }
 // 画面幅変更でツールバーの折り返しが変わるので追従(描画は伴わない軽量処理)
 window.addEventListener('resize', _syncStickyHeaderTop);
