@@ -1421,7 +1421,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.17</span>
+    <span class="build-date">v8.18</span>
   </div>
 
   <div class="header-right">
@@ -4010,8 +4010,41 @@ let currentTitleQuery = '';
 let titleExceptOn = false;
 // v7.87: タイトルの状態での絞り込み。null=全体 / 'todo' | 'applying' | 'rank1' | 'crown3'
 let currentTitleStatusFilter = null;
+/* ══ v8.18: 上部の絞り込みは重ねがけしない ═══════════════════════════════
+ *   どれかのボタンを押したら、それ以外の絞り込みはぜんぶ解除する。
+ *   条件が残ったままになって「何も出てこない」と悩まずに済むようにするため。
+ *
+ *   except に渡した名前のものだけ残す(これから設定するもの自身)。
+ *   絞り込みを1つ足したら、この表に1行足せばよい。
+ *   ※ 左サイドバーの 評価 / カテゴリ / 状態(通常・無視) はここには入れない。
+ *     あちらは「どの商品を見るか」の土台で、上部の絞り込みとは別軸のため。
+ */
+function _clearOtherFilters(except) {
+  if (except !== 'type')    currentRankingFilter = 'all';
+  if (except !== 'kind')    currentRankingKindFilter = 'all';
+  if (except !== 'tag')     currentProductionTag = null;
+  if (except !== 'third')   currentThirdTag = null;
+  if (except !== 'denrei')  currentDenreiFilter = null;
+  if (except !== 'crown')   currentTitleStatusFilter = null;
+  if (except !== 'torder')  currentTailOrderFilter = null;
+  if (except !== 'twork')   currentTailWorkFilter = null;
+  if (except !== 'tcopy')   currentTailCopyFilter = null;
+  if (except !== 'tcode')   currentTailCodeFilter = _emptyTailCodeFilter();
+  if (except !== 'tquery')  { currentTitleQuery = ''; titleExceptOn = false; }
+  // ボタンの選択状態は描き直しで付け直されるが、この2つは
+  // 描き直さずにクラスだけ切り替えている行なのでここで戻す
+  document.querySelectorAll('#rankingFilterGroup .ranking-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === currentRankingFilter);
+  });
+  document.querySelectorAll('#rankingKindFilterGroup .ranking-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === currentRankingKindFilter);
+  });
+}
+
 function setTitleStatusFilter(k) {
-  currentTitleStatusFilter = (currentTitleStatusFilter === k) ? null : k;
+  const next = (currentTitleStatusFilter === k) ? null : k;
+  _clearOtherFilters('crown');
+  currentTitleStatusFilter = next;
   renderProducts();
 }
 let titleChips = (() => {
@@ -4149,11 +4182,15 @@ function _renderTitleStatusRow(codes) {
 let currentTailOrderFilter = null;   // null | 'none' | 'ok' | 'ng'
 let currentTailWorkFilter = null;    // null | '' (対応なし) | 'wip'
 function setTailOrderFilter(k) {
-  currentTailOrderFilter = (currentTailOrderFilter === k) ? null : k;
+  const next = (currentTailOrderFilter === k) ? null : k;
+  _clearOtherFilters('torder');
+  currentTailOrderFilter = next;
   renderProducts();
 }
 function setTailWorkFilter(k) {
-  currentTailWorkFilter = (currentTailWorkFilter === k) ? null : k;
+  const next = (currentTailWorkFilter === k) ? null : k;
+  _clearOtherFilters('twork');
+  currentTailWorkFilter = next;
   renderProducts();
 }
 function _tailWorkKey(p) { return (p && typeof p.tailWork === 'string' && p.tailWork) ? p.tailWork : ''; }
@@ -4180,7 +4217,9 @@ let currentTailCodeFilter = { a: null, b: null, m: null, c: null };
 // v8.06: コピー履歴での絞り込み。null=全体 / 'done'=コピー済 / 'todo'=未コピー
 let currentTailCopyFilter = null;
 function setTailCopyFilter(k) {
-  currentTailCopyFilter = (currentTailCopyFilter === k) ? null : k;
+  const next = (currentTailCopyFilter === k) ? null : k;
+  _clearOtherFilters('tcopy');
+  currentTailCopyFilter = next;
   renderProducts();
 }
 function _renderTailCopyRow(codes) {
@@ -4206,10 +4245,15 @@ function _renderTailCopyRow(codes) {
 }
 function setTailCodeFilter(slot, k) {
   if (!(slot in currentTailCodeFilter)) return;
-  currentTailCodeFilter[slot] = (currentTailCodeFilter[slot] === k) ? null : k;
+  // v8.18: 型番のかたまり同士も重ねない。押したものだけが残る
+  const off = (currentTailCodeFilter[slot] === k);
+  _clearOtherFilters('tcode');
+  currentTailCodeFilter = _emptyTailCodeFilter();
+  if (!off) currentTailCodeFilter[slot] = k;
   renderProducts();
 }
 function clearTailCodeFilter() {
+  _clearOtherFilters('tcode');
   currentTailCodeFilter = _emptyTailCodeFilter();
   renderProducts();
 }
@@ -4303,17 +4347,23 @@ function _renderTailFilterRows(codes) {
 }
 function setTitleQuery(q) {
   // 同じ語をもう一度押したら解除
-  currentTitleQuery = (q === currentTitleQuery) ? '' : String(q || '');
+  const next = (q === currentTitleQuery) ? '' : String(q || '');
+  _clearOtherFilters('tquery');
+  currentTitleQuery = next;
   titleExceptOn = false;   // 語の検索と「右以外」は同時に使わない
   renderProducts();
 }
 function onTitleQueryInput(v) {
-  currentTitleQuery = String(v || '');
+  const next = String(v || '');
+  _clearOtherFilters('tquery');
+  currentTitleQuery = next;
   titleExceptOn = false;
   renderProducts();
 }
 function toggleTitleExcept() {
-  titleExceptOn = !titleExceptOn;
+  const next = !titleExceptOn;
+  _clearOtherFilters('tquery');
+  titleExceptOn = next;
   if (titleExceptOn) currentTitleQuery = '';
   renderProducts();
 }
@@ -4377,20 +4427,9 @@ function clearAllFilters() {
 
 function setProductionTag(tag) {
   // v7.87: 「全体」ボタンは null を渡してくる(絞り込み解除)
-  if (tag === null) {
-    currentProductionTag = null;
-    renderProducts();
-    return;
-  }
-  // 同じタグを再クリックでオフ(トグル)
-  if (currentProductionTag === tag) {
-    currentProductionTag = null;
-  } else {
-    currentProductionTag = tag;
-    // 他のフィルタをリセット
-    currentScoreBand = 'all';
-    currentCategory = 'all';
-  }
+  const next = (tag === null || currentProductionTag === tag) ? null : tag;
+  _clearOtherFilters('tag');   // v8.18
+  currentProductionTag = next;
   renderProducts();
 }
 
@@ -6569,7 +6608,9 @@ function _renderDenreiRow() {
 let currentDenreiFilter = null;
 function setDenreiFilter(k) {
   // v8.08: null は「全体」= 解除。同じボタンをもう一度押したときも解除
-  currentDenreiFilter = (k === null || currentDenreiFilter === k) ? null : k;
+  const next = (k === null || currentDenreiFilter === k) ? null : k;
+  _clearOtherFilters('denrei');   // v8.18
+  currentDenreiFilter = next;
   renderProducts();
 }
 
@@ -7235,7 +7276,9 @@ function _isThirdHot(p) {
 // 3枚目変更フィルタ。null=全体 / 'hot3' | 'none' | 'skip' | 'changed'
 let currentThirdTag = null;
 function setThirdTag(k) {
-  currentThirdTag = (currentThirdTag === k) ? null : k;
+  const next = (currentThirdTag === k) ? null : k;
+  _clearOtherFilters('third');   // v8.18
+  currentThirdTag = next;
   renderProducts();
 }
 function _renderThirdFilterRow(codes) {
@@ -7546,6 +7589,7 @@ function setRankingFilter(filter) {
   if (!valid.includes(filter)) filter = 'all';
   // v7.87: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingFilter && filter !== 'all') filter = 'all';
+  _clearOtherFilters('type');   // v8.18
   currentRankingFilter = filter;
   // ボタン active 状態
   document.querySelectorAll('#rankingFilterGroup .ranking-filter-btn').forEach(btn => {
@@ -7559,6 +7603,7 @@ function setRankingKindFilter(filter) {
   if (!valid.includes(filter)) filter = 'all';
   // v7.87: 同じボタンをもう一度押したら「全体」に戻す(トグル)
   if (filter === currentRankingKindFilter && filter !== 'all') filter = 'all';
+  _clearOtherFilters('kind');   // v8.18
   currentRankingKindFilter = filter;
   document.querySelectorAll('#rankingKindFilterGroup .ranking-filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.filter === filter);
