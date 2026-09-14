@@ -195,6 +195,35 @@ body.mode-third .tag-filter-row { display: none; }
 .ranking-filter-btn.active .rf-count { color: rgba(255,255,255,0.75); }
 /* 内数(🔥)だけは赤で固定 */
 .tag-filter-btn.tf-hot3, .tag-filter-btn.tf-none200 { --c: #c62828; --cb: rgba(198,40,40,0.4); }
+/* v8.17: 「手をつける商品が今いる」ボタンは、押していなくても塗りつぶして目立たせる。
+   対象は 伝令ちゃんのランキング獲得済-登録可能 / 2枚目・3枚目の🔥の内数。
+   0件のときは何も付かないので、赤いボタンが見えたら用事がある、という読み方になる。 */
+.tag-filter-btn.is-urgent,
+.ranking-filter-btn.is-urgent,
+.tsf-btn.is-urgent {
+  color: #fff !important;
+  background: var(--c, #c62828) !important;
+  border-color: var(--c, #c62828) !important;
+  font-weight: 700;
+  animation: urgentPulse 1.9s ease-out infinite;
+}
+.tag-filter-btn.is-urgent .tf-count,
+.ranking-filter-btn.is-urgent .tf-count,
+.tsf-btn.is-urgent .tsf-count { color: rgba(255,255,255,0.85); }
+.tag-filter-btn.is-urgent:hover,
+.ranking-filter-btn.is-urgent:hover,
+.tsf-btn.is-urgent:hover { filter: brightness(1.12); }
+@keyframes urgentPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(198,40,40,0.45); }
+  70%  { box-shadow: 0 0 0 6px rgba(198,40,40,0); }
+  100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); }
+}
+/* 動きが苦手な環境では光らせずに枠だけ出す */
+@media (prefers-reduced-motion: reduce) {
+  .tag-filter-btn.is-urgent, .ranking-filter-btn.is-urgent, .tsf-btn.is-urgent {
+    animation: none; box-shadow: 0 0 0 3px rgba(198,40,40,0.25);
+  }
+}
 /* v6.28: 登録前エクスポートボタン(緑系、目立つ配色) */
 .ranking-export-btn { font-size: 12px; padding: 6px 14px; border: 1px solid #1d9e75; border-radius: var(--radius-sm); background: #1d9e75; color: #fff; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
 .ranking-export-btn:hover { background: #17805d; border-color: #17805d; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(29,158,117,0.3); }
@@ -1392,7 +1421,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.16</span>
+    <span class="build-date">v8.17</span>
   </div>
 
   <div class="header-right">
@@ -3948,7 +3977,9 @@ function renderSidebar() {
             : `「獲得前」のうち上昇率が${GROWTH_HOT_MIN}%以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`)
         : `${t.label}の商品だけ表示`;
       const st = t.color ? `--c:${t.color};--cb:${_rdRgba(t.color, 0.4)}` : '';
-      _parts[_seg] = (_parts[_seg] || '') + `<button class="tag-filter-btn ${isActive ? 'active' : ''}" style="${st}" onclick="setProductionTag('${t.key}')" title="${_escape(tip)}">`
+      // v8.17: 内数(🔥)に1件でもいれば派手にする
+      const urgent = t.subset && (tagCounts[t.key] || 0) > 0 ? ' is-urgent' : '';
+      _parts[_seg] = (_parts[_seg] || '') + `<button class="tag-filter-btn ${isActive ? 'active' : ''}${urgent}" style="${st}" onclick="setProductionTag('${t.key}')" title="${_escape(tip)}">`
         + `${t.icon ? _escape(t.icon) + ' ' : ''}${_escape(t.label)} <span class="tf-count">(${tagCounts[t.key] || 0})</span></button>`;
       if (t.sep) { _seg++; _parts[_seg] = _parts[_seg] || ''; }   // この項目までが1つ前のかたまり
     }
@@ -6515,7 +6546,9 @@ function _renderDenreiRow() {
   if (denreiLoadState === 'ok') {
     for (const k of ['before', 'ready', 'registered', 'none']) {
       const def = DENREI_STATES[k];
-      html += `<button type="button" class="tsf-btn${currentDenreiFilter === k ? ' active' : ''}"`
+      // v8.17: 「登録できる状態で待っている商品」がいれば派手にする
+      const urgent = (k === 'ready' && counts[k] > 0) ? ' is-urgent' : '';
+      html += `<button type="button" class="tsf-btn${currentDenreiFilter === k ? ' active' : ''}${urgent}"`
         + ` onclick="setDenreiFilter('${k}')" title="${_escape(def.label)}の商品だけ表示(もう一度押すと解除)">`
         + `${_escape(def.label)} <span class="tsf-count">(${counts[k]})</span></button>`;
     }
@@ -7231,7 +7264,9 @@ function _renderThirdFilterRow(codes) {
       : `${d.label}の商品だけ表示`;
     const on = (currentThirdTag === d.key);
     const st = d.color ? `--c:${d.color};--cb:${_rdRgba(d.color, 0.4)}` : '';
-    _parts[_seg] = (_parts[_seg] || '') + `<button class="tag-filter-btn ${on ? 'active' : ''}" style="${st}" onclick="setThirdTag('${d.key}')" title="${_escape(tip)}">`
+    // v8.17: 内数(🔥)に1件でもいれば派手にする
+    const urgent = d.subset && (counts[d.key] || 0) > 0 ? ' is-urgent' : '';
+    _parts[_seg] = (_parts[_seg] || '') + `<button class="tag-filter-btn ${on ? 'active' : ''}${urgent}" style="${st}" onclick="setThirdTag('${d.key}')" title="${_escape(tip)}">`
           + `${d.icon ? _escape(d.icon) + ' ' : ''}${_escape(d.label)} <span class="tf-count">(${counts[d.key] || 0})</span></button>`;
     if (d.sep) { _seg++; _parts[_seg] = _parts[_seg] || ''; }   // この項目までが1つ前のかたまり
   }
