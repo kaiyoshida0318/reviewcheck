@@ -51,6 +51,19 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 .api-status.error { background: var(--red-light); color: var(--danger); border: 1px solid rgba(163,45,45,0.3); }
 
 /* Save status indicator */
+/* v8.12: ヘッダーにまとめた状態ボタン。丸の色で状態を示す */
+.status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text2); background: var(--surface); border: 1px solid var(--border2); border-radius: 4px; cursor: pointer; white-space: nowrap; transition: all 0.12s; }
+.status-chip:hover { background: var(--surface2); color: var(--text); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.status-chip.is-warn { color: #6d4c00; background: #fff8e1; border-color: #ffe082; }
+.status-chip.is-warn .status-dot { background: var(--amber); }
+.status-chip.is-error { color: var(--danger); background: var(--red-light); border-color: rgba(163,45,45,0.3); }
+.status-chip.is-error .status-dot { background: var(--danger); }
+/* v8.12: 状態モーダルの各行 */
+.status-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.status-row:last-of-type { border-bottom: 0; }
+.status-row-label { flex: 0 0 72px; font-size: 12px; font-weight: 700; color: var(--text2); }
+.status-row-note { flex: 1 1 100%; margin-left: 80px; font-size: 11px; color: var(--text3); line-height: 1.5; }
 .save-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-family: 'Noto Sans JP', sans-serif; }
 .save-status.saved { background: #e6f9f1; color: var(--green); }
 .save-status.pending { background: #fff8e1; color: var(--amber); }
@@ -1376,7 +1389,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.11</span>
+    <span class="build-date">v8.12</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用<span class="mode-badge" id="modeBadgeRanking"></span></button>
@@ -1392,9 +1405,12 @@ body.resize-mode .col-align-btns { display: flex; }
       <span class="zoom-label" id="zoomLabel">100%</span>
       <button class="zoom-btn" style="font-size:15px" onclick="adjustZoom(+0.02)" title="文字を大きく">A+</button>
     </div>
-    <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
-    <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
-    <span id="apiStatus" class="api-status unset" onclick="openSettings()">アプリID未設定</span>
+    <!-- v8.12: 保存・自動取得・楽天APIの3つはヘッダーが混むので、
+         小さな1つのボタンにまとめた。中身はクリックでモーダル表示。
+         色つきの丸で「問題があるかどうか」だけは一目で分かるようにしてある。 -->
+    <button class="status-chip" id="statusChip" onclick="openStatusModal()" title="保存・自動取得・楽天APIの状態">
+      <span class="status-dot" id="statusDot"></span>状態
+    </button>
     <!-- v7.87: 「商品番号・商品名」「売上反映」は ⚙ 各種設定 メニューへ移動(ヘッダーの混雑解消) -->
     <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCsvImport(event)">
     <input type="file" id="mappingFileInput" accept=".csv" style="display:none" onchange="handleMappingFileSelect(event)">
@@ -1710,6 +1726,31 @@ body.resize-mode .col-align-btns { display: flex; }
     <div class="modal-actions" style="margin-top:16px">
       <button class="modal-btn" onclick="closeTailPreview()">閉じる</button>
       <button class="modal-btn save" id="tailPreviewCopyBtn" onclick="copyTailFixedTitleFromModal(this)">📋 変更後をコピー</button>
+    </div>
+  </div>
+</div>
+
+<!-- v8.12: 保存・自動取得・楽天APIの状態をまとめて見るモーダル -->
+<div class="modal-overlay" id="statusModal" onclick="if(event.target===this)closeStatusModal()">
+  <div class="modal" style="max-width:520px">
+    <h3 style="margin-top:0">📊 状態</h3>
+    <div class="status-row">
+      <span class="status-row-label">保存</span>
+      <span id="saveStatus" class="save-status saved" style="display:none">💾 保存済み</span>
+      <span class="status-row-note">この画面での変更をGitHubへ送った結果です。</span>
+    </div>
+    <div class="status-row">
+      <span class="status-row-label">自動取得</span>
+      <span id="autoFetchStatus" class="auto-fetch-status" title="GitHub Actions による毎日6時の自動取得" style="display:none">🤖 —</span>
+      <span class="status-row-note">毎日6時の自動取得が最後に動いた時刻です。26時間以上あいていれば黄色、36時間以上なら赤になります。</span>
+    </div>
+    <div class="status-row">
+      <span class="status-row-label">楽天API</span>
+      <span id="apiStatus" class="api-status unset" onclick="closeStatusModal();openSettings()">アプリID未設定</span>
+      <span class="status-row-note">今のショップのアプリID・アクセスキー・店舗コードが揃っているかです。クリックで設定を開きます。</span>
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="modal-btn save" onclick="closeStatusModal()">閉じる</button>
     </div>
   </div>
 </div>
@@ -2567,7 +2608,7 @@ function _unlockUI() {
 function _setSaveStatus(state, msg) {
   const el = document.getElementById('saveStatus');
   if (!el) return;
-  if (!state) { el.style.display = 'none'; return; }
+  if (!state) { el.style.display = 'none'; _syncStatusChip(); return; }
   el.style.display = '';
   el.className = 'save-status ' + state;
   el.textContent = msg || ({
@@ -2576,6 +2617,7 @@ function _setSaveStatus(state, msg) {
     saving: '📥 保存中...',
     error: '⚠ 保存エラー',
   }[state] || msg || '');
+  _syncStatusChip();   // v8.12
 }
 
 // ── GitHub save ──
@@ -2735,11 +2777,13 @@ function _updateAutoFetchStatus(isoStr) {
   if (!el) return;
   if (!isoStr) {
     el.style.display = 'none';
+    _syncStatusChip();   // v8.12
     return;
   }
   const d = new Date(isoStr);
   if (isNaN(d.getTime())) {
     el.style.display = 'none';
+    _syncStatusChip();   // v8.12
     return;
   }
   // JST 表示
@@ -2754,6 +2798,7 @@ function _updateAutoFetchStatus(isoStr) {
   if (hoursAgo > 36)      el.classList.add('error');   // 1.5日以上 = 異常(赤)
   else if (hoursAgo > 26) el.classList.add('stale');   // 26時間以上 = やや古い(黄)
   el.style.display = '';
+  _syncStatusChip();   // v8.12
 }
 
 // ── 画像URL高解像化 ──
@@ -8850,6 +8895,38 @@ async function testApi() {
   }
 }
 
+/* ══ v8.12: ヘッダーの状態ボタン ═══════════════════════════════════════════
+ *   保存・自動取得・楽天APIの3つをまとめて見せる。
+ *   丸の色は3つのうち一番重いものに合わせる(赤 > 黄 > 緑)。
+ *   判定は各表示が付けているクラスをそのまま見るので、
+ *   表示側を直せばここも自動で追従する。
+ */
+function openStatusModal() {
+  document.getElementById('statusModal').classList.add('open');
+}
+function closeStatusModal() {
+  document.getElementById('statusModal').classList.remove('open');
+}
+function _syncStatusChip() {
+  const chip = document.getElementById('statusChip');
+  if (!chip) return;
+  const ids = ['saveStatus', 'autoFetchStatus', 'apiStatus'];
+  let worst = 'ok';
+  const texts = [];
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (!el || el.style.display === 'none') continue;
+    texts.push(el.textContent.trim());
+    const c = el.className;
+    if (/\berror\b/.test(c)) worst = 'error';
+    else if (worst !== 'error' && /\b(unset|stale|pending)\b/.test(c)) worst = 'warn';
+  }
+  chip.classList.toggle('is-warn', worst === 'warn');
+  chip.classList.toggle('is-error', worst === 'error');
+  // マウスを乗せるだけで中身が読めるようにしておく(開かなくても済むように)
+  chip.title = texts.length ? texts.join(' / ') : '保存・自動取得・楽天APIの状態';
+}
+
 function updateApiStatus() {
   const shop = _getCurrentShop();
   const el = document.getElementById('apiStatus');
@@ -8860,6 +8937,7 @@ function updateApiStatus() {
     el.className = 'api-status ok';
     el.textContent = `API設定済 (${shop.shopCode})`;
   }
+  _syncStatusChip();   // v8.12
 }
 
 // ── ショップ切替UI ──
