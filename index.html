@@ -1094,6 +1094,12 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .view-toggle-btn { border: none; background: none; cursor: pointer; padding: 4px 10px; font-size: 11px; color: var(--text2); border-radius: 4px; font-family: inherit; display: flex; align-items: center; gap: 4px; transition: all 0.12s; }
 .view-toggle-btn:hover { color: var(--text); }
 .view-toggle-btn.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+/* v8.11: 手をつける商品があるモードは色を変えて、件数を右に出す。
+   選択中かどうかに関係なく目に入るようにしたいので、文字色と枠で示す。 */
+.mode-badge { display: none; }
+.view-toggle-btn.has-alert { color: #bf0000; font-weight: 700; }
+.view-toggle-btn.has-alert .mode-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 4px; margin-left: 2px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700; line-height: 1; color: #fff; background: #bf0000; border-radius: 8px; }
+.view-toggle-btn.has-alert.active { background: #fff0f0; color: #bf0000; box-shadow: 0 1px 2px rgba(191,0,0,0.18); }
 
 /* ── Image strip ── */
 .image-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1370,12 +1376,12 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.10</span>
+    <span class="build-date">v8.11</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
-      <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
-      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="2枚目用モード(画面上件数を入力してレビュー差を確認し、2枚目を作る)">🔍 2枚目用</button>
-      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目用モード(中身は2枚目用と同じ)">🥉 3枚目用</button>
+      <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用<span class="mode-badge" id="modeBadgeRanking"></span></button>
+      <button class="view-toggle-btn" id="modeToggleDiff" onclick="setTableMode('diff')" title="2枚目用モード(画面上件数を入力してレビュー差を確認し、2枚目を作る)">🔍 2枚目用<span class="mode-badge" id="modeBadgeDiff"></span></button>
+      <button class="view-toggle-btn" id="modeToggleThird" onclick="setTableMode('third')" title="3枚目用モード(中身は2枚目用と同じ)">🥉 3枚目用<span class="mode-badge" id="modeBadgeThird"></span></button>
       <button class="view-toggle-btn" id="modeToggleTitle" onclick="setTableMode('title')" title="タイトル先頭用モード(楽天側の現在のタイトルを見ながらタイトルの先頭を直す)">✏ タイトル先頭用</button>
       <!-- v7.92: タイトル末尾用。中身は今のところタイトル先頭用と同じ -->
       <button class="view-toggle-btn" id="modeToggleTitle2" onclick="setTableMode('title2')" title="タイトル末尾用モード(今はタイトル先頭用と同じ表示)">✏ タイトル末尾用</button>
@@ -3831,6 +3837,7 @@ function renderSidebar() {
   _renderTailCodeRow(codes);      // v8.00: 型番での絞り込み
   _renderTailCopyRow(codes);      // v8.06: コピー履歴
   _renderDenreiRow();             // v8.07: 伝令ちゃんの状態
+  _updateModeBadges();            // v8.11: モードボタンの件数バッジ
   _renderThirdFilterRow(codes);
   // v7.87: 3行の縦線を同じ位置にそろえる(中身が変わるたびに測り直す)
   _syncFilterRowDividers();
@@ -6407,6 +6414,41 @@ function setDenreiFilter(k) {
   // v8.08: null は「全体」= 解除。同じボタンをもう一度押したときも解除
   currentDenreiFilter = (k === null || currentDenreiFilter === k) ? null : k;
   renderProducts();
+}
+
+/* ══ v8.11: モード切替ボタンに「手をつける商品の件数」を出す ═══════════════
+ *   上部のボタンを見ただけで、どのモードに用事があるか分かるようにする。
+ *     1枚目用 … 伝令ちゃんが「ランキング獲得済-登録可能」の商品
+ *     2枚目用 … 🔥獲得前-3件以上 と 🔥獲得前-上昇200% の合計
+ *               (フィルタ行に出ている2つの数字をそのまま足したもの。
+ *                両方に当てはまる商品は2つぶん数える)
+ *     3枚目用 … 🔥獲得前-3件以上 の件数
+ *   数え方は上部のフィルタと同じで、「無視」の商品は数えない。
+ *   0件のときはバッジも色も出さない(用事がないことが分かるように)。
+ */
+const MODE_BADGE_IDS = { ranking: 'modeBadgeRanking', diff: 'modeBadgeDiff', third: 'modeBadgeThird' };
+function _modeAlertCounts() {
+  let ranking = 0, tagHot3 = 0, tagHot200 = 0, third = 0;
+  for (const code of Object.keys(productCache)) {
+    const p = productCache[code];
+    if (!p || p.status === 'ignore') continue;
+    if (_denreiStateOf(code) === 'ready') ranking++;
+    if (_isTagHot3(p)) tagHot3++;
+    if (_isHotUntouched(p)) tagHot200++;
+    if (_isThirdHot(p)) third++;
+  }
+  return { ranking, diff: tagHot3 + tagHot200, third };
+}
+function _updateModeBadges() {
+  const counts = _modeAlertCounts();
+  for (const mode of Object.keys(MODE_BADGE_IDS)) {
+    const btn = document.getElementById(MODE_BTN_IDS[mode]);
+    const badge = document.getElementById(MODE_BADGE_IDS[mode]);
+    if (!btn || !badge) continue;
+    const n = counts[mode] || 0;
+    btn.classList.toggle('has-alert', n > 0);
+    badge.textContent = n > 0 ? String(n) : '';
+  }
 }
 
 function _renderDenreiBtn(code, p) {
