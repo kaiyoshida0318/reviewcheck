@@ -195,33 +195,49 @@ body.mode-third .tag-filter-row { display: none; }
 .ranking-filter-btn.active .rf-count { color: rgba(255,255,255,0.75); }
 /* 内数(🔥)だけは赤で固定 */
 .tag-filter-btn.tf-hot3, .tag-filter-btn.tf-none200 { --c: #c62828; --cb: rgba(198,40,40,0.4); }
-/* v8.17: 「手をつける商品が今いる」ボタンは、押していなくても塗りつぶして目立たせる。
+/* v8.17/v8.19: 「手をつける商品が今いる」ボタンの見た目。
    対象は 伝令ちゃんのランキング獲得済-登録可能 / 2枚目・3枚目の🔥の内数。
+     押していないとき … 薄い地色 + 太く見える赤枠 + 外に広がる光(派手な枠)
+     押しているとき   … 赤で塗りつぶし(他のボタンを選んだときと同じ読み方)
+   枠を太く見せるのは内側の影なので、押しても押さなくてもボタンの大きさは変わらない。
    0件のときは何も付かないので、赤いボタンが見えたら用事がある、という読み方になる。 */
-.tag-filter-btn.is-urgent,
-.ranking-filter-btn.is-urgent,
-.tsf-btn.is-urgent {
-  color: #fff !important;
-  background: var(--c, #c62828) !important;
-  border-color: var(--c, #c62828) !important;
+.tag-filter-btn.is-urgent:not(.active),
+.ranking-filter-btn.is-urgent:not(.active),
+.tsf-btn.is-urgent:not(.active) {
+  color: var(--c, #c62828);
+  background: #fff5f5;
+  border-color: var(--c, #c62828);
   font-weight: 700;
   animation: urgentPulse 1.9s ease-out infinite;
 }
-.tag-filter-btn.is-urgent .tf-count,
-.ranking-filter-btn.is-urgent .tf-count,
-.tsf-btn.is-urgent .tsf-count { color: rgba(255,255,255,0.85); }
+.tag-filter-btn.is-urgent:not(.active) .tf-count,
+.ranking-filter-btn.is-urgent:not(.active) .tf-count,
+.tsf-btn.is-urgent:not(.active) .tsf-count { color: var(--c, #c62828); opacity: 0.75; }
+/* 押したときは塗りつぶし。tsf-btn の既定は黒塗りなので、ここだけ赤にそろえる */
+.tag-filter-btn.is-urgent.active,
+.ranking-filter-btn.is-urgent.active,
+.tsf-btn.is-urgent.active {
+  color: #fff;
+  background: var(--c, #c62828);
+  border-color: var(--c, #c62828);
+  font-weight: 700;
+  animation: none;
+  box-shadow: 0 0 0 3px rgba(198,40,40,0.28);
+}
+.tsf-btn.is-urgent.active .tsf-count,
+.tag-filter-btn.is-urgent.active .tf-count { color: rgba(255,255,255,0.8); }
 .tag-filter-btn.is-urgent:hover,
 .ranking-filter-btn.is-urgent:hover,
-.tsf-btn.is-urgent:hover { filter: brightness(1.12); }
+.tsf-btn.is-urgent:hover { filter: brightness(1.06); }
 @keyframes urgentPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(198,40,40,0.45); }
-  70%  { box-shadow: 0 0 0 6px rgba(198,40,40,0); }
-  100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); }
+  0%   { box-shadow: inset 0 0 0 1px currentColor, 0 0 0 0 rgba(198,40,40,0.5); }
+  70%  { box-shadow: inset 0 0 0 1px currentColor, 0 0 0 7px rgba(198,40,40,0); }
+  100% { box-shadow: inset 0 0 0 1px currentColor, 0 0 0 0 rgba(198,40,40,0); }
 }
 /* 動きが苦手な環境では光らせずに枠だけ出す */
 @media (prefers-reduced-motion: reduce) {
-  .tag-filter-btn.is-urgent, .ranking-filter-btn.is-urgent, .tsf-btn.is-urgent {
-    animation: none; box-shadow: 0 0 0 3px rgba(198,40,40,0.25);
+  .tag-filter-btn.is-urgent:not(.active), .ranking-filter-btn.is-urgent:not(.active), .tsf-btn.is-urgent:not(.active) {
+    animation: none; box-shadow: inset 0 0 0 1px currentColor, 0 0 0 3px rgba(198,40,40,0.22);
   }
 }
 /* v6.28: 登録前エクスポートボタン(緑系、目立つ配色) */
@@ -1421,7 +1437,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.18</span>
+    <span class="build-date">v8.19</span>
   </div>
 
   <div class="header-right">
@@ -3946,7 +3962,9 @@ function renderSidebar() {
   //     (無視を含めると、触る予定のない商品が「変更前」に大量に積まれて実態と合わなくなる)
   //     「全体」は内訳の合計なので、獲得前 + 変更中 + ... + 変更完了 = 全体 が常に成り立つ。
   // v7.87: 選択肢の定義(TAG_OPTS)からそのまま作る。項目を足すときは1か所直せばよい
-  const tagCounts = { none200: 0, none3: 0 };
+  // v8.19: none3blank = 「獲得前」だが画面上件数が未入力で、3件以上の判定ができないもの。
+  //   「レビューは増えているのに🔥に出てこない」の原因がこれなので、説明に出す。
+  const tagCounts = { none200: 0, none3: 0, none3blank: 0 };
   _tagOptList().forEach(o => { tagCounts[o.key || 'none'] = 0; });
   let tagTotal = 0;
   for (const code of codes) {
@@ -3956,6 +3974,8 @@ function renderSidebar() {
     // v7.87: none200 は「変更前」の内数(状態ではなく絞り込み専用)なので別に数える
     if (_isHotUntouched(p)) tagCounts.none200++;
     if (_isTagHot3(p)) tagCounts.none3++;   // v7.87
+    // v8.19: 獲得前なのに画面上件数が空で、判定の土俵に乗れていないもの
+    if (_getActiveTagKey(p.tags) === '' && typeof p.onScreenCount !== 'number') tagCounts.none3blank++;
     tagTotal++;
   }
   // v7.87: 並び(内数の位置を含む)は項目編集の設定どおり。内数は絞り込み専用の「見せかけの項目」
@@ -3973,7 +3993,9 @@ function renderSidebar() {
       const isActive = currentProductionTag === t.key;
       const tip = t.subset
         ? (t.key === 'none3'
-            ? `「獲得前」のうち件数差異が${THIRD_DIFF_MIN}件以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`
+            ? `「獲得前」のうち件数差異(レビュー件数 − 画面上件数)が${THIRD_DIFF_MIN}件以上の商品だけ表示`
+              + `\n※「獲得前」の内数なので、合計は全体と一致しません`
+              + `\n※ 画面上件数が空の商品は差が出せないため対象外です(いま ${tagCounts.none3blank} 件)`
             : `「獲得前」のうち上昇率が${GROWTH_HOT_MIN}%以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`)
         : `${t.label}の商品だけ表示`;
       const st = t.color ? `--c:${t.color};--cb:${_rdRgba(t.color, 0.4)}` : '';
