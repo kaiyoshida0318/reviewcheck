@@ -1370,7 +1370,7 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 
   <div class="header-right">
-    <span class="build-date">v8.09</span>
+    <span class="build-date">v8.10</span>
     <div class="view-toggle">
       <!-- v7.87: よく使う順に並べ替え(1枚目用 → 2枚目用 → 基本) -->
       <button class="view-toggle-btn" id="modeToggleRanking" onclick="setTableMode('ranking')" title="1枚目用モード(ランキング・画像選択を含む列レイアウト)">🏆 1枚目用</button>
@@ -4543,7 +4543,8 @@ function _renderTableRow(code) {
   // v6.17: 2枚目作成用モード用セル(常に生成、CSSでモード別に表示切替)
   let diffCells = '';
   {
-    const onScreen = (typeof p.onScreenCount === 'number') ? p.onScreenCount : null;
+    // v8.10: 3枚目作成用は未入力を0として扱う(これから作るので今の表示は0件)
+    const onScreen = _onScreenOf(p, tableMode === 'third');
     const apiCount = p.reviewCount || 0;
     let diffHtml, growthHtml;
     if (onScreen === null) {
@@ -4564,7 +4565,7 @@ function _renderTableRow(code) {
       growthHtml = `<span class="diff-result ${gCls}">${gSign}${gStr}%</span>`;
     }
     diffCells = `<td class="col-diff-onscreen">
-        <input type="number" min="0" class="diff-onscreen-input" value="${onScreen !== null ? onScreen : ''}" placeholder="—" onchange="setOnScreenCount('${_escape(code)}', this.value)" id="onscreen-${_escape(code)}">
+        <input type="number" min="0" class="diff-onscreen-input" value="${onScreen !== null ? onScreen : ''}" placeholder="0" onchange="setOnScreenCount('${_escape(code)}', this.value)" id="onscreen-${_escape(code)}">
       </td>
       <td class="col-diff-result" id="diffresult-${_escape(code)}">${diffHtml}</td>
       <td class="col-diff-growth" id="diffgrowth-${_escape(code)}">${growthHtml}</td>`;
@@ -7000,8 +7001,19 @@ function setThirdStatus(code, v) {
  *   画面上件数が未入力のものは比べようがないので対象外。
  */
 const THIRD_DIFF_MIN = 3;
-function _diffCount(p) {
+/*
+ * v8.10: 画面上件数の読み取り。
+ *   2枚目は「今そのバナーに出ている件数」なので、未入力は比べようがない(null)。
+ *   3枚目はこれから作るもので、今出ている件数は0。だから未入力でも0として扱う。
+ *   その違いはこの blankIsZero だけで表す(呼び出し側は素直に読むだけ)。
+ */
+function _onScreenOf(p, blankIsZero) {
   const os = (p && typeof p.onScreenCount === 'number') ? p.onScreenCount : null;
+  if (os !== null) return os;
+  return blankIsZero ? 0 : null;
+}
+function _diffCount(p, blankIsZero) {
+  const os = _onScreenOf(p, blankIsZero);
   if (os === null) return null;
   return (p.reviewCount || 0) - os;
 }
@@ -7017,7 +7029,7 @@ function _isTagHot3(p) {
 }
 function _isThirdHot(p) {
   if (!p || _thirdKey(p.thirdStatus) !== '') return false;
-  const d = _diffCount(p);
+  const d = _diffCount(p, true);   // v8.10: 未入力は0として数える
   return d !== null && d >= THIRD_DIFF_MIN;
 }
 
