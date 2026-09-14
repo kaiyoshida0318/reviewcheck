@@ -1437,7 +1437,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.19</span>
+    <span class="build-date">v8.20</span>
   </div>
 
   <div class="header-right">
@@ -3962,9 +3962,7 @@ function renderSidebar() {
   //     (無視を含めると、触る予定のない商品が「変更前」に大量に積まれて実態と合わなくなる)
   //     「全体」は内訳の合計なので、獲得前 + 変更中 + ... + 変更完了 = 全体 が常に成り立つ。
   // v7.87: 選択肢の定義(TAG_OPTS)からそのまま作る。項目を足すときは1か所直せばよい
-  // v8.19: none3blank = 「獲得前」だが画面上件数が未入力で、3件以上の判定ができないもの。
-  //   「レビューは増えているのに🔥に出てこない」の原因がこれなので、説明に出す。
-  const tagCounts = { none200: 0, none3: 0, none3blank: 0 };
+  const tagCounts = { none200: 0, none3: 0 };
   _tagOptList().forEach(o => { tagCounts[o.key || 'none'] = 0; });
   let tagTotal = 0;
   for (const code of codes) {
@@ -3974,8 +3972,6 @@ function renderSidebar() {
     // v7.87: none200 は「変更前」の内数(状態ではなく絞り込み専用)なので別に数える
     if (_isHotUntouched(p)) tagCounts.none200++;
     if (_isTagHot3(p)) tagCounts.none3++;   // v7.87
-    // v8.19: 獲得前なのに画面上件数が空で、判定の土俵に乗れていないもの
-    if (_getActiveTagKey(p.tags) === '' && typeof p.onScreenCount !== 'number') tagCounts.none3blank++;
     tagTotal++;
   }
   // v7.87: 並び(内数の位置を含む)は項目編集の設定どおり。内数は絞り込み専用の「見せかけの項目」
@@ -3993,9 +3989,8 @@ function renderSidebar() {
       const isActive = currentProductionTag === t.key;
       const tip = t.subset
         ? (t.key === 'none3'
-            ? `「獲得前」のうち件数差異(レビュー件数 − 画面上件数)が${THIRD_DIFF_MIN}件以上の商品だけ表示`
+            ? `「獲得前」のうちレビュー件数が${THIRD_DIFF_MIN}件以上の商品だけ表示`
               + `\n※「獲得前」の内数なので、合計は全体と一致しません`
-              + `\n※ 画面上件数が空の商品は差が出せないため対象外です(いま ${tagCounts.none3blank} 件)`
             : `「獲得前」のうち上昇率が${GROWTH_HOT_MIN}%以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`)
         : `${t.label}の商品だけ表示`;
       const st = t.color ? `--c:${t.color};--cb:${_rdRgba(t.color, 0.4)}` : '';
@@ -7259,8 +7254,11 @@ function setThirdStatus(code, v) {
 }
 
 /*
- * v7.87: 「獲得前-3件以上」= 3枚目変更が「獲得前」で、件数差異(API件数 - 画面上件数)が3件以上。
- *   画面上件数が未入力のものは比べようがないので対象外。
+ * v8.20: 「獲得前-3件以上」= 「獲得前」で、レビュー件数が3件以上。
+ *   以前は件数差異(レビュー件数 − 画面上件数)で見ていたが、
+ *   画面上件数が空だと判定できず「レビューはあるのに出てこない」状態になっていた。
+ *   実際のレビュー件数で見るようにしたので、画面上件数の入力有無に関係なく出る。
+ *   2枚目変更・3枚目変更のどちらも同じ条件。
  */
 const THIRD_DIFF_MIN = 3;
 /*
@@ -7279,20 +7277,20 @@ function _diffCount(p, blankIsZero) {
   if (os === null) return null;
   return (p.reviewCount || 0) - os;
 }
+// v8.20: レビュー件数そのもの
+function _reviewCountOf(p) { return (p && typeof p.reviewCount === 'number') ? p.reviewCount : 0; }
 /*
- * v7.87: 2枚目変更の「獲得前-3件以上」。
- *   2枚目変更が「獲得前」で、件数差異(API件数 - 画面上件数)が3件以上。
+ * v8.20: 2枚目変更の「獲得前-3件以上」。
+ *   2枚目変更が「獲得前」で、レビュー件数が3件以上。
  *   3枚目変更の同名の内数と条件は同じで、見ている状態だけが違う。
  */
 function _isTagHot3(p) {
   if (!p || _getActiveTagKey(p.tags) !== '') return false;
-  const d = _diffCount(p);
-  return d !== null && d >= THIRD_DIFF_MIN;
+  return _reviewCountOf(p) >= THIRD_DIFF_MIN;
 }
 function _isThirdHot(p) {
   if (!p || _thirdKey(p.thirdStatus) !== '') return false;
-  const d = _diffCount(p, true);   // v8.10: 未入力は0として数える
-  return d !== null && d >= THIRD_DIFF_MIN;
+  return _reviewCountOf(p) >= THIRD_DIFF_MIN;
 }
 
 // 3枚目変更フィルタ。null=全体 / 'hot3' | 'none' | 'skip' | 'changed'
@@ -7325,7 +7323,7 @@ function _renderThirdFilterRow(codes) {
   let _seg = 0;
   for (const d of defs) {
     const tip = d.subset
-      ? `「獲得前」のうち件数差異が${THIRD_DIFF_MIN}件以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`
+      ? `「獲得前」のうちレビュー件数が${THIRD_DIFF_MIN}件以上の商品だけ表示(「獲得前」の内数なので、合計は全体と一致しません)`
       : `${d.label}の商品だけ表示`;
     const on = (currentThirdTag === d.key);
     const st = d.color ? `--c:${d.color};--cb:${_rdRgba(d.color, 0.4)}` : '';
