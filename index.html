@@ -1432,12 +1432,13 @@ body.resize-mode .col-align-btns { display: flex; }
       <div id="shopMenu">
         <div id="shopMenuList"></div>
         <div style="border-top:1px solid var(--border)"></div>
-        <button class="shop-menu-item" style="color:var(--accent);font-weight:600" onclick="event.stopPropagation();openShopAddModal();closeShopMenu()">＋ 新規ショップ追加</button>
+        <button class="shop-menu-item" style="color:var(--text2)" onclick="event.stopPropagation();copyShopUrl()">🔗 このショップのURLをコピー</button>
+        <button class="shop-menu-item" style="color:var(--accent);font-weight:600;border-top:1px solid var(--border)" onclick="event.stopPropagation();openShopAddModal();closeShopMenu()">＋ 新規ショップ追加</button>
         <button class="shop-menu-item" style="color:var(--text2);border-top:1px solid var(--border)" onclick="event.stopPropagation();openShopManageModal();closeShopMenu()">⚙ ショップ管理</button>
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.20</span>
+    <span class="build-date">v8.21</span>
   </div>
 
   <div class="header-right">
@@ -2337,7 +2338,7 @@ body.resize-mode .col-align-btns { display: flex; }
     <div class="modal-field">
       <label class="modal-label">ショップID(英数字・ハイフンのみ)</label>
       <input type="text" class="modal-input" id="shopAddId" placeholder="例: shop2" pattern="[a-zA-Z0-9_-]+">
-      <div class="modal-hint">後から変更不可。データ保存先のディレクトリ名になります。</div>
+      <div class="modal-hint">後から変更不可。データ保存先のディレクトリ名になります。<br>小文字に統一されます（英数字・ハイフン・アンダーバーのみ）。</div>
     </div>
     <div class="modal-field">
       <label class="modal-label">表示名</label>
@@ -2425,18 +2426,74 @@ const GH_REPO = 'reviewcheck';
 // ── ショップ管理 ──
 const SHOPS_KEY = 'reviewcheck_shops';
 const CURRENT_SHOP_KEY = 'reviewcheck_current_shop';
+const DEFAULT_SHOP_ID = 'yukaiya';
+
+/* ══ v8.21: ショップIDの正規化 ═══════════════════════════════════════════
+ *   ショップIDはそのまま保存先のフォルダ名(data/{id}/)になる。
+ *   大文字小文字の違いや前後の空白でフォルダが分かれてしまうと、
+ *   同じ店なのにデータが2つに割れる事故が起きる。
+ *   そこで読むときも書くときも必ずこの形に寄せる。
+ *   使えるのは英数字・ハイフン・アンダーバーだけ。それ以外は落とす。
+ */
+const SHOP_ID_MAX = 40;
+function _normalizeShopId(v) {
+  return String(v == null ? '' : v).trim().toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '').slice(0, SHOP_ID_MAX);
+}
+
+/* v8.21: 一覧を読むときに必ず通す掃除。
+ *   ・IDを正規化する
+ *   ・IDが空になったもの(記号だけ等)は捨てる
+ *   ・同じIDが2つあれば、先に出てきたほうだけを残す
+ *   ここ1か所に集めてあるので、どこから読んでも同じ並び・同じIDになる。
+ */
+function _sanitizeShops(list) {
+  const out = [];
+  const seen = {};
+  for (const s of (Array.isArray(list) ? list : [])) {
+    if (!s || typeof s !== 'object') continue;
+    const id = _normalizeShopId(s.id);
+    if (!id || seen[id]) continue;
+    seen[id] = true;
+    out.push(Object.assign({}, s, { id: id, name: String(s.name || id) }));
+  }
+  return out;
+}
 
 function _getShops() {
-  try { return JSON.parse(localStorage.getItem(SHOPS_KEY) || '[]'); } catch(e) { return []; }
+  try { return _sanitizeShops(JSON.parse(localStorage.getItem(SHOPS_KEY) || '[]')); } catch(e) { return []; }
 }
 function _saveShops(shops) {
-  try { localStorage.setItem(SHOPS_KEY, JSON.stringify(shops)); } catch(e) {}
+  try { localStorage.setItem(SHOPS_KEY, JSON.stringify(_sanitizeShops(shops))); } catch(e) {}
 }
-function _getCurrentShopId() {
-  return localStorage.getItem(CURRENT_SHOP_KEY) || 'yukaiya';
+function _hasShop(id) { return _getShops().some(s => s.id === id); }
+
+/* ══ v8.21: このタブで見ているショップを固定する ═══════════════════════════
+ *   localStorage はブラウザ全体で1つしかない。
+ *   2つのタブでショップAとショップBを開いていると、Bのタブで切り替えた瞬間に
+ *   Aのタブの保存先まで動いてしまい、Aで入力したものがBのフォルダに書かれる。
+ *
+ *   そこで「このタブが開いた時点のショップ」を _sessionShopId に持ち、
+ *   保存先(data/{id}/)も、このPCの控え(localStorageのキー)も、すべてこちらを見る。
+ *   タブの中でショップを切り替えたときは、もちろん一緒に動く。
+ *   localStorage の値は「次に新しく開いたときの初期値」としてだけ使う。
+ */
+let _sessionShopId = null;
+function _storedShopId() {
+  const id = _normalizeShopId(localStorage.getItem(CURRENT_SHOP_KEY));
+  if (id) return id;
+  const shops = _getShops();
+  return (shops[0] && shops[0].id) || DEFAULT_SHOP_ID;
 }
+function _getSessionShopId() {
+  if (!_sessionShopId) _sessionShopId = _storedShopId();
+  return _sessionShopId;
+}
+function _getCurrentShopId() { return _getSessionShopId(); }
 function _setCurrentShopId(id) {
-  localStorage.setItem(CURRENT_SHOP_KEY, id);
+  const norm = _normalizeShopId(id) || DEFAULT_SHOP_ID;
+  _sessionShopId = norm;                                      // このタブを動かす
+  try { localStorage.setItem(CURRENT_SHOP_KEY, norm); } catch(e) {}   // 次に開くときの初期値
 }
 function _getCurrentShop() {
   const shops = _getShops();
@@ -2462,10 +2519,92 @@ function _initShopsIfNeeded() {
     console.log('[reviewcheck] 初回マイグレーション: yukaiyaショップを作成');
   }
 }
-_initShopsIfNeeded();
 
+/* v8.21: 今のショップIDが一覧に無いときの復旧。
+ *   ショップを消したあとや、古いIDが残っていたときに、
+ *   どこにも無いフォルダを指したまま「何も出てこない画面」になるのを防ぐ。
+ */
+function _recoverCurrentShopId() {
+  const shops = _getShops();
+  if (!shops.length) return;
+  const id = _getCurrentShopId();
+  if (shops.some(s => s.id === id)) return;
+  console.warn('[reviewcheck] ショップ "' + id + '" は一覧にないため "' + shops[0].id + '" に戻しました');
+  _setCurrentShopId(shops[0].id);
+}
+
+/* ══ v8.21: URLでショップを指定する ═══════════════════════════════════════
+ *   ?shop=xxx / ?s=xxx / #shop=xxx のどれでもよい。
+ *   ショップごとにブックマークしておけば、開いた時点でそのショップになる。
+ *   ・登録されていないIDは何もしない(前回のショップのまま開き、注意だけ出す)
+ *   ・今と同じショップなら何もしない(読み込み直しは起きない)
+ *   データを読む前に効かせるので、最初から正しいショップのぶんだけ読みに行く。
+ */
+let _shopUrlWarn = '';
+function _shopIdFromUrl() {
+  try {
+    const q = new URLSearchParams(location.search);
+    let raw = q.get('shop') || q.get('s') || '';
+    if (!raw && location.hash) {
+      const m = /(?:^#|[#&])(?:shop|s)=([^&]+)/.exec(location.hash);
+      if (m) { try { raw = decodeURIComponent(m[1]); } catch(e) { raw = m[1]; } }
+    }
+    return _normalizeShopId(raw);
+  } catch(e) { return ''; }
+}
+function _applyShopFromUrl() {
+  const id = _shopIdFromUrl();
+  if (!id) return false;
+  if (id === _getCurrentShopId()) return false;   // 同じショップ: 何もしない
+  if (!_hasShop(id)) {
+    _shopUrlWarn = 'URLのショップ「' + id + '」は登録されていないため、前回のショップで開きました';
+    console.warn('[reviewcheck] ' + _shopUrlWarn);
+    return false;
+  }
+  _setCurrentShopId(id);
+  console.log('[reviewcheck] URLの指定でショップ "' + id + '" を開きます');
+  return true;
+}
+
+/* v8.21: 今のショップをURLにも書いておく。
+ *   再読み込みしても、そのURLを人に渡しても、同じショップが開く。
+ *   履歴は増やしたくないので replaceState を使う。
+ */
+function _syncShopUrl() {
+  try {
+    const id = _getCurrentShopId();
+    const url = new URL(location.href);
+    if (url.searchParams.get('shop') === id && !url.searchParams.has('s')) return;
+    url.searchParams.set('shop', id);
+    url.searchParams.delete('s');
+    history.replaceState(null, '', url.toString());
+  } catch(e) {}
+}
+
+/* ══ v8.21: 起動順 ═══════════════════════════════════════════════════════
+ *     ① 正規化して書き戻す      … 大文字まじり・重複IDをここでそろえる
+ *     ② 定義の作成 / 復旧        … 空なら作る。今のIDが無ければ先頭へ戻す
+ *     ③ URLの指定を反映          … ?shop= などがあればここで差し替え
+ *     ④ このタブに固定           … 以後この値だけを見る(他のタブに引きずられない)
+ *     ⑤ URLに書き戻す
+ *   このあとに loadCache() / loadFromGitHub() が走るので、
+ *   読み込みは最初から正しいショップのぶんだけになる。
+ */
+function _initShopContext() {
+  _saveShops(_getShops());              // ①
+  _initShopsIfNeeded();                 // ②
+  _recoverCurrentShopId();
+  _applyShopFromUrl();                  // ③
+  _recoverCurrentShopId();              //   URL適用後にもう一度確認
+  _sessionShopId = _getCurrentShopId(); // ④ ここでこのタブに固定
+  _syncShopUrl();                       // ⑤
+}
+_initShopContext();
+
+/* v8.21: 保存先。_getCurrentShopId() はこのタブに固定されたIDを返すので、
+ *   別のタブでショップを切り替えても、このタブの保存先は動かない。 */
 function _shopDataDir() {
-  const id = _getCurrentShopId() || 'yukaiya';
+  const id = _getCurrentShopId() || DEFAULT_SHOP_ID;
   return `data/${id}`;
 }
 function _ghReviewFile() { return `${_shopDataDir()}/review_data.json`; }
@@ -2578,6 +2717,7 @@ let _fetchInProgress = false;
 let _saveInFlight = null;
 
 // ── localStorage cache ──
+// v8.21: このPCの控え。保存先と同じく、このタブに固定されたショップIDで分ける
 function _cacheKey() { return 'reviewcheck_cache_' + _getCurrentShopId(); }
 // v6.57: rankingType/rankingKind スキーマ移行
 //   旧: rankingType に daily/realtime 等(=ランキングの種類)が入っていた
@@ -4706,6 +4846,7 @@ function _renderSalesCell(code) {
 }
 
 // monthlySalesのlocalStorage保存(GitHubと別にローカルキャッシュ)
+// v8.21: 売上の控えも同じく、このタブに固定されたショップIDで分ける
 function _monthlySalesCacheKey() {
   return `reviewcheck_monthly_sales_${_getCurrentShopId()}`;
 }
@@ -9120,22 +9261,85 @@ function updateApiStatus() {
 }
 
 // ── ショップ切替UI ──
+/* v8.21: メニューは body の直下に出す。
+ *   ヘッダーは position:sticky なので、その中に置いたままだと
+ *   条件によってはメニューが下の表の裏に潜って読めなくなる。
+ *   body直下へ移せば重なりの心配がなくなるので、位置は画面座標で置く。
+ *   ついでに画面からはみ出さないよう、入らなければ上に出し、高さも制限する。
+ */
 function toggleShopMenu(e) {
   if (e) e.stopPropagation();
   const menu = document.getElementById('shopMenu');
-  if (menu.style.display === 'block') {
-    menu.style.display = 'none';
-    return;
-  }
-  renderShopMenu();
   const btn = document.getElementById('shopSelectorBtn');
+  if (!menu || !btn) return;
+  if (menu.style.display === 'block') { closeShopMenu(); return; }
+  if (menu.parentNode !== document.body) document.body.appendChild(menu);
+  renderShopMenu();
   const rect = btn.getBoundingClientRect();
-  menu.style.top = (rect.bottom + 4) + 'px';
-  menu.style.left = rect.left + 'px';
+  menu.style.marginTop = '0';
   menu.style.display = 'block';
+  menu.style.visibility = 'hidden';   // 測るあいだは見せない(位置が飛ぶのを防ぐ)
+  const below = window.innerHeight - rect.bottom;
+  menu.style.maxHeight = Math.max(160, Math.min(440, Math.max(below, rect.top) - 16)) + 'px';
+  menu.style.overflowY = 'auto';
+  const mw = menu.offsetWidth || 240;
+  const mh = menu.offsetHeight || 0;
+  menu.style.left = Math.round(Math.max(4, Math.min(rect.left, window.innerWidth - mw - 8))) + 'px';
+  menu.style.top = Math.round(below >= mh + 8 ? rect.bottom + 4 : Math.max(4, rect.top - mh - 4)) + 'px';
+  menu.style.visibility = '';
 }
 function closeShopMenu() {
-  document.getElementById('shopMenu').style.display = 'none';
+  const menu = document.getElementById('shopMenu');
+  if (menu) menu.style.display = 'none';
+}
+// 画面が動くと位置がずれるので閉じる(本文のスクロールも拾うので capture で取る)
+window.addEventListener('scroll', function () {
+  const m = document.getElementById('shopMenu');
+  if (m && m.style.display === 'block') closeShopMenu();
+}, true);
+window.addEventListener('resize', function () {
+  const m = document.getElementById('shopMenu');
+  if (m && m.style.display === 'block') closeShopMenu();
+});
+
+/* v8.21: 今のショップのURLをコピーする。
+ *   ショップごとにブックマークしたり、別のPCの人に渡したりするためのもの。
+ *   渡された側は、そのURLを開くだけでそのショップになる。
+ */
+function copyShopUrl() {
+  const id = _getCurrentShopId();
+  let url = location.href;
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('shop', id);
+    u.searchParams.delete('s');
+    u.hash = '';
+    url = u.toString();
+  } catch(e) {}
+  closeShopMenu();
+  const done = function (ok) {
+    _showToast(ok ? 'このショップのURLをコピーしました' : 'コピーに失敗しました: ' + url, ok ? 'success' : 'error');
+  };
+  // 使えない場面(保護されていないURLなど)では画面外のテキスト欄を経由する
+  const legacy = function () {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-1000px;left:-1000px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, url.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(ok);
+    } catch(e) { done(false); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function () { done(true); }, legacy);
+  } else {
+    legacy();
+  }
 }
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('shopMenu');
@@ -9158,8 +9362,15 @@ function updateShopSelectorLabel() {
   document.getElementById('shopSelectorLabel').textContent = shop ? shop.name : '—';
 }
 async function switchShop(id) {
-  if (id === _getCurrentShopId()) {
+  const next = _normalizeShopId(id);
+  // v8.21: 同じショップ / 知らないショップなら何もしない(読み込み直しを起こさない)
+  if (!next || next === _getCurrentShopId()) {
     closeShopMenu();
+    return;
+  }
+  if (!_hasShop(next)) {
+    closeShopMenu();
+    _showToast('ショップ「' + next + '」は登録されていません', 'error');
     return;
   }
   // 未保存があれば先に保存
@@ -9168,7 +9379,8 @@ async function switchShop(id) {
     _saveTimer = null;
     await saveToGitHub({ showLock: true });
   }
-  _setCurrentShopId(id);
+  _setCurrentShopId(next);
+  _syncShopUrl();   // v8.21: URLも今のショップに合わせる
   closeShopMenu();
   updateShopSelectorLabel();
   updateApiStatus();
@@ -9198,7 +9410,9 @@ function closeShopAddModal() {
   document.getElementById('shopAddModal').classList.remove('open');
 }
 async function saveNewShop() {
-  const id        = document.getElementById('shopAddId').value.trim();
+  // v8.21: 入力されたIDは保存先のフォルダ名になるので、必ず正規化した形で持つ
+  const rawId     = document.getElementById('shopAddId').value.trim();
+  const id        = _normalizeShopId(rawId);
   const name      = document.getElementById('shopAddName').value.trim();
   const shopCode  = document.getElementById('shopAddShopCode').value.trim();
   const appId     = document.getElementById('shopAddAppId').value.trim();
@@ -9210,7 +9424,7 @@ async function saveNewShop() {
     status.textContent = '⚠ ショップID・表示名・店舗コードは必須です';
     return;
   }
-  if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
+  if (!/^[a-zA-Z0-9_-]+$/.test(rawId) || !id) {
     status.className = 'modal-status error';
     status.textContent = '⚠ ショップIDは英数字・ハイフン・アンダーバーのみ';
     return;
@@ -9224,8 +9438,11 @@ async function saveNewShop() {
   shops.push({ id, name, appId, accessKey, shopCode });
   _saveShops(shops);
   _setCurrentShopId(id);
+  _syncShopUrl();   // v8.21
   status.className = 'modal-status ok';
-  status.textContent = '✓ 追加して切替しました';
+  status.textContent = (id === rawId)
+    ? '✓ 追加して切替しました'
+    : '✓ 追加して切替しました（IDは「' + id + '」に統一しました）';
   setTimeout(async () => {
     closeShopAddModal();
     updateShopSelectorLabel();
@@ -9319,6 +9536,7 @@ function deleteCurrentEditShop() {
   // 現在ショップだったら別のに切替
   if (_getCurrentShopId() === _editingShopId) {
     _setCurrentShopId(filtered[0].id);
+    _syncShopUrl();   // v8.21: 移った先をURLにも反映
   }
   closeShopEditModal();
   updateShopSelectorLabel();
@@ -11551,7 +11769,13 @@ async function init() {
   attachColumnResizeHandles();
   // v8.07: 伝令ちゃんの状態は待たずに読む(失敗しても他の表示は止めない)
   fetchDenreiStatus(false);
-  console.log('[reviewcheck] v7.87 initialized');
+  // v8.21: URLに知らないショップが入っていたことを画面でも知らせる
+  if (_shopUrlWarn) {
+    const _w = _shopUrlWarn;
+    _shopUrlWarn = '';
+    setTimeout(function () { _showToast(_w, 'error'); }, 300);
+  }
+  console.log('[reviewcheck] v8.21 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
