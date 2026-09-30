@@ -1470,7 +1470,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.23</span>
+    <span class="build-date">v8.24</span>
   </div>
 
   <div class="header-right">
@@ -1505,7 +1505,7 @@ body.resize-mode .col-align-btns { display: flex; }
     <button class="header-btn" onclick="openSetupMenuModal()">⚙ 各種設定</button>
     <!-- v8.22: 押すといきなり取得が始まるのは分かりにくいので、まず更新メニューを開く。
          何がいつ新しくなるのかの説明も、そのメニューの中に置いてある。 -->
-    <button class="header-btn primary" onclick="openUpdateMenuModal()" id="updateMenuBtn" title="データの更新メニューを開く（何がいつ新しくなるかの説明もここ）">🔄 更新</button>
+    <button class="header-btn primary" onclick="openUpdateMenuModal()" id="updateMenuBtn" title="更新一覧を開く（何がいつ新しくなるかの説明もここ）">🔄 更新一覧</button>
   </div>
 </header>
 
@@ -1645,7 +1645,7 @@ body.resize-mode .col-align-btns { display: flex; }
           </svg>
         </div>
         <h3>レビューチェックを始めましょう</h3>
-        <p>まず <strong>⚙ 各種設定 → 楽天データ入力</strong> から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>そのあと右上の <strong>🔄 更新 → 📥 商品データ取得</strong> を押すと、商品画像とレビュー件数・平均評価が一覧に出てきます。</p>
+        <p>まず <strong>⚙ 各種設定 → 楽天データ入力</strong> から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>そのあと右上の <strong>🔄 更新一覧 → 📥 商品データ取得</strong> を押すと、商品画像とレビュー件数・平均評価が一覧に出てきます。</p>
         <button class="empty-upload-btn" onclick="openSetupMenuModal()">⚙ 各種設定を開く</button>
       </div>
 
@@ -1819,7 +1819,7 @@ body.resize-mode .col-align-btns { display: flex; }
 <!-- ══ v8.22: 更新メニュー ══ -->
 <div class="modal-overlay" id="updateMenuModal" onclick="if(event.target===this)closeUpdateMenuModal()">
   <div class="modal" style="max-width:720px">
-    <h3 style="margin-top:0">🔄 更新</h3>
+    <h3 style="margin-top:0">🔄 更新一覧</h3>
     <p style="margin-bottom:12px">データを取り直します。下の表で「何がいつ新しくなるか」を確認できます。</p>
 
     <div class="upd-status" id="updStatusLine"></div>
@@ -1974,7 +1974,7 @@ body.resize-mode .col-align-btns { display: flex; }
     </div>
     <div class="modal-actions" style="margin-top:16px">
       <!-- v8.22: 「古い」と気づいた流れでそのまま取り直せるようにする -->
-      <button class="modal-btn" onclick="closeStatusModal();openUpdateMenuModal()" title="データの更新メニューを開く">🔄 更新メニューを開く</button>
+      <button class="modal-btn" onclick="closeStatusModal();openUpdateMenuModal()" title="更新一覧を開く">🔄 更新一覧を開く</button>
       <button class="modal-btn save" onclick="closeStatusModal()">閉じる</button>
     </div>
   </div>
@@ -2184,7 +2184,7 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="edit-danger-zone">
           <div class="edit-danger-note">
             この商品を reviewcheck から<strong>完全に削除</strong>します。<br>
-            ※ 楽天側に商品が残っている場合は「🔄 更新 → 📥 商品データ取得」で復活します。
+            ※ 楽天側に商品が残っている場合は「🔄 更新一覧 → 📥 商品データ取得」で復活します。
           </div>
           <button class="modal-btn danger" style="flex-shrink:0;font-weight:600" onclick="deleteProductFromEdit()" title="この商品を productCache から削除する">🗑 この商品を削除</button>
         </div>
@@ -3263,13 +3263,13 @@ function _hiResImg(url) {
 }
 
 /* v8.22: 取得中の見た目。
- *   ヘッダーの「🔄 更新」と、更新メニューの中の取得ボタンの両方を同じ状態にする。
+ *   ヘッダーの「🔄 更新一覧」と、その中の取得ボタンの両方を同じ状態にする。
  *   以前は1つのボタンの文字を直接書き換えていたが、置き場所が2か所になったので
  *   ここ1か所にまとめた。ボタンを増やしてもこの関数だけ直せばよい。 */
 function _setFetchBusy(on) {
   const hdr = document.getElementById('updateMenuBtn');
   if (hdr) {
-    hdr.textContent = on ? '⏳ 取得中...' : '🔄 更新';
+    hdr.textContent = on ? '⏳ 取得中...' : '🔄 更新一覧';
     hdr.disabled = !!on;
   }
   const act = document.getElementById('fetchProductDataBtn');
@@ -3616,7 +3616,7 @@ async function diagnoseFetchAll() {
     }
     if (missingInCache.length > 30) html += `<span style="color:var(--text3)">…他 ${missingInCache.length - 30} 件</span>`;
     html += `</div>`;
-    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「🔄 更新 → 📥 商品データ取得」で再取得してください</div>`;
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「🔄 更新一覧 → 📥 商品データ取得」で再取得してください</div>`;
   }
   // v7.87: API取得が0件 or エラーありのときは「古いデータ」判定を信用してはいけない。
   //   (バージョン廃止で全滅したとき、全商品が「古いデータ」に見えて全消しできてしまう事故を防ぐ)
@@ -3750,7 +3750,7 @@ async function clearAllData() {
   }
 
   renderProducts();
-  alert('✓ クリア完了\n\n「🔄 更新 → 📥 商品データ取得」で取り直してください。');
+  alert('✓ クリア完了\n\n「🔄 更新一覧 → 📥 商品データ取得」で取り直してください。');
 }
 
 function manualFetchAll() {
@@ -10483,7 +10483,7 @@ function deleteProductFromEdit() {
     + `商品番号: ${p.itemNumber || '—'}\n`
     + `商品名: ${nm}\n\n`
     + `レビュー履歴・ランキング情報・タグ・メモも一緒に消えます。\n`
-    + `※ 楽天側に商品が残っている場合は「🔄 更新 → 📥 商品データ取得」で復活します。\n\n`
+    + `※ 楽天側に商品が残っている場合は「🔄 更新一覧 → 📥 商品データ取得」で復活します。\n\n`
     + `削除しますか？`)) return;
   if (!confirm(`もう一度確認します。\n\n「${code}」を本当に削除しますか？\n（この操作は取り消せません）`)) return;
   delete productCache[code];
@@ -10638,7 +10638,7 @@ function _renderReviewHistoryTable(code) {
   if (!table) return;
   const history = _getReviewHistory(code);
   if (history.length === 0) {
-    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">🔄 更新 → 📥 商品データ取得 を押すたびに記録されます</span></td></tr></tbody>`;
+    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">🔄 更新一覧 → 📥 商品データ取得 を押すたびに記録されます</span></td></tr></tbody>`;
     return;
   }
   let html = `<thead><tr>
@@ -12095,7 +12095,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.23 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.24 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
