@@ -1277,6 +1277,14 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .upd-note li { margin-bottom: 3px; }
 .upd-note li:last-child { margin-bottom: 0; }
 .upd-sec-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.04em; margin: 18px 0 7px; }
+/* v8.23: 各ボタンの右端に出す「最後に取得した日」。
+   古くなるほど色が付くので、押す前に取り直すべきか判断できる。 */
+.upd-last { margin-left: auto; flex-shrink: 0; padding: 3px 9px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; line-height: 1.4; color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; white-space: nowrap; }
+.upd-last.is-stale { background: #fff8e1; border-color: #ffe082; color: #6d4c00; }
+.upd-last.is-old   { background: var(--red-light); border-color: rgba(163,45,45,0.3); color: var(--danger); }
+.upd-last.is-none  { color: var(--text3); background: transparent; border-style: dashed; }
+/* ボタンの見出しは「アイコン + 名前 + 右端に日付」の3つ。名前が長いときは日付を守って名前側を詰める */
+.menu-action-btn .action-title > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── Modal ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
@@ -1462,7 +1470,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.22</span>
+    <span class="build-date">v8.23</span>
   </div>
 
   <div class="header-right">
@@ -1818,7 +1826,7 @@ body.resize-mode .col-align-btns { display: flex; }
 
     <div class="menu-modal-actions">
       <button class="menu-action-btn" id="fetchProductDataBtn" onclick="closeUpdateMenuModal();fetchAllProductData()">
-        <div class="action-title"><span class="action-title-icon">📥</span><span id="fetchProductDataBtnLabel">商品データ取得（楽天API）</span></div>
+        <div class="action-title"><span class="action-title-icon">📥</span><span id="fetchProductDataBtnLabel">商品データ取得（楽天API）</span><span class="upd-last is-none" id="updLastFetch">—</span></div>
         <div class="action-desc">
           楽天APIから<strong>全商品</strong>を取り直します。<br>
           新しくなるもの … <strong>レビュー件数 / 平均評価 / 商品画像 / 現在のタイトル</strong><br>
@@ -1827,14 +1835,14 @@ body.resize-mode .col-align-btns { display: flex; }
         </div>
       </button>
       <button class="menu-action-btn" onclick="closeUpdateMenuModal();fetchDenreiStatus(true)">
-        <div class="action-title"><span class="action-title-icon">🔔</span><span>伝令ちゃんの状態を取り直す</span></div>
+        <div class="action-title"><span class="action-title-icon">🔔</span><span>伝令ちゃんの状態を取り直す</span><span class="upd-last is-none" id="updLastDenrei">—</span></div>
         <div class="action-desc">
           ランキング伝令ちゃん側の<strong>ランキング登録状況</strong>だけを取り直します（数秒で終わります）。<br>
           <span style="color:var(--text3)">※ 画面を開いたときにも自動で1回読んでいます。1枚目用モードの「🔔 伝令ちゃん」の行に出ます。</span>
         </div>
       </button>
       <button class="menu-action-btn" onclick="reloadFromGitHubManual()">
-        <div class="action-title"><span class="action-title-icon">☁</span><span>GitHubから読み直す</span></div>
+        <div class="action-title"><span class="action-title-icon">☁</span><span>GitHubから読み直す</span><span class="upd-last is-none" id="updLastGh">—</span></div>
         <div class="action-desc">
           <strong>他のPCで入力した内容</strong>をこの画面に反映します。楽天APIは叩きません。<br>
           <span style="color:var(--text3)">※ この画面での未送信の変更は、読み直す前に先に保存します。</span>
@@ -3039,6 +3047,7 @@ async function saveToGitHub(opts = {}) {
         const e = await putRes.json().catch(() => ({}));
         throw new Error(e.message || `HTTP ${putRes.status}`);
       }
+      _ghSavedAt = payload.savedAt;   // v8.23: 自分で保存したぶんも反映する
       _setSaveStatus('saved');
       console.log('[reviewcheck] GitHub保存成功');
     } catch(e) {
@@ -3120,6 +3129,9 @@ async function loadFromGitHub() {
     // v6.6: GitHub Actions による自動取得の最終時刻
     // v8.14: 印とデータの新しいほうを出す
     _refreshAutoFetchStatus(parsed.lastAutoFetch || '');
+    // v8.23: 更新メニューに出すため、読み込んだ時刻と、GitHub側の最終保存時刻を控えておく
+    _lastGitHubLoadAt = new Date().toISOString();
+    _ghSavedAt = parsed.savedAt || '';
   } catch(e) {
     console.error('[reviewcheck] GitHub読込エラー:', e);
   }
@@ -3137,6 +3149,12 @@ async function loadFromGitHub() {
  *   印が書かれていなくても、データが新しければそれが見える。
  */
 let _lastAutoFetchMarker = '';
+/* v8.23: 更新メニューのボタンに出すための時刻。
+ *   _lastGitHubLoadAt … この画面がGitHubから読み込んだ時刻（他のPCの入力を取り込んだ時点）
+ *   _ghSavedAt        … GitHub上のデータが最後に保存された時刻（誰が保存したかは問わない）
+ *   どちらも保存はしない。画面を開いている間だけ覚えていればよい値。 */
+let _lastGitHubLoadAt = '';
+let _ghSavedAt = '';
 function _newestLastFetched() {
   let best = '';
   for (const code of Object.keys(productCache)) {
@@ -6877,6 +6895,7 @@ async function fetchDenreiStatus(manual) {
     if (manual) _showToast('伝令ちゃんの状態を取得できませんでした', 'error');
   }
   _renderDenreiRow();
+  _renderUpdateMenuStatus();   // v8.23: 更新メニューの日付も合わせる
   renderProducts();
 }
 function _renderDenreiStatusCell(code) {
@@ -9400,30 +9419,86 @@ function closeUpdateMenuModal() {
   document.getElementById('updateMenuModal').classList.remove('open');
 }
 
-// 上部の1行。「最後にいつ取れたか」を押す前に見せる(無駄な取得を減らすため)
-function _renderUpdateMenuStatus() {
-  const el = document.getElementById('updStatusLine');
+/* ══ v8.23: 「最後に取得した日」をボタンごとに出す ═══════════════════════
+ *   上に1行まとめて出すだけだと、どのボタンの話なのか結びつかなかったので、
+ *   それぞれのボタンの右端に出すようにした。
+ *   古くなると色が付く（黄 → 赤）ので、押す前に取り直すべきか判断できる。
+ */
+function _updFmtDateTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const z = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${z(d.getMonth() + 1)}/${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+// 「たった今 / 42分前 / 約3時間前 / 2日前」。数字より、どれくらい前かのほうが直感的なので添える
+function _updAgoText(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const min = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (min < 1) return 'たった今';
+  if (min < 60) return min + '分前';
+  const h = Math.floor(min / 60);
+  if (h < 24) return '約' + h + '時間前';
+  return Math.floor(h / 24) + '日前';
+}
+/* 1つのボタンの日付チップを書き換える。
+ *   opts.prefix … 「最終取得」など、頭に付ける言葉
+ *   opts.empty  … まだ一度も無いときの文字
+ *   opts.staleH / opts.oldH … 何時間あいたら黄色 / 赤にするか */
+function _setUpdLast(id, iso, opts) {
+  const el = document.getElementById(id);
   if (!el) return;
-  const fmt = (iso) => {
-    if (!iso) return 'なし';
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return '—';
-    const z = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}/${z(d.getMonth() + 1)}/${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
-  };
+  opts = opts || {};
+  if (!iso || isNaN(new Date(iso).getTime())) {
+    el.className = 'upd-last is-none';
+    el.textContent = opts.empty || 'まだ取得していません';
+    el.title = '';
+    return;
+  }
+  const h = (Date.now() - new Date(iso).getTime()) / 36e5;
+  let cls = '';
+  if (opts.oldH && h > opts.oldH) cls = ' is-old';
+  else if (opts.staleH && h > opts.staleH) cls = ' is-stale';
+  el.className = 'upd-last' + cls;
+  el.textContent = (opts.prefix || '最終取得') + ': ' + _updFmtDateTime(iso) + '（' + _updAgoText(iso) + '）';
+  el.title = new Date(iso).toLocaleString('ja-JP');
+}
+
+// 更新メニューを開くたびに、上の1行と3つのボタンの日付を書き直す
+function _renderUpdateMenuStatus() {
+  // ① 商品データ取得 … 自動取得の印と、データ内の最終取得の新しいほう
   const data = _newestLastFetched();
   const mk = _lastAutoFetchMarker;
   const newest = (data && (!mk || data > mk)) ? data : mk;
-  const dnr = {
-    ok: '取得済み（' + _tailCopiedLabel(denreiLoadedAt) + '）',
-    loading: '読込中…',
-    error: '取得できませんでした',
-    idle: '未取得',
-  }[denreiLoadState] || '未取得';
-  el.innerHTML = `商品データの最終取得: <b>${_escape(fmt(newest))}</b>`
+  // 毎日6時に自動で走る前提なので、26時間で黄色・36時間で赤(ヘッダーの状態表示と同じ基準)
+  _setUpdLast('updLastFetch', newest, { prefix: '最終取得', staleH: 26, oldH: 36, empty: 'まだ取得していません' });
+
+  // ② 伝令ちゃん … 画面を開くたびに取り直すので、古くなること自体が異常
+  const dl = document.getElementById('updLastDenrei');
+  if (dl) {
+    if (denreiLoadState === 'loading') {
+      dl.className = 'upd-last'; dl.textContent = '読込中…'; dl.title = '';
+    } else if (denreiLoadState === 'error') {
+      dl.className = 'upd-last is-old'; dl.textContent = '取得できませんでした'; dl.title = denreiError || '';
+    } else {
+      _setUpdLast('updLastDenrei', denreiLoadState === 'ok' ? denreiLoadedAt : '',
+        { prefix: '最終取得', staleH: 6, oldH: 24, empty: 'まだ取得していません' });
+    }
+  }
+
+  // ③ GitHub … この画面が読み込んだ時刻。他のPCの入力をいつ取り込んだか
+  _setUpdLast('updLastGh', _lastGitHubLoadAt,
+    { prefix: '最終読込', staleH: 6, oldH: 24, empty: 'この画面ではまだ読み込んでいません' });
+
+  // 上の1行は「今どこを見ているか」だけにする(日付は各ボタンへ移したので重複させない)
+  const el = document.getElementById('updStatusLine');
+  if (!el) return;
+  const gh = _ghSavedAt
+    ? `GitHub上の最終保存: <b>${_escape(_updFmtDateTime(_ghSavedAt))}</b>`
+    : `GitHub上の最終保存: <b>—</b>`;
+  el.innerHTML = `ショップ <b>${_escape(_getCurrentShopId())}</b>`
     + `<span class="upd-sep">｜</span>商品 <b>${Object.keys(productCache).length}</b> 件`
-    + `<span class="upd-sep">｜</span>ショップ <b>${_escape(_getCurrentShopId())}</b>`
-    + `<span class="upd-sep">｜</span>伝令ちゃん: <b>${_escape(dnr)}</b>`;
+    + `<span class="upd-sep">｜</span>${gh}`;
 }
 
 /* v8.22: 他のPCで入力した内容をこの画面に取り込む。
@@ -9450,6 +9525,7 @@ async function reloadFromGitHubManual() {
   }
   _loadSalesMonth();
   renderProducts();
+  _renderUpdateMenuStatus();   // v8.23: 次に開いたとき新しい日付が出るように
   _showToast('GitHubから読み直しました（商品 ' + Object.keys(productCache).length + ' 件）', 'success');
 }
 
@@ -12019,7 +12095,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.22 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.23 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
