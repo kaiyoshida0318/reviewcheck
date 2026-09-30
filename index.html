@@ -1254,6 +1254,30 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .menu-action-btn.danger:hover { border-color: var(--danger); background: var(--red-light); }
 .menu-action-btn.danger .action-title { color: var(--danger); }
 
+/* ══ v8.22: 更新メニュー ══════════════════════════════════════════════
+ *   「何がいつ新しくなるのか」を一覧で見せる表。
+ *   自動で入るもの(緑)と、手で入れるもの(灰)を色で分けて、
+ *   「押しても変わらないもの」を探しに行かなくて済むようにする。 */
+.upd-status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; margin-bottom: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 11px; color: var(--text2); }
+.upd-status b { color: var(--text); font-family: 'DM Mono', monospace; font-weight: 700; }
+.upd-status .upd-sep { color: var(--border2); }
+.upd-table-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.upd-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.upd-table th { padding: 7px 10px; text-align: left; font-weight: 700; font-size: 10.5px; color: var(--text2); background: var(--surface2); border-bottom: 1px solid var(--border2); white-space: nowrap; }
+.upd-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+.upd-table tr:last-child td { border-bottom: 0; }
+.upd-table .upd-name { font-weight: 600; color: var(--text); white-space: nowrap; }
+.upd-table .upd-when { color: var(--text2); }
+.upd-table .upd-src { color: var(--text3); white-space: nowrap; }
+.upd-group td { padding: 6px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; }
+.upd-group.is-auto td { background: #eaf7f0; color: #1b6b50; border-bottom: 1px solid rgba(29,158,117,0.25); }
+.upd-group.is-manual td { background: #f3f2ef; color: #6b6b6b; border-bottom: 1px solid var(--border2); }
+.upd-note { margin-top: 14px; padding: 11px 13px; background: #fff8e1; border: 1px solid #ffe082; border-radius: var(--radius-sm); font-size: 11px; line-height: 1.75; color: #6d4c00; }
+.upd-note ul { margin: 4px 0 0; padding-left: 1.2em; }
+.upd-note li { margin-bottom: 3px; }
+.upd-note li:last-child { margin-bottom: 0; }
+.upd-sec-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.04em; margin: 18px 0 7px; }
+
 /* ── Modal ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
@@ -1438,7 +1462,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.21</span>
+    <span class="build-date">v8.22</span>
   </div>
 
   <div class="header-right">
@@ -1471,7 +1495,9 @@ body.resize-mode .col-align-btns { display: flex; }
     <!-- v6.14: 列幅調整モード切替(セッション限定) -->
     <button class="header-btn" id="resizeModeBtn" onclick="toggleColumnResizeMode()" title="項目の文字揃えと列幅を調整するモード。ONの間だけヘッダーの数値入力・揃えボタン・ドラッグが使えます。">⇔ 項目・幅調整</button>
     <button class="header-btn" onclick="openSetupMenuModal()">⚙ 各種設定</button>
-    <button class="header-btn primary" onclick="fetchAllProductData()" id="fetchProductDataBtn" title="楽天APIから商品データを全件取得しレビュー件数を記録">📥 商品データ取得</button>
+    <!-- v8.22: 押すといきなり取得が始まるのは分かりにくいので、まず更新メニューを開く。
+         何がいつ新しくなるのかの説明も、そのメニューの中に置いてある。 -->
+    <button class="header-btn primary" onclick="openUpdateMenuModal()" id="updateMenuBtn" title="データの更新メニューを開く（何がいつ新しくなるかの説明もここ）">🔄 更新</button>
   </div>
 </header>
 
@@ -1611,7 +1637,7 @@ body.resize-mode .col-align-btns { display: flex; }
           </svg>
         </div>
         <h3>レビューチェックを始めましょう</h3>
-        <p>まず <strong>⚙ 各種設定 → 楽天データ入力</strong> から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>商品データを取得すると、商品画像とレビュー件数・平均評価を一覧で確認できます。</p>
+        <p>まず <strong>⚙ 各種設定 → 楽天データ入力</strong> から楽天アプリID・アクセスキー・店舗コードを入力してください。<br>そのあと右上の <strong>🔄 更新 → 📥 商品データ取得</strong> を押すと、商品画像とレビュー件数・平均評価が一覧に出てきます。</p>
         <button class="empty-upload-btn" onclick="openSetupMenuModal()">⚙ 各種設定を開く</button>
       </div>
 
@@ -1782,6 +1808,143 @@ body.resize-mode .col-align-btns { display: flex; }
   </div>
 </div>
 
+<!-- ══ v8.22: 更新メニュー ══ -->
+<div class="modal-overlay" id="updateMenuModal" onclick="if(event.target===this)closeUpdateMenuModal()">
+  <div class="modal" style="max-width:720px">
+    <h3 style="margin-top:0">🔄 更新</h3>
+    <p style="margin-bottom:12px">データを取り直します。下の表で「何がいつ新しくなるか」を確認できます。</p>
+
+    <div class="upd-status" id="updStatusLine"></div>
+
+    <div class="menu-modal-actions">
+      <button class="menu-action-btn" id="fetchProductDataBtn" onclick="closeUpdateMenuModal();fetchAllProductData()">
+        <div class="action-title"><span class="action-title-icon">📥</span><span id="fetchProductDataBtnLabel">商品データ取得（楽天API）</span></div>
+        <div class="action-desc">
+          楽天APIから<strong>全商品</strong>を取り直します。<br>
+          新しくなるもの … <strong>レビュー件数 / 平均評価 / 商品画像 / 現在のタイトル</strong><br>
+          あわせて、その日のレビュー件数が<strong>履歴に1件記録</strong>され、画像が差し替わっていれば<strong>差し替え日</strong>が付きます。<br>
+          <span style="color:var(--text3)">※ 楽天APIの制限で1.2秒間隔。100商品で約2分かかります。入力済みの内容は消えません。</span>
+        </div>
+      </button>
+      <button class="menu-action-btn" onclick="closeUpdateMenuModal();fetchDenreiStatus(true)">
+        <div class="action-title"><span class="action-title-icon">🔔</span><span>伝令ちゃんの状態を取り直す</span></div>
+        <div class="action-desc">
+          ランキング伝令ちゃん側の<strong>ランキング登録状況</strong>だけを取り直します（数秒で終わります）。<br>
+          <span style="color:var(--text3)">※ 画面を開いたときにも自動で1回読んでいます。1枚目用モードの「🔔 伝令ちゃん」の行に出ます。</span>
+        </div>
+      </button>
+      <button class="menu-action-btn" onclick="reloadFromGitHubManual()">
+        <div class="action-title"><span class="action-title-icon">☁</span><span>GitHubから読み直す</span></div>
+        <div class="action-desc">
+          <strong>他のPCで入力した内容</strong>をこの画面に反映します。楽天APIは叩きません。<br>
+          <span style="color:var(--text3)">※ この画面での未送信の変更は、読み直す前に先に保存します。</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="upd-sec-title">📋 何がいつ新しくなるか</div>
+    <div class="upd-table-wrap">
+      <table class="upd-table">
+        <thead>
+          <tr><th style="width:170px">項目</th><th>いつ新しくなるか</th><th style="width:130px">どこから</th></tr>
+        </thead>
+        <tbody>
+          <tr class="upd-group is-auto"><td colspan="3">▼ 自動で入るもの（手で直す必要はありません）</td></tr>
+          <tr>
+            <td class="upd-name">レビュー件数</td>
+            <td class="upd-when"><strong>①</strong> 上の「📥 商品データ取得」を押したとき<br><strong>②</strong> 毎日6時の自動取得</td>
+            <td class="upd-src">楽天API</td>
+          </tr>
+          <tr>
+            <td class="upd-name">平均評価（★）</td>
+            <td class="upd-when">同上</td>
+            <td class="upd-src">楽天API</td>
+          </tr>
+          <tr>
+            <td class="upd-name">商品画像（画像1〜3）</td>
+            <td class="upd-when">同上<br><span style="color:var(--text3)">※ 楽天側で差し替えてから反映されるまで、楽天のキャッシュで少し遅れることがあります</span></td>
+            <td class="upd-src">楽天API</td>
+          </tr>
+          <tr>
+            <td class="upd-name">画像の差し替え日<br><span style="font-weight:400;color:var(--text3);font-size:10px">（画像の下の日付）</span></td>
+            <td class="upd-when">同上。<strong>画像のURLが前回と変わったときだけ</strong>記録されます</td>
+            <td class="upd-src">自動判定</td>
+          </tr>
+          <tr>
+            <td class="upd-name">現在のタイトル</td>
+            <td class="upd-when">同上（毎回、楽天側の最新に置き換わります）</td>
+            <td class="upd-src">楽天API</td>
+          </tr>
+          <tr>
+            <td class="upd-name">レビュー件数の履歴<br><span style="font-weight:400;color:var(--text3);font-size:10px">（📊 全レビュー・詳細のグラフ）</span></td>
+            <td class="upd-when">同上。<strong>1日1件</strong>記録され、同じ日に何回取っても最後の値で上書きされます</td>
+            <td class="upd-src">自動記録</td>
+          </tr>
+          <tr>
+            <td class="upd-name">出品された新商品</td>
+            <td class="upd-when">同上。取得すると<strong>自動的に一覧へ増えます</strong></td>
+            <td class="upd-src">楽天API</td>
+          </tr>
+          <tr>
+            <td class="upd-name">伝令ちゃんの状態</td>
+            <td class="upd-when"><strong>①</strong> この画面を開いたとき<br><strong>②</strong> 上の「🔔 伝令ちゃんの状態を取り直す」</td>
+            <td class="upd-src">伝令ちゃん</td>
+          </tr>
+
+          <tr class="upd-group is-manual"><td colspan="3">▼ 手で入れるもの（取得を押しても変わりません）</td></tr>
+          <tr>
+            <td class="upd-name">商品名</td>
+            <td class="upd-when"><strong>自動では変わりません。</strong>手で直したものを守るため、あえて上書きしていません<br><span style="color:var(--text3)">楽天側の名前を見たいときは「現在のタイトル」の列を見てください</span></td>
+            <td class="upd-src">手入力 / CSV</td>
+          </tr>
+          <tr>
+            <td class="upd-name">商品番号</td>
+            <td class="upd-when">手入力、または ⚙ 各種設定 →「商品番号・商品名」からCSVで一括</td>
+            <td class="upd-src">手入力 / CSV</td>
+          </tr>
+          <tr>
+            <td class="upd-name">画面上件数</td>
+            <td class="upd-when">手入力。または<strong>2枚目作成の「⬇ PNGを保存 / スタッツ変更」</strong>を押したときに、その時点のレビュー件数に合わせます</td>
+            <td class="upd-src">手入力</td>
+          </tr>
+          <tr>
+            <td class="upd-name">1枚目変更 / ランクタイプ<br>2枚目変更 / 3枚目変更 / 冠状態</td>
+            <td class="upd-when">手入力。行のドロップダウン、または上部の「✏ 選択商品を一括変更」</td>
+            <td class="upd-src">手入力</td>
+          </tr>
+          <tr>
+            <td class="upd-name">ランキング詳細 / 年月日<br>タイトル末尾の型番</td>
+            <td class="upd-when">手入力（型番はタイトルから自動で拾いますが、打ち替えるとそちらが優先されます）</td>
+            <td class="upd-src">手入力</td>
+          </tr>
+          <tr>
+            <td class="upd-name">入力した内容の保存</td>
+            <td class="upd-when"><strong>入力した3秒後に自動で</strong>GitHubへ送っています。「保存」ボタンはありません</td>
+            <td class="upd-src">→ GitHub</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="upd-note">
+      <strong>知っておくと迷わないこと</strong>
+      <ul>
+        <li><strong>同じファイル名で画像を上書きすると、差し替え日が付きません。</strong>
+            画像のURLが変わらないので、こちらからは見分けがつきません。日付を残したいときは別のファイル名で上げてください。</li>
+        <li><strong>楽天から消えた商品は、自動では一覧から消えません。</strong>
+            ⚙ 各種設定 →「🔍 取得状況の診断」で「古いデータ」として出てくるので、そこから削除できます。</li>
+        <li><strong>取得しても、入力した内容は消えません。</strong>
+            状態・画面上件数・メモ・選んだ画像などはそのまま残ります。</li>
+        <li>毎日6時の自動取得が最後にいつ動いたかは、ヘッダーの「状態」ボタンから確認できます。</li>
+      </ul>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeUpdateMenuModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- v8.12: 保存・自動取得・楽天APIの状態をまとめて見るモーダル -->
 <div class="modal-overlay" id="statusModal" onclick="if(event.target===this)closeStatusModal()">
   <div class="modal" style="max-width:520px">
@@ -1802,6 +1965,8 @@ body.resize-mode .col-align-btns { display: flex; }
       <span class="status-row-note">今のショップのアプリID・アクセスキー・店舗コードが揃っているかです。クリックで設定を開きます。</span>
     </div>
     <div class="modal-actions" style="margin-top:16px">
+      <!-- v8.22: 「古い」と気づいた流れでそのまま取り直せるようにする -->
+      <button class="modal-btn" onclick="closeStatusModal();openUpdateMenuModal()" title="データの更新メニューを開く">🔄 更新メニューを開く</button>
       <button class="modal-btn save" onclick="closeStatusModal()">閉じる</button>
     </div>
   </div>
@@ -2011,7 +2176,7 @@ body.resize-mode .col-align-btns { display: flex; }
         <div class="edit-danger-zone">
           <div class="edit-danger-note">
             この商品を reviewcheck から<strong>完全に削除</strong>します。<br>
-            ※ 楽天側に商品が残っている場合は「📥 商品データ取得」で復活します。
+            ※ 楽天側に商品が残っている場合は「🔄 更新 → 📥 商品データ取得」で復活します。
           </div>
           <button class="modal-btn danger" style="flex-shrink:0;font-weight:600" onclick="deleteProductFromEdit()" title="この商品を productCache から削除する">🗑 この商品を削除</button>
         </div>
@@ -3079,24 +3244,33 @@ function _hiResImg(url) {
   return url.replace(/\?_ex=\d+x\d+/, '?_ex=500x500');
 }
 
+/* v8.22: 取得中の見た目。
+ *   ヘッダーの「🔄 更新」と、更新メニューの中の取得ボタンの両方を同じ状態にする。
+ *   以前は1つのボタンの文字を直接書き換えていたが、置き場所が2か所になったので
+ *   ここ1か所にまとめた。ボタンを増やしてもこの関数だけ直せばよい。 */
+function _setFetchBusy(on) {
+  const hdr = document.getElementById('updateMenuBtn');
+  if (hdr) {
+    hdr.textContent = on ? '⏳ 取得中...' : '🔄 更新';
+    hdr.disabled = !!on;
+  }
+  const act = document.getElementById('fetchProductDataBtn');
+  if (act) act.disabled = !!on;
+  const lbl = document.getElementById('fetchProductDataBtnLabel');
+  if (lbl) lbl.textContent = on ? '取得中…' : '商品データ取得（楽天API）';
+}
+
 // ── 楽天Ichiba Item Search APIで全商品取得 ──
 async function fetchAllProductInfo() {
   if (_fetchInProgress) return;
   _fetchInProgress = true;
-  const btn = document.getElementById('fetchProductDataBtn');
-  if (btn) {
-    btn.textContent = '⏳ 取得中...';
-    btn.disabled = true;
-  }
+  _setFetchBusy(true);
 
   const shop = _getCurrentShop();
   if (!shop || !shop.appId || !shop.accessKey || !shop.shopCode) {
     alert('設定が未入力です。⚙ 設定 から楽天API認証情報を入力してください。');
     _fetchInProgress = false;
-    if (btn) {
-      btn.textContent = '📥 商品データ取得';
-      btn.disabled = false;
-    }
+    _setFetchBusy(false);
     return;
   }
 
@@ -3248,11 +3422,7 @@ async function fetchAllProductInfo() {
 
   saveCache();
   _fetchInProgress = false;
-  const finishBtn = document.getElementById('fetchProductDataBtn');
-  if (finishBtn) {
-    finishBtn.textContent = '📥 商品データ取得';
-    finishBtn.disabled = false;
-  }
+  _setFetchBusy(false);
   console.log(`[reviewcheck] fetchAllProductInfo 完了. 新規${newCount}件 / 更新${updateCount}件 / 合計${Object.keys(productCache).length}件 / error=${fetchError || 'なし'}`);
   _unlockUI();
   renderProducts();
@@ -3428,7 +3598,7 @@ async function diagnoseFetchAll() {
     }
     if (missingInCache.length > 30) html += `<span style="color:var(--text3)">…他 ${missingInCache.length - 30} 件</span>`;
     html += `</div>`;
-    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「📥 商品データ取得」で再取得してください</div>`;
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--text2)">→ 「🔄 更新 → 📥 商品データ取得」で再取得してください</div>`;
   }
   // v7.87: API取得が0件 or エラーありのときは「古いデータ」判定を信用してはいけない。
   //   (バージョン廃止で全滅したとき、全商品が「古いデータ」に見えて全消しできてしまう事故を防ぐ)
@@ -3562,7 +3732,7 @@ async function clearAllData() {
   }
 
   renderProducts();
-  alert('✓ クリア完了\n\n「📥 商品データ取得」を押して正しい番号で取り直してください。');
+  alert('✓ クリア完了\n\n「🔄 更新 → 📥 商品データ取得」で取り直してください。');
 }
 
 function manualFetchAll() {
@@ -9215,6 +9385,74 @@ async function testApi() {
   }
 }
 
+/* ══ v8.22: 更新メニュー ═══════════════════════════════════════════════════
+ *   以前はヘッダーの「📥 商品データ取得」を押すといきなり取得が始まっていた。
+ *   何が取れるのか・どれくらいかかるのかが押す前に分からなかったので、
+ *   いったんこのメニューを開き、説明を読んでから実行できるようにした。
+ *   「何がいつ新しくなるか」の表も、探さずに済むようここに置いている。
+ */
+function openUpdateMenuModal() {
+  _renderUpdateMenuStatus();
+  _setFetchBusy(_fetchInProgress);   // 取得中に開いても見た目が合うようにする
+  document.getElementById('updateMenuModal').classList.add('open');
+}
+function closeUpdateMenuModal() {
+  document.getElementById('updateMenuModal').classList.remove('open');
+}
+
+// 上部の1行。「最後にいつ取れたか」を押す前に見せる(無駄な取得を減らすため)
+function _renderUpdateMenuStatus() {
+  const el = document.getElementById('updStatusLine');
+  if (!el) return;
+  const fmt = (iso) => {
+    if (!iso) return 'なし';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    const z = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}/${z(d.getMonth() + 1)}/${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+  };
+  const data = _newestLastFetched();
+  const mk = _lastAutoFetchMarker;
+  const newest = (data && (!mk || data > mk)) ? data : mk;
+  const dnr = {
+    ok: '取得済み（' + _tailCopiedLabel(denreiLoadedAt) + '）',
+    loading: '読込中…',
+    error: '取得できませんでした',
+    idle: '未取得',
+  }[denreiLoadState] || '未取得';
+  el.innerHTML = `商品データの最終取得: <b>${_escape(fmt(newest))}</b>`
+    + `<span class="upd-sep">｜</span>商品 <b>${Object.keys(productCache).length}</b> 件`
+    + `<span class="upd-sep">｜</span>ショップ <b>${_escape(_getCurrentShopId())}</b>`
+    + `<span class="upd-sep">｜</span>伝令ちゃん: <b>${_escape(dnr)}</b>`;
+}
+
+/* v8.22: 他のPCで入力した内容をこの画面に取り込む。
+ *   まだGitHubへ送っていない変更があれば先に送る(3秒待ちの最中に読み直すと消えるため)。
+ */
+async function reloadFromGitHubManual() {
+  if (!localStorage.getItem('github_pat')) {
+    _showToast('GitHub PAT が未設定です（⚙ 各種設定 → 楽天データ入力）', 'error');
+    return;
+  }
+  closeUpdateMenuModal();
+  if (_saveTimer) {
+    clearTimeout(_saveTimer);
+    _saveTimer = null;
+    await saveToGitHub({ showLock: true });
+  }
+  _lockUI('GitHubから読み直しています…');
+  try {
+    await loadFromGitHub();
+    await loadColumnWidthsFromGitHub();
+    await loadRankingDefsFromGitHub();
+  } finally {
+    _unlockUI();
+  }
+  _loadSalesMonth();
+  renderProducts();
+  _showToast('GitHubから読み直しました（商品 ' + Object.keys(productCache).length + ' 件）', 'success');
+}
+
 /* ══ v8.12: ヘッダーの状態ボタン ═══════════════════════════════════════════
  *   保存・自動取得・楽天APIの3つをまとめて見せる。
  *   丸の色は3つのうち一番重いものに合わせる(赤 > 黄 > 緑)。
@@ -9267,6 +9505,25 @@ function updateApiStatus() {
  *   body直下へ移せば重なりの心配がなくなるので、位置は画面座標で置く。
  *   ついでに画面からはみ出さないよう、入らなければ上に出し、高さも制限する。
  */
+/* v8.22: 位置決めだけを切り出した。
+ *   画面が動いたときに「閉じる」のではなく「置き直す」ようにするため。
+ *   v8.21 では動いたら閉じていたが、表が画面より広くて横スクロールしている状態で
+ *   ショップ名を押すと、開いた直後にレイアウトが変わってスクロール位置が
+ *   詰められ、その scroll を拾って自分で閉じてしまっていた（＝一度も開けない）。
+ *   ヘッダーは上に貼り付いているので、置き直すほうが素直で事故もない。 */
+function _positionShopMenu() {
+  const menu = document.getElementById('shopMenu');
+  const btn = document.getElementById('shopSelectorBtn');
+  if (!menu || !btn || menu.style.display !== 'block') return;
+  const rect = btn.getBoundingClientRect();
+  const below = window.innerHeight - rect.bottom;
+  menu.style.maxHeight = Math.max(160, Math.min(440, Math.max(below, rect.top) - 16)) + 'px';
+  menu.style.overflowY = 'auto';
+  const mw = menu.offsetWidth || 240;
+  const mh = menu.offsetHeight || 0;
+  menu.style.left = Math.round(Math.max(4, Math.min(rect.left, window.innerWidth - mw - 8))) + 'px';
+  menu.style.top = Math.round(below >= mh + 8 ? rect.bottom + 4 : Math.max(4, rect.top - mh - 4)) + 'px';
+}
 function toggleShopMenu(e) {
   if (e) e.stopPropagation();
   const menu = document.getElementById('shopMenu');
@@ -9275,32 +9532,19 @@ function toggleShopMenu(e) {
   if (menu.style.display === 'block') { closeShopMenu(); return; }
   if (menu.parentNode !== document.body) document.body.appendChild(menu);
   renderShopMenu();
-  const rect = btn.getBoundingClientRect();
   menu.style.marginTop = '0';
   menu.style.display = 'block';
   menu.style.visibility = 'hidden';   // 測るあいだは見せない(位置が飛ぶのを防ぐ)
-  const below = window.innerHeight - rect.bottom;
-  menu.style.maxHeight = Math.max(160, Math.min(440, Math.max(below, rect.top) - 16)) + 'px';
-  menu.style.overflowY = 'auto';
-  const mw = menu.offsetWidth || 240;
-  const mh = menu.offsetHeight || 0;
-  menu.style.left = Math.round(Math.max(4, Math.min(rect.left, window.innerWidth - mw - 8))) + 'px';
-  menu.style.top = Math.round(below >= mh + 8 ? rect.bottom + 4 : Math.max(4, rect.top - mh - 4)) + 'px';
+  _positionShopMenu();
   menu.style.visibility = '';
 }
 function closeShopMenu() {
   const menu = document.getElementById('shopMenu');
   if (menu) menu.style.display = 'none';
 }
-// 画面が動くと位置がずれるので閉じる(本文のスクロールも拾うので capture で取る)
-window.addEventListener('scroll', function () {
-  const m = document.getElementById('shopMenu');
-  if (m && m.style.display === 'block') closeShopMenu();
-}, true);
-window.addEventListener('resize', function () {
-  const m = document.getElementById('shopMenu');
-  if (m && m.style.display === 'block') closeShopMenu();
-});
+// 画面が動いたら置き直す(本文のスクロールも拾うので capture で取る)
+window.addEventListener('scroll', _positionShopMenu, true);
+window.addEventListener('resize', _positionShopMenu);
 
 /* v8.21: 今のショップのURLをコピーする。
  *   ショップごとにブックマークしたり、別のPCの人に渡したりするためのもの。
@@ -10163,7 +10407,7 @@ function deleteProductFromEdit() {
     + `商品番号: ${p.itemNumber || '—'}\n`
     + `商品名: ${nm}\n\n`
     + `レビュー履歴・ランキング情報・タグ・メモも一緒に消えます。\n`
-    + `※ 楽天側に商品が残っている場合は「📥 商品データ取得」で復活します。\n\n`
+    + `※ 楽天側に商品が残っている場合は「🔄 更新 → 📥 商品データ取得」で復活します。\n\n`
     + `削除しますか？`)) return;
   if (!confirm(`もう一度確認します。\n\n「${code}」を本当に削除しますか？\n（この操作は取り消せません）`)) return;
   delete productCache[code];
@@ -10318,7 +10562,7 @@ function _renderReviewHistoryTable(code) {
   if (!table) return;
   const history = _getReviewHistory(code);
   if (history.length === 0) {
-    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">📥 商品データ取得を押すたびに記録されます</span></td></tr></tbody>`;
+    table.innerHTML = `<tbody><tr><td colspan="3" class="no-data" style="text-align:center;padding:16px">レビュー履歴がありません<br><span style="font-size:10px">🔄 更新 → 📥 商品データ取得 を押すたびに記録されます</span></td></tr></tbody>`;
     return;
   }
   let html = `<thead><tr>
@@ -11775,7 +12019,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.21 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.22 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
