@@ -1085,6 +1085,10 @@ body.mode-basic .col-diff-growth { display: none; }
 /* v7.87: 3枚目作成用は 2枚目作成/2枚目変更 を出さず、3枚目変更を出す */
 .product-table .col-third { width: var(--col-third-w, 160px); display: none; }
 .product-table .col-third { text-align: var(--col-third-align, left); }
+/* v8.25: ドロップダウンの上に置く「3枚目作成」ボタン。2枚目作成と同じ見た目にそろえる */
+.make3-btn { display: block; width: 100%; box-sizing: border-box; margin-bottom: 5px; font-size: 11px; padding: 6px 6px; white-space: nowrap; font-weight: 600; }
+.make3-btn:hover { background: #00695c; color: #fff !important; border-color: #00695c; }
+body.bulk-edit-mode .col-third .make3-btn { pointer-events: auto; }
 body.mode-third .product-table .col-third { display: table-cell; }
 body.mode-third .col-make2,
 body.mode-third .col-tags { display: none; }
@@ -1253,6 +1257,59 @@ body.mode-ranking .product-table .table-img-cell img { object-fit: cover; }
 .menu-action-btn.danger { border-color: rgba(163, 45, 45, 0.2); }
 .menu-action-btn.danger:hover { border-color: var(--danger); background: var(--red-light); }
 .menu-action-btn.danger .action-title { color: var(--danger); }
+
+/* ══ v8.25: 3枚目作成（ご利用者さまの声） ═══════════════════════════════
+ *   テンプレート画像の上に「見出し + 本文3行」を3組と、店長からの一言を載せる。
+ *   文字数の決まりが細かいので、入力欄のとなりに数えた結果をそのまま出す。 */
+.modal.t3-modal { max-width: 1760px; width: 97vw; max-height: 94vh; }
+.t3-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 2px solid var(--border2); }
+.t3-tab { position: relative; bottom: -2px; padding: 8px 16px; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text2); background: none; border: 2px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; }
+.t3-tab:hover { background: var(--surface2); color: var(--text); }
+.t3-tab.active { color: var(--accent); background: var(--surface); border-color: var(--border2); border-bottom: 2px solid var(--surface); font-weight: 700; }
+.t3-pane { display: none; }
+.t3-pane.active { display: block; }
+/* 手順 */
+.t3-steps { counter-reset: t3s; list-style: none; padding: 0; margin: 10px 0 0; max-width: 760px; }
+.t3-steps li { counter-increment: t3s; position: relative; padding: 0 0 14px 40px; font-size: 13px; line-height: 1.8; }
+.t3-steps li::before { content: counter(t3s); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; border-radius: 50%; background: var(--text); color: var(--surface); font-family: 'DM Mono', monospace; font-size: 12px; display: grid; place-items: center; }
+.t3-steps li:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 28px; bottom: 4px; width: 2px; background: var(--border2); }
+.t3-steps b { color: var(--text); }
+.t3-lead { font-size: 13px; color: var(--text2); line-height: 1.8; max-width: 760px; margin-bottom: 4px; }
+.t3-prompt { width: 100%; box-sizing: border-box; height: 48vh; min-height: 260px; padding: 12px 14px; font-family: 'DM Mono', monospace; font-size: 11.5px; line-height: 1.65; color: var(--text); background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); resize: vertical; white-space: pre; }
+.t3-prompt:focus { outline: none; border-color: #1976d2; }
+.t3-copybar { display: flex; align-items: center; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+/* 流し込み */
+.t3-body { display: grid; grid-template-columns: minmax(320px, 1fr) 860px; gap: 20px; }
+.t3-right { max-height: 76vh; overflow-y: auto; padding-right: 6px; }
+@media (max-width: 1500px) { .t3-body { grid-template-columns: minmax(0, 1fr) 560px; } }
+.t3-slot { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); margin-bottom: 12px; }
+.t3-slot-head { display: flex; align-items: center; gap: 8px; padding: 7px 11px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-size: 12px; font-weight: 700; }
+.t3-slot-head .t3-total { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.t3-slot-body { padding: 9px 11px 11px; }
+.t3-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.t3-line > label { flex: 0 0 56px; font-size: 10px; color: var(--text3); white-space: nowrap; }
+.t3-line input { flex: 1; min-width: 0; box-sizing: border-box; padding: 6px 8px; font-family: inherit; font-size: 13px; line-height: 1.5; color: var(--text); background: #fff; border: 1px solid var(--border2); border-radius: 4px; }
+.t3-line input:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 2px rgba(25,118,210,0.15); }
+.t3-line.is-head input { font-weight: 700; background: linear-gradient(transparent 58%, #fff3a8 58%); }
+/* 文字数の表示。範囲内=灰 / 足りない=黄 / 多すぎ=赤 */
+.t3-count { flex: 0 0 76px; text-align: right; font-family: 'DM Mono', monospace; font-size: 10.5px; font-variant-numeric: tabular-nums; color: var(--text3); white-space: nowrap; }
+.t3-count.ok { color: var(--green); }
+.t3-count.under { color: var(--amber); }
+.t3-count.over { color: var(--danger); font-weight: 700; }
+.t3-total.ok { color: var(--green); background: #e6f9f1; }
+.t3-total.under { color: var(--amber); background: #fff8e1; }
+.t3-total.over { color: var(--danger); background: var(--red-light); }
+.t3-wide { margin-top: 4px; font-size: 10.5px; line-height: 1.6; color: var(--danger); }
+.t3-wide:empty { display: none; }
+.t3-mgr textarea { width: 100%; box-sizing: border-box; min-height: 74px; padding: 7px 9px; font-family: inherit; font-size: 13px; line-height: 1.6; border: 1px solid var(--border2); border-radius: 4px; background: #fff; resize: vertical; }
+.t3-mgr textarea:focus { outline: none; border-color: #1976d2; }
+.t3-adv { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.t3-adv > summary { padding: 9px 12px; font-size: 12px; font-weight: 700; color: var(--text2); cursor: pointer; }
+.t3-adv > summary:hover { background: var(--surface2); }
+.t3-adv-body { padding: 0 12px 12px; }
+.t3-canvas-wrap { position: relative; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; overflow: auto; height: 72vh; min-height: 320px; display: flex; }
+.t3-canvas-wrap canvas { display: block; margin: auto; background: repeating-conic-gradient(#f0efec 0% 25%, #fff 0% 50%) 50% / 16px 16px; }
+.t3-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text3); text-align: center; padding: 20px; }
 
 /* ══ v8.22: 更新メニュー ══════════════════════════════════════════════
  *   「何がいつ新しくなるのか」を一覧で見せる表。
@@ -1470,7 +1527,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.24</span>
+    <span class="build-date">v8.25</span>
   </div>
 
   <div class="header-right">
@@ -1812,6 +1869,375 @@ body.resize-mode .col-align-btns { display: flex; }
     <div class="modal-actions" style="margin-top:16px">
       <button class="modal-btn" onclick="closeTailPreview()">閉じる</button>
       <button class="modal-btn save" id="tailPreviewCopyBtn" onclick="copyTailFixedTitleFromModal(this)">📋 変更後をコピー</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ v8.25: 3枚目作成（ご利用者さまの声） ══ -->
+<div class="modal-overlay" id="make3Modal">
+  <div class="modal t3-modal">
+    <div class="edit-header-row">
+      <h3 style="margin:0">🥉 3枚目作成</h3>
+      <div class="edit-header-actions">
+        <span class="bn-target" id="t3Target"></span>
+        <button class="modal-btn" onclick="t3Download(false)" title="合成したPNGをダウンロードします。3枚目変更は変わりません">⬇ PNGを保存</button>
+        <button class="modal-btn bn-dl-stats" onclick="t3Download(true)" title="PNGをダウンロードしたうえで、3枚目変更を「🛠 変更中」にします">⬇ PNGを保存 / スタッツ変更</button>
+        <button class="modal-btn save" onclick="t3SaveSettings()" title="テンプレート画像と位置の設定をGitHubに保存します(全PC共有)">💾 設定を保存</button>
+        <button class="modal-btn" onclick="closeMake3Modal()">閉じる</button>
+      </div>
+    </div>
+
+    <div class="t3-tabs">
+      <button type="button" class="t3-tab active" id="t3Tab-csv"    onclick="t3SetTab('csv')">① レビューCSVを取る</button>
+      <button type="button" class="t3-tab"        id="t3Tab-prompt" onclick="t3SetTab('prompt')">② 原稿を作ってもらう</button>
+      <button type="button" class="t3-tab"        id="t3Tab-build"  onclick="t3SetTab('build')">③ 画像に流し込む</button>
+    </div>
+
+    <!-- ① CSVを取る -->
+    <div class="t3-pane active" id="t3Pane-csv">
+      <p class="t3-lead">まず楽天RMSから、この商品のレビューをCSVで取ります。ここで取ったCSVを、次の②で原稿に変えてもらいます。</p>
+      <ol class="t3-steps">
+        <li><b>RMSにログイン</b>します。</li>
+        <li>左メニュー、またはRMSトップから <b>「コミュニティ」</b> を開きます。</li>
+        <li><b>「みんなのレビュー」</b> を開きます。</li>
+        <li><b>「レビューチェックツール」</b> を開きます。</li>
+        <li>対象期間や条件を指定して<b>検索</b>します。</li>
+        <li><b>「CSVダウンロード」</b> をクリックします。</li>
+        <li><b>CSVファイルを保存</b>します。</li>
+      </ol>
+      <div class="upd-note" style="max-width:760px">
+        <strong>この商品の情報</strong>
+        <div id="t3CsvInfo" style="margin-top:6px"></div>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;border-top:0;padding-top:4px">
+        <button class="modal-btn save" onclick="t3SetTab('prompt')">② 原稿を作ってもらう →</button>
+      </div>
+    </div>
+
+    <!-- ② 原稿 -->
+    <div class="t3-pane" id="t3Pane-prompt">
+      <p class="t3-lead">
+        ①で保存したCSVを<strong>AIに添付</strong>して、下の指示文をそのまま貼り付けてください。<br>
+        「見出し1行 + 本文3行」のレビュー候補が最大6案返ってきます。そこから使うものを選んで、③に貼り込みます。
+      </p>
+      <div class="t3-copybar">
+        <button class="modal-btn save" id="t3CopyPromptBtn" onclick="t3CopyPrompt(this)">📋 指示文をすべてコピー</button>
+        <span style="font-size:11px;color:var(--text3)">貼り付ける前に、CSVの添付を忘れずに</span>
+      </div>
+      <textarea class="t3-prompt" id="t3PromptText" readonly spellcheck="false">添付したレビューCSVをもとに、楽天LP・商品ページ用の
+「ご利用者さまの声」画像に入れる原稿を作成してください。
+
+目的は、参考画像のように、
+・ご利用者さまの声
+・レビュー吹き出し
+にそのまま入れられるレビュー原稿を作ることです。
+
+文章は画像にそのまま配置する前提です。
+そのため、行数だけでなく、1行ごとの文字数バランスも厳密に整えてください。
+
+最優先は以下の3点です。
+
+・レビュー本文は必ず3行固定
+・画像内で余白が目立たないよう、各行の文字量をしっかり使う
+・コピペしやすいように、本文行には余計なラベルを付けない
+
+短くまとめすぎず、吹き出し内の横幅をできるだけ広く使う原稿にしてください。
+
+--------------------------------
+■作成件数
+--------------------------------
+
+・お客様の声は、候補案として最大6案作成してください
+・元レビューが十分にあり、違う切り口で自然に作れる場合は必ず6案作成してください
+・元レビューが少ない、似た内容が多い、自然に分けにくい場合は最低3案で構いません
+・無理に6案へ増やすために、レビューに書かれていない内容を足してはいけません
+・最終的に使用するレビューは、出力された候補案の中から選ぶ前提です
+
+--------------------------------
+■作成内容
+--------------------------------
+
+各レビュー候補は、以下の形で作成してください。
+
+・見出し：1行
+・本文：必ず3行
+
+店長からの一言は作成しないでください。
+
+--------------------------------
+■行数ルール
+--------------------------------
+
+・各レビュー本文は、必ず3行にしてください
+・2行や4行以上にはしないでください
+・4行以上になりそうな文章は、短く言い換えて必ず3行に収めてください
+・画像内で自動改行されないよう、1行ごとの長さを調整してください
+・ただし、短くしすぎて余白が目立つ文章にはしないでください
+
+--------------------------------
+■レビュー本文の文字数ルール
+--------------------------------
+
+レビュー本文は、3行全体でしっかり文字量があるようにしてください。
+
+【1行ごとの目安】
+・1行目：全角12〜18文字程度
+・2行目：全角14〜20文字程度
+・3行目：全角12〜18文字程度
+
+【3行合計の目安】
+・3行合計で全角42〜52文字程度を目安にしてください
+
+【重要】
+・1行だけ極端に短い形はNGです
+・3行目だけ極端に短くしないでください
+・3行すべてを無理に同じ文字数にしなくて構いません
+・1行目が短めの場合は、2行目または3行目を少し長めにして文字量を補ってください
+・3行の長さを完全に揃えることより、吹き出し内の余白が目立たないことを優先してください
+・ただし、画像内で自動改行されそうな長すぎる行は避けてください
+
+--------------------------------
+■レビュー本文の構成ルール
+--------------------------------
+
+各レビュー本文は、必ず3行にしてください。
+
+基本構成は、
+
+・1行目：導入、第一印象、使ってみた感想
+・2行目：特に良かった点
+・3行目：満足感、安心感、締め
+
+の流れにしてください。
+
+文章構成はできるだけ、
+
+「1〜2行目で1文」
+＋
+「3行目で1文」
+
+の合計2文構成を優先してください。
+
+3行すべてを別々の文にせず、
+1〜2行目で自然につながる1文を作り、
+3行目で短く締める形を基本にしてください。
+
+どうしても2行で1文＋1行で1文にしにくい場合のみ、
+3行それぞれを1文ずつにしても構いません。
+
+ただしその場合も、
+3行すべてを「です」「ます」「でした」で終わらせないでください。
+
+--------------------------------
+■句読点ルール
+--------------------------------
+
+・レビュー本文の文末には、自然な範囲で「。」を付けてください
+・1〜2行目で文が続く場合は、1行目の末尾に「。」を付けなくて構いません
+・文が終わる行には、できるだけ「。」を付けてください
+・全行に無理やり「。」を付ける必要はありません
+・読みやすさと画像内での見え方を優先してください
+
+--------------------------------
+■文体ルール
+--------------------------------
+
+・実際のレビューらしい自然な口調にしてください
+・不自然な敬語や、広告っぽい言い回しは避けてください
+・丁寧すぎる説明文にしないでください
+・意味を変えない範囲で、語尾や表現は自然に整えて構いません
+・3行すべてが「です」「ます」「でした」調で並ばないようにしてください
+・同じ語尾や言い回しを繰り返さないでください
+
+【使ってよい自然な語尾の例】
+・〜で満足です。
+・〜てよかったです。
+・〜できました。
+・〜なところが良いです。
+・〜して助かりました。
+・〜も気に入っています。
+・〜で使いやすいです。
+・〜だと思います。
+・〜も安心でした。
+・〜したくなります。
+・〜なのがうれしいです。
+
+--------------------------------
+■内容の正確性ルール
+--------------------------------
+
+・実際のレビュー内容をもとに作成してください
+・意味を変えない範囲で、語尾や言い回しは自然に整えて構いません
+・レビューに書かれていない効果、性能、事実は作らないでください
+・お客様名、注文番号、個人情報は出さないでください
+・短くなりすぎる場合でも、存在しないメリットを足してはいけません
+・文字数を増やす場合は、元レビュー内にある内容を自然に補足する形にしてください
+・商品説明文のように作らず、あくまでレビューらしい感想文にしてください
+
+--------------------------------
+■候補案のバリエーションルール
+--------------------------------
+
+・各レビュー候補は、できるだけ内容の種類を変えてください
+・6案すべてが同じような内容にならないようにしてください
+・候補案ごとに、伝わるメリットが少しずつ違うようにしてください
+・見出し、本文の書き出し、締めの言い回しもできるだけ重複しないようにしてください
+・似たレビューが多い場合でも、見せ方や切り口を変えてください
+・ただし、元レビューに書かれていない内容は作らないでください
+
+【切り口の例】
+1. 使いやすさ
+2. 着け心地・使用感
+3. サイズ感
+4. 色味・見た目
+5. 取り付けやすさ
+6. 配送の早さ・対応の良さ
+7. リピートしたい気持ち
+8. 家族用・予備用としての満足感
+9. コスパの良さ
+10. 悩みが解決した感想
+
+--------------------------------
+■重複禁止ルール
+--------------------------------
+
+・見出しは全案でできるだけ違う表現にしてください
+・本文の書き出しも、全案で似せすぎないでください
+・同じ語尾や同じ構文を繰り返さないでください
+・「買ってよかったです」「満足です」ばかりで締めないでください
+・レビュー候補どうしで、同じ意味の言い換えだけにならないようにしてください
+
+--------------------------------
+■見出しルール
+--------------------------------
+
+・各レビューに短い見出しをつけてください
+・見出しは1行で収まる長さにしてください
+・見出しは全角10〜16文字程度を目安にしてください
+・参考画像のように、黄色マーカー背景に載せる前提で作ってください
+・見出しだけでレビュー内容の魅力が伝わる表現にしてください
+・全案で見出しの方向性が似すぎないようにしてください
+
+--------------------------------
+■出力形式
+--------------------------------
+
+必ず以下の形式で出力してください。
+
+・「■レビュー候補1」のように、候補番号の後にピリオドは付けないでください
+・「本文1行目：」「本文2行目：」のようなラベルは付けないでください
+・本文はコピペしやすいように、3行をそのまま改行して出力してください
+・ダミーの例文や「〇〇〇〇〇」のような仮文は出力しないでください
+・店長からの一言は出力しないでください
+
+■レビュー候補1
+見出し：
+本文をここに3行で出力
+
+■レビュー候補2
+見出し：
+本文をここに3行で出力
+
+■レビュー候補3
+見出し：
+本文をここに3行で出力
+
+■レビュー候補4
+見出し：
+本文をここに3行で出力
+
+■レビュー候補5
+見出し：
+本文をここに3行で出力
+
+■レビュー候補6
+見出し：
+本文をここに3行で出力
+
+自然に作れる内容が3案しかない場合は、3案で止めてください。
+無理に6案へ増やすために、レビューにない内容を足さないでください。
+
+--------------------------------
+■出力前の最終チェック
+--------------------------------
+
+出力前に、必ず以下を確認してください。
+
+・レビュー本文がそれぞれ必ず3行になっているか
+・レビュー本文3行の合計が全角42〜52文字程度になっているか
+・1行だけ極端に短い、または長い行がないか
+・画像内で自動改行されにくい長さになっているか
+・吹き出し内の余白が目立たない文字量になっているか
+・3行すべてが「です」「ます」「でした」で終わっていないか
+・基本は「2行で1文＋1行で1文」になっているか
+・文末に必要な「。」が自然に付いているか
+・候補案ごとに内容や切り口が違っているか
+・同じような見出しや書き出しが続いていないか
+・同じ語尾や言い回しが続いていないか
+・レビューにない内容を勝手に足していないか
+・「本文1行目：」などのラベルを出していないか
+・候補番号の後にピリオドを付けていないか
+・店長からの一言を出力していないか
+・ダミーの仮文を出力していないか
+・元レビューが十分ある場合は6案出せているか
+・自然に作れる内容が少ない場合でも最低3案は出せているか
+
+文字数バランスが悪い場合は、出力前に必ず言い換えて整えてください。
+
+最優先は、
+「レビュー本文3行固定」
+「吹き出し内の横幅をしっかり使う文字量」
+「各行の長さが自然にそろって見えること」
+「そのまま画像にコピペしやすい出力形式」
+です。</textarea>
+      <div class="modal-actions" style="justify-content:flex-start;border-top:0">
+        <button class="modal-btn save" onclick="t3SetTab('build')">③ 画像に流し込む →</button>
+      </div>
+    </div>
+
+    <!-- ③ 流し込み -->
+    <div class="t3-pane" id="t3Pane-build">
+      <div class="t3-body">
+        <div class="bn-left">
+          <div class="bn-toolbar">
+            <div class="view-toggle">
+              <button class="view-toggle-btn active" id="t3ZoomFit" onclick="t3SetZoom('fit')" title="枠に合わせて表示">フィット</button>
+              <button class="view-toggle-btn" id="t3Zoom1" onclick="t3SetZoom(1)" title="等倍(1px単位の確認用)">等倍</button>
+            </div>
+            <span class="bn-coord" id="t3Coord">— , —</span>
+            <span class="bn-size" id="t3CanvasSize"></span>
+          </div>
+          <div class="t3-canvas-wrap" id="t3CanvasWrap">
+            <canvas id="t3Preview"></canvas>
+            <div class="t3-empty" id="t3PreviewEmpty">テンプレート画像を読み込んでください（右の「テンプレート」から）</div>
+          </div>
+          <div class="bn-hint">プレビュー上の座標はテンプレート画像の実ピクセルです。文字を入れると、その場で反映されます。</div>
+        </div>
+
+        <div class="t3-right">
+          <div class="edit-section-title">🖼 テンプレート</div>
+          <div class="bn-row">
+            <button class="modal-btn" style="flex:1" onclick="document.getElementById('t3TemplateFile').click()">📁 テンプレート画像を選ぶ</button>
+            <input type="file" id="t3TemplateFile" accept="image/*" style="display:none" onchange="t3PickTemplate(event)">
+          </div>
+          <div class="bn-note" id="t3TemplateNote">未設定</div>
+
+          <div class="edit-section-title" style="margin-top:16px">💬 ご利用者さまの声</div>
+          <div class="bn-note" style="margin-bottom:8px">②で返ってきた候補から、使うものを貼り付けてください。右の数字は文字数です（灰＝未入力 / 緑＝ちょうどよい / 黄＝短い / 赤＝長すぎ）。</div>
+          <div id="t3SlotList"></div>
+
+          <div class="edit-section-title" style="margin-top:16px">🗣 店長からの一言</div>
+          <div class="t3-mgr">
+            <textarea id="t3Manager" placeholder="店長からの一言（改行でそのまま改行されます）" oninput="t3EditManager(this.value)"></textarea>
+            <div class="bn-note" id="t3ManagerNote"></div>
+          </div>
+
+          <details class="t3-adv">
+            <summary>⚙ 位置とサイズの調整</summary>
+            <div class="t3-adv-body" id="t3AdvBody"></div>
+          </details>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -5242,7 +5668,7 @@ function _renderTableRow(code) {
       <button type="button" class="modal-btn make2-btn" onclick="openMake2('${_escape(code)}')" title="2枚目画像の作成画面を開きます。開くだけでは何も変わりません(作成画面の「PNGを保存 / スタッツ変更」を押すと「🛠 変更中」になります)">🖼 2枚目作成</button>
     </td>
     <td class="col-tags" id="tagsCell-${_escape(code)}">${_renderTagsButtons(code, p.tags)}</td>
-    <td class="col-third" id="thirdCell-${_escape(code)}">${_renderThirdSelect(code, p.thirdStatus)}</td>
+    <td class="col-third" id="thirdCell-${_escape(code)}">${_renderThirdCell(code, p.thirdStatus)}</td>
     <td class="col-action">
       <a class="modal-btn rms-btn" href="${_escape(_rmsEditUrl(code))}" target="_blank" rel="noopener" title="RMSの商品編集ページを新規タブで開きます(RMSにログイン済みならそのまま開きます)">🏬 RMS</a>
       <button class="modal-btn" style="font-size:11px;padding:6px 8px;white-space:nowrap;width:100%" onclick="openProductEditModal('${_escape(code)}')" title="詳細を表示・編集">✎ 詳細</button>
@@ -7559,6 +7985,12 @@ function _renderFirstStatusCell(code, p) {
   </div>`;
 }
 
+/* v8.25: 3枚目変更の列。ドロップダウンの上に「3枚目作成」ボタンを置く。 */
+function _renderThirdCell(code, cur) {
+  return `<button type="button" class="modal-btn make3-btn" onclick="openMake3('${_escape(code)}')"`
+    + ` title="ご利用者さまの声（3枚目画像）を作ります。開くだけでは何も変わりません">🥉 3枚目作成</button>`
+    + _renderThirdSelect(code, cur);
+}
 function _renderThirdSelect(code, cur) {
   const k = _thirdKey(cur);
   const o0 = _thirdOpt(k);
@@ -7578,7 +8010,7 @@ function setThirdStatus(code, v) {
   _touchUpdatedAt(code);
   scheduleGitHubSave();
   const cell = document.getElementById('thirdCell-' + code);
-  if (cell) { cell.innerHTML = _renderThirdSelect(code, next); _flashCell(cell); }
+  if (cell) { cell.innerHTML = _renderThirdCell(code, next); _flashCell(cell); }
   // フィルタで絞り込んでいると表示対象が変わるので件数も描き直す
   _renderThirdFilterRow();
 }
@@ -8185,6 +8617,8 @@ const RANKING_DEFS_DEFAULT = {
     // v7.87: 内数(絞り込み専用)。並べ替えと区切りだけ変えられる
     { key:'__hot__',  icon:'🔥', label:'獲得前-3件以上', bg:'#fff0f0', fg:'#c62828', fixed:true },
     { key:'none',     icon:'⬜', label:'獲得前',       bg:'#f5f4ee', fg:'#78716c' },
+    // v8.25: 3枚目作成で「PNGを保存 / スタッツ変更」を押したときの行き先
+    { key:'changing', icon:'🛠', label:'変更中',       bg:'#fff3e0', fg:'#e65100' },
     { key:'skip',     icon:'⏭', label:'SKIP',         bg:'#e7f1fb', fg:'#1976d2', sep:true },
     { key:'changed',  icon:'✅', label:'変更完了',     bg:'#e8f5e9', fg:'#2e7d32' },
     { key:'stale',    icon:'📦', label:'昔のまま放置', bg:'#fbeeee', fg:'#a32d2d' },
@@ -8208,7 +8642,7 @@ const RANKING_DEFS_DEFAULT = {
  *   ・tag の 'changing'  … 「PNGを保存 / スタッツ変更」が自動で付けるので消せない
  *   名前・アイコン・配色・並び順はロック中の項目でも変更できる。
  */
-const RD_LOCKED_KEYS = { type: ['pending'], kind: ['not_needed'], tag: ['none', 'changing', '__hot__', '__hot3__'], third: ['none', '__hot__'] };
+const RD_LOCKED_KEYS = { type: ['pending'], kind: ['not_needed'], tag: ['none', 'changing', '__hot__', '__hot3__'], third: ['none', 'changing', '__hot__'] };
 const RANKING_DEFS_KEY = 'reviewcheck_ranking_defs';
 let rankingDefs = _rdCloneDefaults();
 
@@ -11190,6 +11624,558 @@ function _renderAllReviewsTable(totals) {
   table.innerHTML = html;
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════
+ * v8.25: 3枚目作成（ご利用者さまの声）
+ *
+ *   テンプレート画像の上に「見出し + 本文3行」を3組、
+ *   それと「店長からの一言」を載せて1枚のPNGにする。
+ *
+ *   2枚目作成（バナー合成）との違い:
+ *     ・置く文字が決まっているので、自由なテキスト項目ではなく専用の入力欄にした
+ *     ・文字数の決まりが細かいので、入力欄のとなりに数えた結果をそのまま出す
+ *     ・入力した原稿は商品ごとに保存する（次に開いたら続きから直せる）
+ *
+ *   描画は2枚目作成と同じしくみを使い回す（_bnLoadImage / _bnWrapText /
+ *   BANNER_WEIGHT / フォント読み込み）。別オリジンの画像を使うと canvas が
+ *   汚染されて保存できなくなるのも同じなので、テンプレートは data URL で持つ。
+ * ══════════════════════════════════════════════════════════════════════ */
+
+/* 添付テンプレート(750×1230)から実測した既定値。
+ *   黄色マーカー: 1組目 x60..465 / y196..215、以降は下の offsets ぶんずれる
+ *   吹き出しの枠: 1組目 x37..512 / y167..344
+ * テンプレートを差し替えたら「⚙ 位置とサイズの調整」で直せる。 */
+const THIRD_DEFAULTS = {
+  version: 1,
+  template: '',
+  fontFamily: '',
+  head:    { x: 60,  y: 192,  size: 24, lineHeight: 34, weight: 'bold',   color: '#1a1a1a', align: 'left', letterSpacing: 0 },
+  body:    { x: 60,  y: 242,  size: 21, lineHeight: 34, weight: 'normal', color: '#1a1a1a', align: 'left', letterSpacing: 0 },
+  manager: { x: 300, y: 1035, size: 20, lineHeight: 34, weight: 'normal', color: '#1a1a1a', align: 'left', letterSpacing: 0, maxWidth: 420, maxLines: 5 },
+  offsets: [ { x: 0, y: 0 }, { x: 201, y: 243 }, { x: 0, y: 486 } ],
+  headW: 406,   // 黄色マーカーの幅。見出しがこれを超えたら知らせる
+  bodyW: 430,   // 吹き出しの内側の幅。本文1行がこれを超えたら知らせる
+};
+/* 指示文で決めている文字数の目安。ここを直せば入力欄の判定も変わる */
+const T3_LIMITS = { head: [10, 16], body: [[12, 18], [14, 20], [12, 18]], total: [42, 52] };
+const THIRD_SETTINGS_KEY = 'reviewcheck_third_settings';
+
+let thirdSettings = null;
+let _t3LoadedFromGitHub = false;
+let _t3State = { code: null, tab: 'csv', zoom: 'fit' };
+
+function _t3Num(v, d) { const n = Number(v); return isNaN(n) ? d : n; }
+function _t3NormBlock(src, def) {
+  const o = Object.assign({}, def, src || {});
+  ['x', 'y', 'size', 'lineHeight', 'maxWidth', 'maxLines'].forEach(k => {
+    if (def[k] !== undefined) o[k] = Math.round(_t3Num(o[k], def[k]));
+  });
+  o.letterSpacing = _t3Num(o.letterSpacing, def.letterSpacing || 0);
+  if (!BANNER_WEIGHT[o.weight]) o.weight = def.weight;
+  if (['left', 'center', 'right'].indexOf(o.align) < 0) o.align = def.align;
+  if (!/^#[0-9a-f]{6}$/i.test(String(o.color))) o.color = def.color;
+  return o;
+}
+function _t3Normalize(cfg) {
+  const d = THIRD_DEFAULTS;
+  const c = cfg || {};
+  const out = {
+    version: d.version,
+    template: (typeof c.template === 'string') ? c.template : '',
+    fontFamily: (typeof c.fontFamily === 'string') ? c.fontFamily : '',
+    head: _t3NormBlock(c.head, d.head),
+    body: _t3NormBlock(c.body, d.body),
+    manager: _t3NormBlock(c.manager, d.manager),
+    headW: Math.max(0, Math.round(_t3Num(c.headW, d.headW))),
+    bodyW: Math.max(0, Math.round(_t3Num(c.bodyW, d.bodyW))),
+    offsets: [],
+  };
+  for (let i = 0; i < 3; i++) {
+    const o = (Array.isArray(c.offsets) && c.offsets[i]) || d.offsets[i];
+    out.offsets.push({ x: Math.round(_t3Num(o.x, d.offsets[i].x)), y: Math.round(_t3Num(o.y, d.offsets[i].y)) });
+  }
+  return out;
+}
+function _t3InitSettings() {
+  if (thirdSettings) return;
+  let cached = null;
+  try { const raw = localStorage.getItem(THIRD_SETTINGS_KEY); if (raw) cached = JSON.parse(raw); } catch (e) {}
+  thirdSettings = _t3Normalize(cached);
+}
+function _t3CacheLocal() {
+  try { localStorage.setItem(THIRD_SETTINGS_KEY, JSON.stringify(thirdSettings)); }
+  catch (e) { console.warn('[third] localStorageキャッシュ失敗(サイズ超過の可能性):', e.message); }
+}
+
+/* ── 商品ごとの原稿 ──
+ *   productCache[code].thirdCopy = { s:[{h,b:[3]}×3], m:'店長からの一言' }
+ *   レビューデータと同じ場所に入るので、全PCで共有される。 */
+function _t3Blank() { return { s: [0, 1, 2].map(() => ({ h: '', b: ['', '', ''] })), m: '' }; }
+function _t3Data(code) {
+  const p = productCache[code];
+  if (!p) return _t3Blank();
+  if (!p.thirdCopy || !Array.isArray(p.thirdCopy.s)) p.thirdCopy = _t3Blank();
+  const d = p.thirdCopy;
+  while (d.s.length < 3) d.s.push({ h: '', b: ['', '', ''] });
+  d.s.forEach(sl => {
+    if (typeof sl.h !== 'string') sl.h = '';
+    if (!Array.isArray(sl.b)) sl.b = ['', '', ''];
+    while (sl.b.length < 3) sl.b.push('');
+  });
+  if (typeof d.m !== 'string') d.m = '';
+  return d;
+}
+// 全部空なら保存しない(使っていない商品のデータを増やさない)
+function _t3IsEmpty(d) {
+  return !d.m && d.s.every(sl => !sl.h && sl.b.every(v => !v));
+}
+let _t3SaveTimer = null;
+function _t3TouchSave(code) {
+  const p = productCache[code];
+  if (!p) return;
+  if (_t3IsEmpty(p.thirdCopy)) delete p.thirdCopy;
+  _touchUpdatedAt(code);
+  saveCache();
+  clearTimeout(_t3SaveTimer);
+  _t3SaveTimer = setTimeout(() => scheduleGitHubSave(), 400);
+}
+
+/* ── 文字数を数える ──
+ *   絵文字なども1文字として数えたいので、コードポイント単位で数える。 */
+function _t3Len(v) { return [...String(v || '')].length; }
+function _t3Judge(n, lo, hi) {
+  if (n === 0) return '';
+  if (n > hi) return 'over';
+  if (n < lo) return 'under';
+  return 'ok';
+}
+// 指定の設定でその文字が何pxになるかを測る(はみ出しの判定に使う)
+let _t3MeasureCtx = null;
+function _t3Width(text, cfg) {
+  if (!text) return 0;
+  if (!_t3MeasureCtx) _t3MeasureCtx = document.createElement('canvas').getContext('2d');
+  const ctx = _t3MeasureCtx;
+  ctx.font = `${BANNER_WEIGHT[cfg.weight] || '400'} ${cfg.size}px ${_t3Family()}`;
+  if (_bnLetterSpacingSupported) ctx.letterSpacing = `${Number(cfg.letterSpacing) || 0}px`;
+  const w = ctx.measureText(text).width;
+  if (_bnLetterSpacingSupported) ctx.letterSpacing = '0px';
+  return w;
+}
+function _t3Family() {
+  const f = thirdSettings && thirdSettings.fontFamily;
+  return f ? `"${f}", ${BANNER_FONT_FAMILY}` : BANNER_FONT_FAMILY;
+}
+
+/* ── 描画 ── */
+function _t3Texts(code) {
+  const s = thirdSettings, d = _t3Data(code), out = [];
+  s.offsets.forEach((off, i) => {
+    const sl = d.s[i];
+    if (sl.h) out.push(Object.assign({}, s.head, { x: s.head.x + off.x, y: s.head.y + off.y, lines: [sl.h] }));
+    if (sl.b.some(v => v)) out.push(Object.assign({}, s.body, { x: s.body.x + off.x, y: s.body.y + off.y, lines: sl.b.slice(0, 3) }));
+  });
+  if (d.m) out.push(Object.assign({}, s.manager, { value: d.m, wrap: true }));
+  return out;
+}
+function _t3DrawTexts(ctx, texts) {
+  for (const t of texts) {
+    ctx.font = `${BANNER_WEIGHT[t.weight] || '400'} ${t.size}px ${_t3Family()}`;
+    if (_bnLetterSpacingSupported) ctx.letterSpacing = `${Number(t.letterSpacing) || 0}px`;
+    ctx.textAlign = t.align;
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = t.color;
+    let lines = t.lines;
+    if (!lines) lines = _bnWrapText(ctx, t.value, t.wrap ? t.maxWidth : 0, t.maxLines || 5, '');
+    lines.forEach((ln, i) => { if (ln) ctx.fillText(ln, t.x, t.y + i * t.lineHeight); });
+    if (_bnLetterSpacingSupported) ctx.letterSpacing = '0px';
+  }
+}
+async function _t3Compose(opts) {
+  const tpl = await _bnLoadImage(opts.templateUrl);
+  const canvas = opts.canvas || document.createElement('canvas');
+  canvas.width = tpl.naturalWidth;
+  canvas.height = tpl.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(tpl, 0, 0);
+  await _bnEnsureFonts(opts.texts.map(t => ({ weight: t.weight, size: t.size, fontFamily: thirdSettings.fontFamily })));
+  _t3DrawTexts(ctx, opts.texts);
+  return canvas;
+}
+
+let _t3RenderSeq = 0;
+async function t3RenderPreview() {
+  const canvas = document.getElementById('t3Preview');
+  const empty = document.getElementById('t3PreviewEmpty');
+  if (!canvas) return;
+  if (!thirdSettings || !thirdSettings.template) {
+    canvas.style.display = 'none';
+    if (empty) empty.style.display = '';
+    const sz = document.getElementById('t3CanvasSize'); if (sz) sz.textContent = '';
+    return;
+  }
+  canvas.style.display = '';
+  if (empty) empty.style.display = 'none';
+  const seq = ++_t3RenderSeq;
+  try {
+    await _t3Compose({ templateUrl: thirdSettings.template, texts: _t3Texts(_t3State.code), canvas });
+    if (seq !== _t3RenderSeq) return;   // 連打された古い描画は捨てる
+    _t3ApplyZoom(canvas);
+    const sz = document.getElementById('t3CanvasSize');
+    if (sz) sz.textContent = `${canvas.width} × ${canvas.height} px`;
+  } catch (e) {
+    console.warn('[third] プレビュー失敗:', e.message);
+  }
+}
+function _t3ApplyZoom(canvas) {
+  const wrap = document.getElementById('t3CanvasWrap');
+  if (!wrap) return;
+  let scale = 1;
+  if (_t3State.zoom === 'fit') {
+    scale = Math.min(1, (wrap.clientWidth - 24) / canvas.width, (wrap.clientHeight - 24) / canvas.height);
+  } else {
+    scale = Number(_t3State.zoom) || 1;
+  }
+  canvas.style.width = Math.round(canvas.width * scale) + 'px';
+  canvas.style.height = Math.round(canvas.height * scale) + 'px';
+}
+function t3SetZoom(z) {
+  _t3State.zoom = z;
+  ['t3ZoomFit', 't3Zoom1'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+  const el = document.getElementById(z === 'fit' ? 't3ZoomFit' : 't3Zoom1');
+  if (el) el.classList.add('active');
+  const c = document.getElementById('t3Preview');
+  if (c && c.style.display !== 'none') _t3ApplyZoom(c);
+}
+
+/* ── 入力欄 ── */
+function _t3CountHtml(n, lo, hi) {
+  const cls = _t3Judge(n, lo, hi);
+  return `<span class="t3-count ${cls}">${n} / ${lo}〜${hi}</span>`;
+}
+function _t3RenderSlots() {
+  const box = document.getElementById('t3SlotList');
+  if (!box) return;
+  const d = _t3Data(_t3State.code);
+  box.innerHTML = d.s.map((sl, i) => {
+    const total = sl.b.reduce((a, v) => a + _t3Len(v), 0);
+    const tCls = total === 0 ? '' : _t3Judge(total, T3_LIMITS.total[0], T3_LIMITS.total[1]);
+    let html = `<div class="t3-slot"><div class="t3-slot-head"><span>💬 ${i + 1}人目</span>`
+      + `<span class="t3-total ${tCls}">本文合計 ${total} / ${T3_LIMITS.total[0]}〜${T3_LIMITS.total[1]}</span></div><div class="t3-slot-body">`;
+    html += `<div class="t3-line is-head"><label>見出し</label>`
+      + `<input type="text" value="${_escape(sl.h)}" placeholder="黄色マーカーに載る1行"`
+      + ` oninput="t3EditHead(${i}, this.value)">`
+      + _t3CountHtml(_t3Len(sl.h), T3_LIMITS.head[0], T3_LIMITS.head[1]) + `</div>`;
+    for (let j = 0; j < 3; j++) {
+      const lim = T3_LIMITS.body[j];
+      html += `<div class="t3-line"><label>本文 ${j + 1}行目</label>`
+        + `<input type="text" value="${_escape(sl.b[j])}" placeholder="${j + 1}行目"`
+        + ` oninput="t3EditBody(${i}, ${j}, this.value)">`
+        + _t3CountHtml(_t3Len(sl.b[j]), lim[0], lim[1]) + `</div>`;
+    }
+    html += `<div class="t3-wide">${_t3WideWarn(sl)}</div>`;
+    return html + `</div></div>`;
+  }).join('');
+}
+// 吹き出しからはみ出す行を知らせる(実際に測った幅で判定する)
+function _t3WideWarn(sl) {
+  const s = thirdSettings, out = [];
+  if (sl.h && s.headW > 0 && _t3Width(sl.h, s.head) > s.headW) out.push('見出しが黄色マーカーからはみ出しています');
+  sl.b.forEach((v, j) => {
+    if (v && s.bodyW > 0 && _t3Width(v, s.body) > s.bodyW) out.push(`本文${j + 1}行目が吹き出しからはみ出しています`);
+  });
+  return out.length ? '⚠ ' + out.map(_escape).join(' / ') : '';
+}
+// 入力のたびに表を作り直すとカーソルが飛ぶので、数字と警告だけ書き換える
+function _t3SyncSlot(i) {
+  const box = document.getElementById('t3SlotList');
+  const card = box && box.children[i];
+  if (!card) return;
+  const d = _t3Data(_t3State.code), sl = d.s[i];
+  const counts = card.querySelectorAll('.t3-count');
+  const vals = [{ n: _t3Len(sl.h), lim: T3_LIMITS.head }]
+    .concat(sl.b.map((v, j) => ({ n: _t3Len(v), lim: T3_LIMITS.body[j] })));
+  counts.forEach((el, k) => {
+    if (!vals[k]) return;
+    el.className = 't3-count ' + _t3Judge(vals[k].n, vals[k].lim[0], vals[k].lim[1]);
+    el.textContent = `${vals[k].n} / ${vals[k].lim[0]}〜${vals[k].lim[1]}`;
+  });
+  const total = sl.b.reduce((a, v) => a + _t3Len(v), 0);
+  const tEl = card.querySelector('.t3-total');
+  if (tEl) {
+    tEl.className = 't3-total ' + (total === 0 ? '' : _t3Judge(total, T3_LIMITS.total[0], T3_LIMITS.total[1]));
+    tEl.textContent = `本文合計 ${total} / ${T3_LIMITS.total[0]}〜${T3_LIMITS.total[1]}`;
+  }
+  const w = card.querySelector('.t3-wide');
+  if (w) w.textContent = _t3WideWarn(sl).replace(/<[^>]*>/g, '');
+}
+function t3EditHead(i, v) {
+  const d = _t3Data(_t3State.code);
+  d.s[i].h = String(v || '');
+  _t3SyncSlot(i); _t3TouchSave(_t3State.code); t3RenderPreview();
+}
+function t3EditBody(i, j, v) {
+  const d = _t3Data(_t3State.code);
+  d.s[i].b[j] = String(v || '');
+  _t3SyncSlot(i); _t3TouchSave(_t3State.code); t3RenderPreview();
+}
+function t3EditManager(v) {
+  const d = _t3Data(_t3State.code);
+  d.m = String(v || '');
+  const note = document.getElementById('t3ManagerNote');
+  if (note) {
+    const lines = d.m.split('\n');
+    const over = lines.length > thirdSettings.manager.maxLines;
+    note.textContent = `${_t3Len(d.m.replace(/\n/g, ''))}文字 / ${lines.length}行`
+      + (over ? `　⚠ ${thirdSettings.manager.maxLines}行を超えた分は出ません` : '');
+    note.style.color = over ? 'var(--danger)' : '';
+  }
+  _t3TouchSave(_t3State.code); t3RenderPreview();
+}
+
+/* ── 位置とサイズの調整 ── */
+const T3_ADV_FIELDS = {
+  head:    [['x', 'X'], ['y', 'Y'], ['size', 'サイズ'], ['lineHeight', '行送り']],
+  body:    [['x', 'X'], ['y', 'Y'], ['size', 'サイズ'], ['lineHeight', '行送り']],
+  manager: [['x', 'X'], ['y', 'Y'], ['size', 'サイズ'], ['lineHeight', '行送り'], ['maxWidth', '折返し幅'], ['maxLines', '最大行']],
+};
+function _t3RenderAdv() {
+  const box = document.getElementById('t3AdvBody');
+  if (!box) return;
+  const s = thirdSettings;
+  const grp = (key, title) => {
+    let h = `<div class="edit-section-title" style="margin-top:12px">${_escape(title)}</div><div class="bn-grid4">`;
+    for (const [f, lbl] of T3_ADV_FIELDS[key]) {
+      h += `<label class="bn-f"><span>${_escape(lbl)}</span><input type="number" value="${s[key][f]}" oninput="t3EditGeom('${key}','${f}',this.value)"></label>`;
+    }
+    h += `</div><div class="bn-grid2"><label class="bn-f"><span>色</span><input type="color" value="${_escape(s[key].color)}" oninput="t3EditGeom('${key}','color',this.value)"></label>`
+      + `<label class="bn-f"><span>字間(マイナス可)</span><input type="number" step="0.5" value="${s[key].letterSpacing}" oninput="t3EditGeom('${key}','letterSpacing',this.value)"></label></div>`;
+    return h;
+  };
+  let html = `<div class="bn-note">1人目の位置を決めると、2人目・3人目は下の「ずらし幅」ぶん動きます。テンプレートを差し替えたときだけ触ってください。</div>`;
+  html += grp('head', '見出し（1人目）');
+  html += grp('body', '本文（1人目）');
+  html += `<div class="edit-section-title" style="margin-top:12px">2人目・3人目のずらし幅</div><div class="bn-grid4">`;
+  for (let i = 1; i < 3; i++) {
+    html += `<label class="bn-f"><span>${i + 1}人目 X</span><input type="number" value="${s.offsets[i].x}" oninput="t3EditOffset(${i},'x',this.value)"></label>`
+      + `<label class="bn-f"><span>${i + 1}人目 Y</span><input type="number" value="${s.offsets[i].y}" oninput="t3EditOffset(${i},'y',this.value)"></label>`;
+  }
+  html += `</div>`;
+  html += grp('manager', '店長からの一言');
+  html += `<div class="edit-section-title" style="margin-top:12px">はみ出しの判定に使う幅</div><div class="bn-grid2">`
+    + `<label class="bn-f"><span>見出し(マーカーの幅)</span><input type="number" value="${s.headW}" oninput="t3EditWidth('headW',this.value)"></label>`
+    + `<label class="bn-f"><span>本文(吹き出しの内側)</span><input type="number" value="${s.bodyW}" oninput="t3EditWidth('bodyW',this.value)"></label></div>`;
+  html += `<div class="edit-section-title" style="margin-top:12px">フォント</div><div class="bn-grid2">`
+    + `<label class="bn-f"><span>選ぶ</span><select onchange="t3EditFont(this.value)">${_bnFontOptions(s.fontFamily)}</select></label>`
+    + `<label class="bn-f"><span>名前を直接入力</span><input type="text" value="${_escape(s.fontFamily)}" oninput="t3EditFont(this.value)" placeholder="例: 小塚ゴシック Pr6N"></label></div>`
+    + `<div class="bn-font-status ${_bnFontAvailable(s.fontFamily, s.body.weight) ? 'ok' : 'ng'}" id="t3FontStatus">${
+        _bnFontAvailable(s.fontFamily, s.body.weight)
+          ? (s.fontFamily ? '✓ 「' + _escape(s.fontFamily) + '」を使用中' : '既定のフォント(Noto Sans JP)')
+          : '⚠ 「' + _escape(s.fontFamily) + '」はこのPCで見つかりません。別のフォントで描画されています'}</div>`;
+  html += `<button class="modal-btn" style="width:100%;margin-top:10px" onclick="t3ResetGeometry()" title="テンプレート画像と原稿はそのままで、位置だけ既定値に戻します">↩ 位置を既定値に戻す</button>`;
+  box.innerHTML = html;
+}
+function t3EditGeom(key, field, v) {
+  const s = thirdSettings;
+  if (field === 'color') s[key].color = v;
+  else if (field === 'letterSpacing') s[key].letterSpacing = Number(v) || 0;
+  else s[key][field] = Math.round(Number(v) || 0);
+  _t3RenderSlots();   // はみ出し判定が変わる
+  t3RenderPreview();
+}
+function t3EditOffset(i, axis, v) { thirdSettings.offsets[i][axis] = Math.round(Number(v) || 0); t3RenderPreview(); }
+function t3EditWidth(key, v) { thirdSettings[key] = Math.max(0, Math.round(Number(v) || 0)); _t3RenderSlots(); }
+function t3EditFont(v) {
+  thirdSettings.fontFamily = String(v || '');
+  _bnEnsureGoogleFont(thirdSettings.fontFamily);
+  const el = document.getElementById('t3FontStatus');
+  if (el) {
+    const ok = _bnFontAvailable(thirdSettings.fontFamily, thirdSettings.body.weight);
+    el.className = 'bn-font-status ' + (ok ? 'ok' : 'ng');
+    el.textContent = ok
+      ? (thirdSettings.fontFamily ? `✓ 「${thirdSettings.fontFamily}」を使用中` : '既定のフォント(Noto Sans JP)')
+      : `⚠ 「${thirdSettings.fontFamily}」はこのPCで見つかりません。別のフォントで描画されています`;
+  }
+  _t3RenderSlots();
+  t3RenderPreview();
+}
+function t3ResetGeometry() {
+  if (!confirm('位置・サイズ・色を既定値に戻します。\nテンプレート画像と入力した原稿はそのままです。\n\n実行しますか？')) return;
+  const keep = { template: thirdSettings.template, fontFamily: thirdSettings.fontFamily };
+  thirdSettings = Object.assign(_t3Normalize(null), keep);
+  _t3RenderAdv(); _t3RenderSlots(); t3RenderPreview();
+  _showToast('位置を既定値に戻しました（保存するには 💾 を押してください）', 'info');
+}
+
+/* ── テンプレート ── */
+async function t3PickTemplate(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  try {
+    const url = await _bnFileToDataUrl(file);
+    const img = await _bnLoadImage(url);
+    thirdSettings.template = url;
+    _bnClearImageCache();
+    _t3SyncTemplateNote();
+    t3RenderPreview();
+    _showToast(`✓ テンプレートを読み込みました (${img.naturalWidth}×${img.naturalHeight})`, 'success');
+  } catch (e) { alert('❌ ' + e.message); }
+}
+function _t3SyncTemplateNote() {
+  const el = document.getElementById('t3TemplateNote');
+  if (!el) return;
+  el.textContent = thirdSettings.template
+    ? 'テンプレート設定済み（約 ' + Math.round(thirdSettings.template.length * 0.75 / 1024) + ' KB）'
+    : '未設定 — テンプレート画像を選んでください';
+}
+
+/* ── 保存 ── */
+function _t3FileName(code, p) {
+  const num = _bnSafeNamePart((p && p.itemNumber) || code || 'banner', 60) || 'banner';
+  const name = _bnSafeNamePart(p && p.name, 40);
+  return `${name ? num + '_' + name : num}-mori-03.png`;
+}
+// 3枚目変更を「🛠 変更中」にする。すでにそうなら何もしない
+function _t3ApplyStats(code) {
+  const p = productCache[code];
+  if (!p) return null;
+  if (_thirdKey(p.thirdStatus) === 'changing') return null;
+  p.thirdStatus = 'changing';
+  _touchUpdatedAt(code);
+  scheduleGitHubSave();
+  renderProducts();
+  return '🛠 変更中にしました';
+}
+async function t3Download(withStats) {
+  if (!thirdSettings || !thirdSettings.template) { alert('⚠ テンプレート画像が設定されていません。'); return; }
+  const code = _t3State.code;
+  const p = productCache[code] || {};
+  try {
+    const canvas = await _t3Compose({ templateUrl: thirdSettings.template, texts: _t3Texts(code) });
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => (b ? res(b) : rej(new Error('画像を作成できませんでした'))), 'image/png'));
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = _t3FileName(code, p);
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (withStats) {
+      const msg = _t3ApplyStats(code);
+      _showToast(msg ? `✓ PNGを保存しました / ${msg}` : '✓ PNGを保存しました（3枚目変更は既に「変更中」でした）', 'success');
+    } else {
+      _showToast('✓ PNGを保存しました', 'success');
+    }
+  } catch (e) {
+    alert('❌ PNGを作成できませんでした\n\n' + e.message +
+      '\n\n別オリジンの画像を使うと canvas が汚染されて保存できません。' +
+      'テンプレートは、このモーダルから読み込んだファイルを使ってください。');
+  }
+}
+async function loadThirdSettingsFromGitHub() {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) return;
+  const shopId = _getCurrentShopId() || DEFAULT_SHOP_ID;
+  const apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/data/' + shopId + '/third_settings.json';
+  try {
+    const res = await fetch(apiUrl, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } });
+    if (res.status === 404) { console.log('[third] GitHub上に設定なし(初回)、既定を使用'); return; }
+    if (!res.ok) { console.warn('[third] GET失敗:', res.status); return; }
+    const json = await res.json();
+    const decoded = decodeURIComponent(escape(atob(String(json.content || '').replace(/\n/g, ''))));
+    thirdSettings = _t3Normalize(JSON.parse(decoded));
+    _bnClearImageCache();
+    _t3CacheLocal();
+    console.log('[third] GitHubから読み込み完了');
+  } catch (e) { console.warn('[third] 読み込みエラー:', e.message); }
+}
+async function t3SaveSettings() {
+  const pat = localStorage.getItem('github_pat');
+  if (!pat) { alert('⚠ GitHub PAT が未設定です。\n\n⚙ 各種設定 → 楽天データ入力 から設定してください。'); return; }
+  _t3CacheLocal();
+  const shopId = _getCurrentShopId() || DEFAULT_SHOP_ID;
+  const apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/data/' + shopId + '/third_settings.json';
+  const headers = { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+  _showToast('💾 設定を保存中...', 'info');
+  try {
+    let sha = null;
+    try { const g = await fetch(apiUrl, { headers }); if (g.ok) sha = (await g.json()).sha; } catch (e) {}
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(thirdSettings, null, 2))));
+    const body = { message: 'third settings update (' + shopId + ')', content };
+    if (sha) body.sha = sha;
+    const put = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!put.ok) { alert('❌ 保存に失敗しました\n\n' + put.status + ' ' + (await put.text())); return; }
+    _showToast('✓ テンプレートと位置を保存しました（全PC共有）', 'success');
+  } catch (e) { alert('❌ 保存に失敗しました\n\n' + e.message); }
+}
+
+/* ── 開く / 閉じる / タブ ── */
+function t3SetTab(k) {
+  _t3State.tab = k;
+  ['csv', 'prompt', 'build'].forEach(t => {
+    const tab = document.getElementById('t3Tab-' + t);
+    const pane = document.getElementById('t3Pane-' + t);
+    if (tab) tab.classList.toggle('active', t === k);
+    if (pane) pane.classList.toggle('active', t === k);
+  });
+  if (k === 'build') setTimeout(t3RenderPreview, 0);   // 表示されてから測る
+}
+async function openMake3(code) {
+  const p = productCache[code];
+  if (!p) return;
+  _t3InitSettings();
+  _t3State.code = code;
+  _t3State.zoom = 'fit';
+  const t = document.getElementById('t3Target');
+  if (t) { t.textContent = '⬇ ' + _t3FileName(code, p); t.title = `商品管理番号: ${code}\n商品名: ${p.name || '(未設定)'}\nこの名前で保存されます`; }
+  const info = document.getElementById('t3CsvInfo');
+  if (info) {
+    info.innerHTML = `商品管理番号 <b>${_escape(code)}</b>`
+      + `<span class="upd-sep">｜</span>商品番号 <b>${_escape(p.itemNumber || '—')}</b>`
+      + `<span class="upd-sep">｜</span>レビュー <b>${p.reviewCount || 0}</b> 件（★${(p.reviewAvg || 0).toFixed(2)}）`
+      + `<br><a href="${_escape(_reviewPageUrl(code))}" target="_blank" rel="noopener">この商品のレビューページを開く</a>`;
+  }
+  const mgr = document.getElementById('t3Manager');
+  if (mgr) mgr.value = _t3Data(code).m;
+  t3SetTab('csv');
+  _t3SyncTemplateNote();
+  _t3RenderSlots();
+  _t3RenderAdv();
+  t3EditManager(_t3Data(code).m);
+  document.getElementById('make3Modal').classList.add('open');
+  // テンプレート画像を含むので、初回に開いたときだけGitHubから取りに行く
+  if (!_t3LoadedFromGitHub) {
+    _t3LoadedFromGitHub = true;
+    await loadThirdSettingsFromGitHub();
+    _t3SyncTemplateNote();
+    _t3RenderAdv();
+    _t3RenderSlots();
+  }
+  t3RenderPreview();
+}
+function closeMake3Modal() { document.getElementById('make3Modal').classList.remove('open'); }
+
+function t3CopyPrompt(btn) {
+  const el = document.getElementById('t3PromptText');
+  if (!el) return;
+  _copyTextWithBtn(btn, el.value, '指示文をコピーしました。CSVを添付して貼り付けてください');
+}
+
+// プレビュー上のマウス位置をテンプレートの実ピクセルで出す
+document.addEventListener('mousemove', (e) => {
+  const canvas = document.getElementById('t3Preview');
+  const out = document.getElementById('t3Coord');
+  if (!canvas || !out || canvas.style.display === 'none') return;
+  const r = canvas.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+  out.textContent = `${Math.round((e.clientX - r.left) / r.width * canvas.width)} , ${Math.round((e.clientY - r.top) / r.height * canvas.height)}`;
+});
+window.addEventListener('resize', () => {
+  const modal = document.getElementById('make3Modal');
+  if (!modal || !modal.classList.contains('open')) return;
+  const c = document.getElementById('t3Preview');
+  if (c && c.style.display !== 'none') _t3ApplyZoom(c);
+});
+
 // ============================================
 // v6.13: 列幅カスタマイズ機能
 // - CSS変数(--col-{key}-w)経由で全列幅を動的制御
@@ -12058,6 +13044,7 @@ async function init() {
   // v6.13: 列幅をローカルデフォルトで即適用(GitHub取得は非同期で上書き)
   initColumnWidths();
   initRankingDefs();   // v7.87: 項目定義(localStorageキャッシュ)を先に適用
+  _t3InitSettings();   // v8.25: 3枚目作成の設定(テンプレートはモーダルを開いたときにGitHubから)
   if (localStorage.getItem('github_pat')) {
     _setSaveStatus('saving', '📥 GitHubから読込中...');
     await loadFromGitHub();
@@ -12095,7 +13082,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.24 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.25 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
