@@ -640,6 +640,12 @@ body.mode-ranking .product-table .col-denrei { display: table-cell; }
 .dnr-none       { color: var(--text3); background: transparent; border-color: var(--border2); border-style: dashed; }
 .dnr-unknown    { color: #c62828; background: #ffebee; border-color: rgba(198,40,40,0.35); }
 .dnr-sub { display: block; margin-top: 2px; font-size: 9px; color: var(--text3); }
+/* v8.27: 未登録の行に出す「伝令ちゃんに登録」ボタン */
+.dnr-reg-row { display: block; margin-top: 5px; }
+.dnr-reg-btn { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 4px 8px; font-family: inherit; font-size: 10px; font-weight: 700; line-height: 1.3; color: #0d47a1; background: #e7f1fb; border: 1px solid #90caf9; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: all 0.1s; }
+.dnr-reg-btn:hover:not(:disabled) { background: #0d47a1; color: #fff; border-color: #0d47a1; }
+.dnr-reg-btn:disabled { opacity: 0.6; cursor: default; }
+body.bulk-edit-mode .col-denrei .dnr-reg-btn { pointer-events: auto; }
 /* v8.07: 上部の取得状況バー(1枚目用モードのみ) */
 .denrei-row { display: none; }
 body.mode-ranking .denrei-row { display: flex; flex-basis: 100%; align-items: center; gap: 6px; flex-wrap: wrap; row-gap: 6px; }
@@ -1517,7 +1523,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.26</span>
+    <span class="build-date">v8.28</span>
   </div>
 
   <div class="header-right">
@@ -2901,6 +2907,14 @@ body.resize-mode .col-align-btns { display: flex; }
         <button type="button" class="pat-toggle-btn" id="patToggleBtn" onclick="togglePatVisibility()" title="表示/非表示を切り替え" aria-label="PAT表示切り替え">👁</button>
       </div>
       <div class="modal-hint">入力すると全PCでデータを共有できます。GitHubのSettings → Developer settings → Personal access tokens で発行（repo権限）。</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">伝令ちゃん登録キー（一撃登録用・任意）</label>
+      <div class="pat-input-wrap">
+        <input type="password" class="modal-input pat-input" id="denreiKeyInput" placeholder="伝令ちゃん側で発行したキー">
+        <button type="button" class="pat-toggle-btn" id="denreiKeyToggleBtn" onclick="toggleDenreiKeyVisibility()" title="表示/非表示を切り替え" aria-label="登録キー表示切り替え">👁</button>
+      </div>
+      <div class="modal-hint">入れると「🔔 伝令ちゃんに登録」ボタンが<strong>ボタン1回で登録</strong>するようになります。<br>空のままでも使えます（その場合は商品URLをコピーして伝令ちゃんを開きます）。</div>
     </div>
     <div id="modalStatus" class="modal-status"></div>
     <div class="modal-actions">
@@ -7250,6 +7264,176 @@ function _isDenreiVisible(p) {
  *   伝令ちゃん側が本当の持ち主なので、こちらで写しを持つと古い値が残るため。
  */
 const DENREI_API_URL = 'https://ranking-denrei-chan.kaiyoshida0318.workers.dev/api/products';
+/* ══ v8.27: 伝令ちゃんへの一撃登録 ════════════════════════════════════════
+ *   未登録の商品を、reviewcheck の画面からそのまま伝令ちゃんに入れる。
+ *
+ *   2通りの動きをする。どちらになるかは「登録キー」が入っているかだけで決まる。
+ *     キーあり … POST /api/products を直接叩く(本当の一撃)
+ *     キーなし … 楽天の商品URLをコピーして伝令ちゃんを新しいタブで開く(つなぎ)
+ *
+ *   伝令ちゃん側がまだ POST に対応していない間(404/405)も、自動でつなぎに落ちる。
+ *   つまりキーを入れるまでは何も壊れないし、入れた瞬間に一撃になる。
+ */
+const DENREI_KEY_LS  = 'denrei_api_key';
+const DENREI_TOP_URL = 'https://ranking-denrei-chan.kaiyoshida0318.workers.dev/';
+function _denreiKey() {
+  try { return (localStorage.getItem(DENREI_KEY_LS) || '').trim(); } catch (e) { return ''; }
+}
+// 楽天の商品ページURL。取得済みなら itemUrl をそのまま使う。
+function _denreiItemUrl(code) {
+  const p = productCache[code];
+  if (p && p.itemUrl) return p.itemUrl;
+  const sc = ((_getCurrentShop() || {}).shopCode || '').trim();
+  return sc ? `https://item.rakuten.co.jp/${sc}/${code}/` : '';
+}
+function _denreiCopy(text) {
+  return new Promise(resolve => {
+    const legacy = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:-1000px;left:-1000px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        resolve(!!ok);
+      } catch (e) { resolve(false); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => resolve(true), legacy);
+    } else { legacy(); }
+  });
+}
+/* つなぎ: URLをコピーして伝令ちゃんを開く。貼る先までトーストで案内する。 */
+async function _denreiHandoff(urls, why) {
+  const list = (urls || []).filter(Boolean);
+  if (!list.length) { _showToast('商品URLを作れませんでした（店舗コードを確認してください）', 'error'); return; }
+  const ok = await _denreiCopy(list.join('\n'));
+  try { window.open(DENREI_TOP_URL, '_blank', 'noopener'); } catch (e) {}
+  if (ok) {
+    _showToast(`${list.length}件のURLをコピーしました（${why}）。伝令ちゃんの「＋ 商品を追加」→「複数の商品をまとめて追加」に貼り付けて「まとめて登録」を押してください`, 'info');
+  } else {
+    _showToast('URLをコピーできませんでした。伝令ちゃんの画面で直接入力してください', 'error');
+  }
+}
+/* 本命: POST /api/products。例外の message で理由を見分ける。 */
+async function _denreiPost(code) {
+  const p = productCache[code] || {};
+  const body = {
+    product_code:  String(code),
+    product_name:  p.name || '',
+    product_url:   _denreiItemUrl(code),
+    internal_code: p.itemNumber || '',
+    shop_id:       _getCurrentShopId() || DEFAULT_SHOP_ID,
+  };
+  let res;
+  try {
+    res = await fetch(DENREI_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Api-Key': _denreiKey() },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    // CORS で止められた場合もここに来る(ブラウザは理由を教えてくれない)
+    throw new Error('NOROUTE');
+  }
+  let json = null;
+  try { json = await res.json(); } catch (e) {}
+  if (res.status === 401 || res.status === 403) throw new Error('AUTH');
+  if (res.status === 404 || res.status === 405) throw new Error('NOROUTE');
+  // v8.28: 400系は伝令ちゃんが中身を見たうえで断ったもの(知らないショップなど)。
+  //   つなぎに落とすと、手で貼った先で伝令ちゃんの画面で選ばれている店に入ってしまい、
+  //   断った意味がなくなる。だから止めて理由を出す。
+  if (res.status >= 400 && res.status < 500) throw new Error('REJECT:' + ((json && json.error) || ('HTTP ' + res.status)));
+  if (!res.ok) throw new Error((json && json.error) || ('HTTP ' + res.status));
+  return json || { ok: true };
+}
+/* 1件登録。ボタンから呼ぶ。 */
+async function registerToDenrei(code, btn) {
+  const url = _denreiItemUrl(code);
+  if (!url) { _showToast('店舗コードが未設定です。⚙ 設定で店舗コードを入れてください', 'error'); return; }
+  if (!_denreiKey()) { await _denreiHandoff([url], '登録キー未設定'); return; }
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 登録中…'; }
+  try {
+    const r = await _denreiPost(code);
+    _showToast(r && r.already ? `すでに登録されています（${code}）` : `伝令ちゃんに登録しました（${code}）`, 'success');
+    await fetchDenreiStatus();
+  } catch (e) {
+    const m = String((e && e.message) || e);
+    if (m === 'AUTH') {
+      _showToast('登録キーが違います。⚙ 設定の「伝令ちゃん登録キー」を確認してください', 'error');
+    } else if (m === 'NOROUTE') {
+      _showToast('伝令ちゃん側がまだ一撃登録に対応していません。URLをコピーして画面を開きます', 'info');
+      await _denreiHandoff([url], '伝令ちゃん側が未対応');
+    } else if (m.indexOf('REJECT:') === 0) {
+      _showToast(`伝令ちゃんに断られました（${m.slice(7)}）。ショップ: ${_getCurrentShopId()}`, 'error');
+    } else {
+      _showToast(`登録できませんでした（${m}）。URLをコピーして画面を開きます`, 'error');
+      await _denreiHandoff([url], m);
+    }
+  } finally {
+    // 成功時は再描画でこのボタン自体が消えているので、残っているときだけ戻す
+    if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = label || '🔔 伝令ちゃんに登録'; }
+  }
+}
+/* 画面にある未登録の商品(除外ぶんを除く)。 */
+function _denreiUnregisteredCodes() {
+  if (denreiLoadState !== 'ok') return [];
+  return Object.keys(productCache).filter(c => {
+    const p = productCache[c];
+    return p && p.status !== 'ignore' && _denreiStateOf(c) === 'none';
+  });
+}
+/* まとめて登録。キーが無ければ全URLを一度にコピーするだけなので、
+   伝令ちゃんの「複数の商品をまとめて追加」に1回貼れば終わる。 */
+async function registerAllToDenrei(btn) {
+  const codes = _denreiUnregisteredCodes();
+  if (!codes.length) { _showToast('未登録の商品はありません', 'info'); return; }
+  const urls = codes.map(c => _denreiItemUrl(c)).filter(Boolean);
+  if (!urls.length) { _showToast('店舗コードが未設定です。⚙ 設定で店舗コードを入れてください', 'error'); return; }
+  if (!_denreiKey()) { await _denreiHandoff(urls, '登録キー未設定'); return; }
+  if (!confirm(`未登録の ${codes.length}件を伝令ちゃんに登録します。よろしいですか？`)) return;
+  const label = btn ? btn.textContent : '';
+  if (btn) btn.disabled = true;
+  let added = 0, already = 0, stopped = '';
+  const failed = [];
+  for (let i = 0; i < codes.length; i++) {
+    if (btn) btn.textContent = `⏳ 登録中… ${i + 1}/${codes.length}`;
+    try {
+      const r = await _denreiPost(codes[i]);
+      if (r && r.already) already++; else added++;
+    } catch (e) {
+      const m = String((e && e.message) || e);
+      failed.push(codes[i]);
+      // キー違い/未対応は全件同じ結果になるので、そこで止める
+      if (m === 'AUTH' || m === 'NOROUTE') { stopped = m; break; }
+      // v8.28: 断られた理由はショップ違いなど全件共通のことが多いので、そこで止める
+      if (m.indexOf('REJECT:') === 0) { stopped = m; break; }
+    }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = label || '🔔 未登録をまとめて登録'; }
+  if (stopped === 'AUTH') {
+    _showToast('登録キーが違います。⚙ 設定の「伝令ちゃん登録キー」を確認してください', 'error');
+  } else if (stopped === 'NOROUTE') {
+    _showToast('伝令ちゃん側がまだ一撃登録に対応していません。URLをコピーして画面を開きます', 'info');
+    await _denreiHandoff(urls, '伝令ちゃん側が未対応');
+  } else if (stopped.indexOf('REJECT:') === 0) {
+    const done = (added || already) ? `（ここまで ${added}件登録 / ${already}件登録済み）` : '';
+    _showToast(`伝令ちゃんに断られたので止めました（${stopped.slice(7)}）。ショップ: ${_getCurrentShopId()}${done}`, 'error');
+  } else {
+    const parts = [];
+    if (added)   parts.push(`${added}件を登録`);
+    if (already) parts.push(`${already}件はすでに登録済み`);
+    if (failed.length) parts.push(`${failed.length}件は失敗`);
+    _showToast(parts.join(' / ') || '登録するものがありませんでした', failed.length ? 'error' : 'success');
+    if (failed.length) console.warn('[reviewcheck] 伝令ちゃん登録に失敗:', failed);
+  }
+  await fetchDenreiStatus();
+}
 // v8.09: 作業の進む順に並べる(獲得前 → 獲得済-登録可能 → 登録済)。
 //   order は上部のボタンの並びと、列見出しでの並べ替えの両方に効く。
 const DENREI_STATES = {
@@ -7316,7 +7500,14 @@ function _renderDenreiStatusCell(code) {
   } else if (key === 'unknown') {
     sub = `<span class="dnr-sub">${denreiLoadState === 'loading' ? '読込中' : '取得できていません'}</span>`;
   }
-  return `<span class="dnr-badge ${def.cls}" title="${_escape(def.label)}">${_escape(def.label)}</span>${sub}`;
+  // v8.27: 未登録ならその場で登録できるようにする
+  let reg = '';
+  if (key === 'none') {
+    reg = `<div class="dnr-reg-row"><button type="button" class="dnr-reg-btn"`
+      + ` onclick="registerToDenrei('${_escape(code)}', this)"`
+      + ` title="この商品を伝令ちゃんに登録します（登録キーが未設定のときは、商品URLをコピーして伝令ちゃんを開きます）">🔔 伝令ちゃんに登録</button></div>`;
+  }
+  return `<span class="dnr-badge ${def.cls}" title="${_escape(def.label)}">${_escape(def.label)}</span>${sub}${reg}`;
 }
 function _renderDenreiRow() {
   const box = document.getElementById('denreiRow');
@@ -7347,6 +7538,12 @@ function _renderDenreiRow() {
         + `${_escape(def.label)} <span class="tsf-count">(${counts[k]})</span></button>`;
     }
     html += `<span class="dnr-msg">${_escape(_tailCopiedLabel(denreiLoadedAt))} 時点</span>`;
+    // v8.27: 未登録がいるときだけ「まとめて登録」を出す
+    if (counts.none > 0) {
+      html += `<button type="button" class="tsf-btn" onclick="registerAllToDenrei(this)"`
+        + ` title="未登録の${counts.none}件を伝令ちゃんに登録します（登録キーが未設定のときは、全部のURLをまとめてコピーします）">`
+        + `🔔 未登録${counts.none}件をまとめて登録</button>`;
+    }
   } else if (denreiLoadState === 'loading') {
     html += `<span class="dnr-msg">読込中…</span>`;
   } else if (denreiLoadState === 'error') {
@@ -9742,6 +9939,11 @@ function loadSettings() {
   document.getElementById('accessKeyInput').value = shop?.accessKey || '';
   document.getElementById('shopCodeInput').value  = shop?.shopCode  || '';
   document.getElementById('githubPatInput').value = localStorage.getItem('github_pat') || '';
+  // v8.27: 伝令ちゃん登録キー
+  const dkIn = document.getElementById('denreiKeyInput');
+  if (dkIn) { dkIn.value = _denreiKey(); dkIn.type = 'password'; }
+  const dkBtn = document.getElementById('denreiKeyToggleBtn');
+  if (dkBtn) { dkBtn.classList.remove('active'); dkBtn.textContent = '👁'; }
   document.getElementById('modalStatus').className = 'modal-status';
   document.getElementById('modalStatus').textContent = '';
   // v6.11.1: モーダルを開くたびにPATは必ず非表示状態にリセット
@@ -9749,6 +9951,17 @@ function loadSettings() {
   const patBtn = document.getElementById('patToggleBtn');
   if (patInput) patInput.type = 'password';
   if (patBtn) { patBtn.classList.remove('active'); patBtn.textContent = '👁'; }
+}
+// v8.27: 伝令ちゃん登録キーの表示/非表示
+function toggleDenreiKeyVisibility() {
+  const input = document.getElementById('denreiKeyInput');
+  const btn   = document.getElementById('denreiKeyToggleBtn');
+  if (!input || !btn) return;
+  if (input.type === 'password') {
+    input.type = 'text'; btn.classList.add('active'); btn.textContent = '🙈'; btn.title = 'クリックで非表示にする';
+  } else {
+    input.type = 'password'; btn.classList.remove('active'); btn.textContent = '👁'; btn.title = 'クリックで表示する';
+  }
 }
 // v6.11.1: GitHub PAT の表示/非表示を切り替え(1クリックで全文表示)
 function togglePatVisibility() {
@@ -9789,6 +10002,13 @@ function saveSettings() {
   localStorage.setItem('rakuten_shop_code', shopCode);
   if (pat) localStorage.setItem('github_pat', pat);
   else localStorage.removeItem('github_pat');
+  // v8.27: 伝令ちゃん登録キー
+  const dkEl = document.getElementById('denreiKeyInput');
+  if (dkEl) {
+    const dk = dkEl.value.trim();
+    try { if (dk) localStorage.setItem(DENREI_KEY_LS, dk); else localStorage.removeItem(DENREI_KEY_LS); } catch (e) {}
+    _renderDenreiRow();
+  }
 
   updateApiStatus();
   document.getElementById('modalStatus').className = 'modal-status ok';
@@ -12881,7 +13101,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.26 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.28 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
