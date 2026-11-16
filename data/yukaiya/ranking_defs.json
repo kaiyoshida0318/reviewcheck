@@ -36,9 +36,9 @@
     {
       "key": "custom_1",
       "icon": "🏷",
-      "label": "変更完了（画像偏向済）",
-      "bg": "#e8f5e9",
-      "fg": "#2e7d32",
+      "label": "変更完了（画像変化後）",
+      "bg": "#e8eaf6",
+      "fg": "#3949ab",
       "custom": true
     },
     {
