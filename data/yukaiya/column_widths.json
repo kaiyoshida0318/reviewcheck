@@ -46,5 +46,10 @@
     "onscreen": "center",
     "diffResult": "center",
     "growth": "center"
+  },
+  "renewCrop": {
+    "x": 91,
+    "y": 100,
+    "zoom": 370
   }
 }
