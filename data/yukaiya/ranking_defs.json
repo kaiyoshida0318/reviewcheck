@@ -34,6 +34,14 @@
       "fg": "#2e7d32"
     },
     {
+      "key": "custom_1",
+      "icon": "🏷",
+      "label": "変更完了（画像偏向済）",
+      "bg": "#e8f5e9",
+      "fg": "#2e7d32",
+      "custom": true
+    },
+    {
       "key": "past",
       "icon": "📦",
       "label": "昔のまま放置",
@@ -134,6 +142,13 @@
       "fg": "#c62828",
       "fixed": true,
       "sep": true
+    },
+    {
+      "key": "changing",
+      "icon": "🛠",
+      "label": "変更中",
+      "bg": "#fff3e0",
+      "fg": "#e65100"
     },
     {
       "key": "changed",
