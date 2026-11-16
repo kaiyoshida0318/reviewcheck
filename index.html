@@ -677,6 +677,8 @@ body.mode-renew .crop-hdr-renew { display: inline; }
 body.mode-renew .crop-hint-renew { display: block; }
 body.mode-renew .crop-inner { background-size: var(--renew-crop-zoom, 370%) auto; background-position: var(--renew-crop-x, 100%) var(--renew-crop-y, 100%); }
 body.mode-renew .crop-box { cursor: grab; touch-action: none; }
+/* v8.32: リニュー用は拡大枠の高さを1枚目用の1.5倍にする(88 → 132)。幅は列幅のまま */
+body.mode-renew .crop-box { aspect-ratio: 268 / 132; }
 body.mode-renew .crop-box.is-dragging { cursor: grabbing; border-color: #6a1b9a; }
 .renew-crop-row { display: none; }
 body.mode-renew .renew-crop-row { display: flex; flex-basis: 100%; align-items: center; gap: 10px; flex-wrap: wrap; row-gap: 6px; }
@@ -1547,7 +1549,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.31</span>
+    <span class="build-date">v8.32</span>
   </div>
 
   <div class="header-right">
@@ -13267,7 +13269,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.31 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.32 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
