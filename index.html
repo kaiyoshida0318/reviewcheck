@@ -810,7 +810,7 @@ body.bulk-edit-mode .col-name .product-detail-btn { pointer-events: auto; }
 /* v6.20: ランキングセル内の縦並びレイアウト(タイプ + 詳細 + 登録) */
 .bulk-ranking-cell { display: flex; flex-direction: column; gap: 4px; }
 /* v7.87: 状態とランキングタイプを横並び(2列)にして、その分ランキング詳細を2行に広げる */
-.bulk-ranking-topline { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; min-width: 0; }
+.bulk-ranking-topline { display: grid; grid-template-columns: 1fr; gap: 4px; min-width: 0; }   /* v8.37: 状態とランクタイプを縦2段に(横並びだと名前が切れるため) */
 .bulk-ranking-topline > select { min-width: 0; font-size: 10px; padding: 3px 4px; }
 /* v6.22: rankingType selectのスタイル(上段) */
 .bulk-ranking-type-select { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 11px; border: 1px solid var(--border2); border-radius: 3px; background: #fff; font-family: inherit; cursor: pointer; }
@@ -1566,7 +1566,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.36</span>
+    <span class="build-date">v8.37</span>
   </div>
 
   <div class="header-right">
@@ -13366,7 +13366,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.36 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.37 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
