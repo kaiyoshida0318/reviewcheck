@@ -820,6 +820,8 @@ body.bulk-edit-mode .col-name .product-detail-btn { pointer-events: auto; }
 /* v6.58: 状態 ランキング登録可能(水色) / ランキング済レビュー前(ピンク) / レビュー登録可能(ティール) */
 /* v7.87: 伝令ちゃん追加済(インディゴ系、獲得前と登録可能の間) */
 .bulk-ranking-type-select.ranking-type-watch-added { background: #e8eaf6; color: #3949ab; border-color: rgba(57,73,171,0.4); font-weight: 600; }
+/* v8.34: 獲得済-変更分(ライトグリーン) */
+.bulk-ranking-type-select.ranking-type-acquired-changed { background: #f1f8e9; color: #558b2f; border-color: rgba(85,139,47,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-ready { background: #e1f5fe; color: #0277bd; border-color: rgba(2,119,189,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-rank-done { background: #fce4ec; color: #c2185b; border-color: rgba(194,24,91,0.4); font-weight: 600; }
 .bulk-ranking-type-select.ranking-type-review-ready { background: #e0f2f1; color: #00897b; border-color: rgba(0,137,123,0.4); font-weight: 600; }
@@ -839,6 +841,7 @@ body.bulk-edit-mode .col-name .product-detail-btn { pointer-events: auto; }
 .bulk-ranking-type-select option.opt-type-realtime { background: #fff0f0; color: #c62828; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-pending { background: #fff9c4; color: #827717; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-watch-added { background: #e8eaf6; color: #3949ab; font-weight: 600; }
+.bulk-ranking-type-select option.opt-type-acquired-changed { background: #f1f8e9; color: #558b2f; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-rank-ready { background: #e1f5fe; color: #0277bd; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-rank-done { background: #fce4ec; color: #c2185b; font-weight: 600; }
 .bulk-ranking-type-select option.opt-type-review-ready { background: #e0f2f1; color: #00897b; font-weight: 600; }
@@ -855,6 +858,7 @@ body.bulk-edit-mode .col-name .product-detail-btn { pointer-events: auto; }
 .ranking-type-badge.pending { background: #fff9c4; color: #827717; border: 1px solid rgba(130,119,23,0.3); }
 .ranking-type-badge.pending-partial { background: #dcedc8; color: #558b2f; border: 1px solid rgba(85,139,47,0.3); }
 .ranking-type-badge.watch-added { background: #e8eaf6; color: #3949ab; border: 1px solid rgba(57,73,171,0.3); }
+.ranking-type-badge.acquired-changed { background: #f1f8e9; color: #558b2f; border: 1px solid rgba(85,139,47,0.3); }
 .ranking-type-badge.rank-ready { background: #e1f5fe; color: #0277bd; border: 1px solid rgba(2,119,189,0.3); }
 .ranking-type-badge.rank-done { background: #fce4ec; color: #c2185b; border: 1px solid rgba(194,24,91,0.3); }
 .ranking-type-badge.review-ready { background: #e0f2f1; color: #00897b; border: 1px solid rgba(0,137,123,0.3); }
@@ -1556,7 +1560,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.33</span>
+    <span class="build-date">v8.34</span>
   </div>
 
   <div class="header-right">
@@ -8876,6 +8880,8 @@ const RANKING_DEFS_DEFAULT = {
   type: [
     { key:'pending',      icon:'🎯', label:'伝令ちゃん追加前',       selCls:'ranking-type-pending',      optCls:'opt-type-pending',      badgeCls:'pending', bg:'#fff9c4', fg:'#827717' },
     { key:'watch_added',  icon:'👁', label:'伝令ちゃん追加済',       selCls:'ranking-type-watch-added',  optCls:'opt-type-watch-added',  badgeCls:'watch-added', bg:'#e8eaf6', fg:'#3949ab' },
+    // v8.34: 獲得済-変更分。伝令ちゃん追加済の右。保存済みの並び(ranking_defs.json)にも、この位置(3番目)に差し込まれる
+    { key:'acquired_changed', icon:'🔄', label:'獲得済-変更分',       selCls:'ranking-type-acquired-changed', optCls:'opt-type-acquired-changed', badgeCls:'acquired-changed', bg:'#f1f8e9', fg:'#558b2f' },
     { key:'rank_ready',   icon:'🆗', label:'ランキング登録可能',     selCls:'ranking-type-rank-ready',   optCls:'opt-type-rank-ready',   badgeCls:'rank-ready', bg:'#e1f5fe', fg:'#0277bd' },
     { key:'rank_done',    icon:'⏳', label:'ランキング済レビュー前', selCls:'ranking-type-rank-done',    optCls:'opt-type-rank-done',    badgeCls:'rank-done', bg:'#fce4ec', fg:'#c2185b' },
     { key:'review_ready', icon:'📝', label:'レビュー登録可能', sep:true, selCls:'ranking-type-review-ready', optCls:'opt-type-review-ready', badgeCls:'review-ready', bg:'#e0f2f1', fg:'#00897b' },
@@ -10694,6 +10700,7 @@ function _normalizeRankingType(v) {
   if (/^(リアルタイム|realtime|real-time|real|rt|r)$/i.test(s)) return 'realtime';
   if (/^(獲得前|獲得待ち|獲得予定|狙う|狙い|pending|target|todo)$/i.test(s)) return 'pending';
   if (/^(伝令ちゃん追加済|伝令ちゃん追加|伝令ちゃん|伝令|監視リスト追加済|監視リスト追加|監視リスト|監視済|監視|watch|watched|watch_added|watchlist)$/i.test(s)) return 'watch_added';
+  if (/^(獲得済[-‐ー－ ]?変更分|獲得済変更分|acquired_changed)$/i.test(s)) return 'acquired_changed';   // v8.34
   if (/^(SKIP|スキップ|不必要|不要|なし|unnecessary|none|-|—)$/i.test(s)) return 'unnecessary';
   if (/^(昔のまま放置|過去のまま放置|昔のまま|過去のまま|昔|過去|放置|past|kept|legacy)$/i.test(s)) return 'past';
   if (/^(虚偽のまま放置|虚偽のまま|虚偽|嘘|false|false_kept|fake)$/i.test(s)) return 'false_kept';
@@ -13324,7 +13331,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.33 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.34 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
