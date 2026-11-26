@@ -193,6 +193,11 @@ body.mode-third .tag-filter-row { display: none; }
 /* v6.45: フィルタボタン内の件数表示 (32) */
 .ranking-filter-btn .rf-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); font-weight: 400; display: inline-block; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
 .ranking-filter-btn.active .rf-count { color: rgba(255,255,255,0.75); }
+/* v8.39: 1枚目変更の行を1行に収めるため、上部の状態ボタン(1枚目変更・ランクタイプ・伝令ちゃん)を詰める。
+   件数は3桁ぶんの固定幅(32px)をやめて中身ぴったりに。ボタンの左右の余白とボタン同士の間も少し狭く。 */
+.ranking-filter-btn { padding: 0 7px; gap: 2px; }
+.ranking-filter-btn .rf-count { min-width: 0; letter-spacing: -0.4px; }
+#rankingFilterGroup .tf-side, #rankingKindFilterGroup .tf-side, #denreiRow .tf-side { gap: 4px; }
 /* 内数(🔥)だけは赤で固定 */
 .tag-filter-btn.tf-hot3, .tag-filter-btn.tf-none200 { --c: #c62828; --cb: rgba(198,40,40,0.4); }
 /* v8.17/v8.19: 「手をつける商品が今いる」ボタンの見た目。
@@ -1569,7 +1574,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.38</span>
+    <span class="build-date">v8.39</span>
   </div>
 
   <div class="header-right">
@@ -13404,7 +13409,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.38 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.39 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
