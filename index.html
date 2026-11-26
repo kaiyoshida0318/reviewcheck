@@ -275,6 +275,12 @@ body.mode-third #bulkApplyThird { display: inline-block; }
 .lbl-first { display: inline; }
 body.mode-titleish .lbl-status { display: inline; }
 body.mode-titleish .lbl-first { display: none; }
+/* v8.36: 1枚目系(1枚目用・1枚目（リニュ）用)では、1枚目変更の「全体」を「進行分」にする。
+   進行分 = 伝令ちゃん追加前 / 伝令ちゃん追加済 / 獲得済-変更分 だけ(RF_PROGRESS_TYPES)。
+   内部の値は 'all' のまま(＝状態ボタンを何も押していない)で、絞り込み側が1枚目系のときだけ3つに絞る。 */
+.rf-prog-label, #rfCount-progress { display: none; }
+body.mode-rankish #rankingFilterGroup .rf-all-label, body.mode-rankish #rfCount-all { display: none; }
+body.mode-rankish #rankingFilterGroup .rf-prog-label, body.mode-rankish #rfCount-progress { display: inline; }
 /* v7.87: 基本は 状態 + 2枚目変更 + 3枚目変更 */
 body.mode-basic #bulkApplyTag,
 body.mode-basic #bulkApplyThird { display: inline-block; }
@@ -1560,7 +1566,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.35</span>
+    <span class="build-date">v8.36</span>
   </div>
 
   <div class="header-right">
@@ -3268,6 +3274,13 @@ let monthlySales = {}; // { '2026-03': { '10001280': { sales: 1882340, qty: 1102
 let currentSalesMonth = null; // 選択中の表示月 (例: '2026-03')
 // v6.19: ランキング入力状況フィルタ ('all' | 'filled' | 'empty') ※1枚目作成用モード時のみ有効
 let currentRankingFilter = 'all';
+// v8.36: 1枚目系モードの「進行分」(= 1枚目変更で何も押していないとき)に出す状態
+const RF_PROGRESS_TYPES = ['pending', 'watch_added', 'acquired_changed'];
+function _rfTypeOf(p) {
+  // 未設定・知らない値は「伝令ちゃん追加前」に寄せる(件数の数え方と同じ)
+  const t = (p && p.rankingType) || 'pending';
+  return _rdList('type').some(d => d.key === t) ? t : 'pending';
+}
 let currentRankingKindFilter = 'all'; // v6.57: ランキングタイプ(rankingKind)フィルタ
 // v6.29: 1枚目作成用モードでのExcelエクスポート選択(セッション限定、リロードでリセット)
 let _selectedCodes = new Set();
@@ -4377,6 +4390,9 @@ function renderProducts() {
     if (currentRankingFilter !== 'all') {
       const t = p.rankingType || 'pending';   // v7.87: 未設定は「獲得前」
       if (t !== currentRankingFilter) return false;
+    } else if (_isRankMode()) {
+      // v8.36: 1枚目系の「進行分」= 追加前 / 追加済 / 獲得済-変更分 だけ
+      if (RF_PROGRESS_TYPES.indexOf(_rfTypeOf(p)) < 0) return false;
     }
     // v7.87: ランキングタイプフィルタ(rankingKind)。未設定は「不要」に寄せて判定
     // v8.07: 伝令ちゃんの状態(1枚目用モードのみ)
@@ -8791,6 +8807,9 @@ function _updateRankingFilterCounts() {
     if (k[kd] !== undefined) k[kd]++; else k.not_needed++;
   }
   for (const key of Object.keys(c)) { const el = document.getElementById('rfCount-' + key); if (el) el.textContent = '(' + c[key] + ')'; }
+  // v8.36: 進行分の件数
+  const prog = RF_PROGRESS_TYPES.reduce((n, key) => n + (c[key] || 0), 0);
+  const pel = document.getElementById('rfCount-progress'); if (pel) pel.textContent = '(' + prog + ')';
   for (const key of Object.keys(k)) { const el = document.getElementById('rkCount-' + key); if (el) el.textContent = '(' + k[key] + ')'; }
 }
 
@@ -9139,8 +9158,13 @@ function _renderRankingFilterButtons() {
     el.querySelectorAll('.ranking-filter-btn, .tf-side, .tf-divider').forEach(b => b.remove());
     // v7.87: 「区切り」を付けた項目の手前で左右に分ける(縦線の位置を3行でそろえるため)
     // v7.87: 区切りの数だけ、かたまりを分ける(最大3かたまり)
+    // v8.36: 1枚目変更の先頭ボタンは、1枚目系では「進行分」、それ以外では「全体」(CSSで出し分け)
+    const allFace = (sp.group === 'type')
+      ? '<span class="rf-all-label">全体</span><span class="rf-prog-label" title="伝令ちゃん追加前・伝令ちゃん追加済・獲得済-変更分だけを表示">進行分</span>'
+        + ' <span class="rf-count" id="' + sp.prefix + 'Count-all"></span><span class="rf-count" id="' + sp.prefix + 'Count-progress"></span>'
+      : '全体 <span class="rf-count" id="' + sp.prefix + 'Count-all"></span>';
     const parts = ['<button class="ranking-filter-btn' + (sp.cur === 'all' ? ' active' : '') + '" data-filter="all"'
-      + ' onclick="' + sp.fn + '(\'all\')">全体 <span class="rf-count" id="' + sp.prefix + 'Count-all"></span></button>'];
+      + ' onclick="' + sp.fn + '(\'all\')">' + allFace + '</button>'];
     let seg = 0;
     for (const d of _rdList(sp.group)) {
       const fk = d.filterKey || d.key;
@@ -13342,7 +13366,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.35 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.36 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
