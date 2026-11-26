@@ -1560,7 +1560,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.34</span>
+    <span class="build-date">v8.35</span>
   </div>
 
   <div class="header-right">
@@ -8935,6 +8935,8 @@ const RANKING_DEFS_DEFAULT = {
  */
 const RD_LOCKED_KEYS = { type: ['pending'], kind: ['not_needed'], tag: ['none', 'changing', '__hot__', '__hot3__'], third: ['none', 'changing', '__hot__'] };
 const RANKING_DEFS_KEY = 'reviewcheck_ranking_defs';
+// v8.35: 保存済みの並びに差し込むとき、すぐ左の項目の区切り線を引き継ぐ項目(_rdApplyConfig)
+const RD_TAKE_SEP_ON_INSERT = { type: ['acquired_changed'] };
 let rankingDefs = _rdCloneDefaults();
 
 function _rdCloneDefaults() {
@@ -9042,7 +9044,16 @@ function _rdApplyConfig(cfg) {
     defaults.forEach((d, di) => {
       if (seen[d.key]) return;
       if (removed.indexOf(d.key) >= 0 && RD_LOCKED_KEYS[g].indexOf(d.key) < 0) return;
-      out.splice(Math.min(di, out.length), 0, Object.assign({}, d));
+      const at = Math.min(di, out.length);
+      const item = Object.assign({}, d);
+      // v8.35: 区切り線(sep=この項目のあとに線)を、すぐ左の項目から引き継ぐ項目。
+      //   ゆかい屋は「伝令ちゃん追加済」のあとに線があったので、獲得済-変更分が線の左側(=同じかたまり)に入るようにする。
+      //   一度「項目定義」で保存すれば保存済みの側に入るので、この引き継ぎはもう働かない。
+      if ((RD_TAKE_SEP_ON_INSERT[g] || []).indexOf(d.key) >= 0 && at > 0 && out[at - 1].sep) {
+        out[at - 1].sep = false;
+        item.sep = true;
+      }
+      out.splice(at, 0, item);
     });
     next[g] = out;
   }
@@ -13331,7 +13342,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.34 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.35 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
