@@ -1574,7 +1574,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.39</span>
+    <span class="build-date">v8.40</span>
   </div>
 
   <div class="header-right">
@@ -4423,10 +4423,18 @@ function renderProducts() {
       case 'name':       cmp = (pa.name || '').localeCompare(pb.name || '', 'ja'); break;
       case 'ranking':    cmp = (pa.ranking || '~~').localeCompare(pb.ranking || '~~', 'ja'); break;
       case 'denrei': {
-        // v8.07: 登録済 → 登録可能 → 獲得前 → 未登録 の順
+        // v8.07: DENREI_STATES の order の順(昇順で 獲得前 → 登録可能 → 登録済 → 未登録 → 未取得)
         const oa = (DENREI_STATES[_denreiStateOf(a)] || {}).order || 9;
         const ob = (DENREI_STATES[_denreiStateOf(b)] || {}).order || 9;
         cmp = oa - ob;
+        if (cmp === 0) {
+          // v8.40: 同じ状態の中は、リアルタイム順位で並べる(昇順=1位が上)。
+          //   順位なし(圏外・まだ順位なし・対象なし)は、昇順でも降順でもそのかたまりの一番下。
+          const ra = _denreiRtSortRank(a), rb = _denreiRtSortRank(b);
+          if (ra == null && rb == null) cmp = 0;
+          else if (ra == null || rb == null) { const c = ra == null ? 1 : -1; cmp = currentSortDir === 'desc' ? -c : c; }
+          else cmp = ra - rb;
+        }
         break;
       }
       case 'tailA': case 'tailB': case 'tailM': case 'tailC': {
@@ -7568,6 +7576,15 @@ function _denreiRealtimeOf(list) {
   else if (best != null) kind = 'best';
   else kind = 'none';
   return { kind, now, best, bestAt, lines };
+}
+/* v8.40: 並べ替えに使うリアルタイム順位。表示と同じく「今の順位」、取れなければ「最高順位」。順位なしは null */
+function _denreiRtSortRank(code) {
+  const d = denreiLoadState === 'ok' ? denreiMap[String(code)] : null;
+  const rt = d && d.rt;
+  if (!rt) return null;
+  if (rt.kind === 'now')  return rt.now;
+  if (rt.kind === 'best') return rt.best;
+  return null;   // 圏外・順位なし
 }
 function _renderDenreiRtLine(rt, achieved, targets) {
   const tail = `\n獲得 ${achieved}/${targets}`;
@@ -13409,7 +13426,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.39 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.40 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
