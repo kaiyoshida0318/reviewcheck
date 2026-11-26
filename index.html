@@ -551,6 +551,8 @@ body.mode-basic .product-table .col-third { display: table-cell; }
   font-size: 11px; padding: 6px 6px; white-space: nowrap; font-weight: 600;
 }
 .make1-btn:hover { background: #6a1b9a; color: #fff !important; border-color: #6a1b9a; }
+/* v8.33: 「製作可能か確認」は長いので、列が狭いときは「か」のあとで折り返す(<wbr>) */
+.col-make1 .make1-btn, .col-make1b .make1-btn { white-space: normal; word-break: keep-all; line-height: 1.35; }
 .make2-btn:hover { background: #00838f; color: #fff !important; border-color: #00838f; }
 /* v7.87: RMSの商品編集ページへのリンクボタン(確認列・詳細の上) */
 .rms-btn { display: block; width: 100%; box-sizing: border-box; margin-bottom: 5px; font-size: 11px; padding: 6px 8px; white-space: nowrap; text-align: center; text-decoration: none !important; font-weight: 600; }
@@ -640,6 +642,11 @@ body.mode-rankish .product-table .col-denrei { display: table-cell; }
 .dnr-none       { color: var(--text3); background: transparent; border-color: var(--border2); border-style: dashed; }
 .dnr-unknown    { color: #c62828; background: #ffebee; border-color: rgba(198,40,40,0.35); }
 .dnr-sub { display: block; margin-top: 2px; font-size: 9px; color: var(--text3); }
+/* v8.33: 伝令ちゃんのリアルタイム順位(状態バッジの下)。今の順位=濃い色、最高順位(今の順位が取れないとき)=薄い色 */
+.dnr-rt { display: block; margin-top: 3px; font-size: 11px; font-weight: 700; color: #b71c1c; line-height: 1.3; white-space: nowrap; }
+.dnr-rt.is-best { color: #8d6e63; font-weight: 600; font-size: 10px; }
+.dnr-rt.is-out  { color: var(--text3); font-weight: 600; }
+.dnr-rt.is-none { color: var(--text3); font-weight: 400; font-size: 9px; }
 /* v8.27: 未登録の行に出す「伝令ちゃんに登録」ボタン */
 .dnr-reg-row { display: block; margin-top: 5px; }
 .dnr-reg-btn { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 4px 8px; font-family: inherit; font-size: 10px; font-weight: 700; line-height: 1.3; color: #0d47a1; background: #e7f1fb; border: 1px solid #90caf9; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: all 0.1s; }
@@ -1549,7 +1556,7 @@ body.resize-mode .col-align-btns { display: flex; }
       </div>
     </div>
     <!-- v8.13: バージョンはショップ切替のすぐ右に置く(右側が混むため) -->
-    <span class="build-date">v8.32</span>
+    <span class="build-date">v8.33</span>
   </div>
 
   <div class="header-right">
@@ -1778,7 +1785,7 @@ body.resize-mode .col-align-btns { display: flex; }
                 </div>
               </th>
               <!-- v7.87: 1枚目作成ボタンの専用列(評価・件数の右)。飛び先は MAKE1_URL で設定する -->
-              <th class="col-make1">1枚目作成</th>
+              <th class="col-make1">製作可能か確認</th>
               <!-- v6.17: 2枚目作成用モード用の3列(静的に配置、モードで表示切替) -->
               <th class="col-diff-onscreen sortable" onclick="setSortKey('onscreen')" id="sortHeader-onscreen" title="実画面で確認した件数を入力(楽天ページ等)">画面上件数 <span class="sort-indicator" id="sortInd-onscreen"></span></th>
               <th class="col-diff-result sortable" onclick="setSortKey('diff')" id="sortHeader-diff" title="API取得値 - 画面上件数。クリックでソート">件数差異 <span class="sort-indicator" id="sortInd-diff"></span></th>
@@ -1793,7 +1800,7 @@ body.resize-mode .col-align-btns { display: flex; }
               <!-- v7.87: 基本モード用の1枚目作成列。画像3と2枚目作成の間に置く。
                    幅・文字揃えは col-make1 と同じCSS変数を共有するので、
                    「項目・幅調整」の1枚目作成を触れば両方に効く。 -->
-              <th class="col-make1b">1枚目作成</th>
+              <th class="col-make1b">製作可能か確認</th>
               <!-- v7.87: 2枚目作成ボタンの専用列(画像3と2枚目変更の間) -->
               <th class="col-make2">2枚目作成</th>
               <th class="col-tags">2枚目変更</th>
@@ -5688,14 +5695,14 @@ function _renderTableRow(code) {
       </div>
     </td>
     <td class="col-make1">
-      <button type="button" class="modal-btn make1-btn" onclick="openMake1('${_escape(code)}')" title="ランキング伝令ちゃんの1枚目作成ページを新規タブで開きます">🖼 1枚目作成</button>
+      <button type="button" class="modal-btn make1-btn" onclick="openMake1('${_escape(code)}')" title="ランキング伝令ちゃんでこの商品を開き、1枚目を製作できるか確認します(新規タブ)">🔍 製作可能か<wbr>確認</button>
     </td>
     ${diffCells}
     ${imageCells}
     ${cropCell}
     <td class="col-first">${_renderFirstStatusCell(code, p)}</td>
     <td class="col-make1b">
-      <button type="button" class="modal-btn make1-btn" onclick="openMake1('${_escape(code)}')" title="ランキング伝令ちゃんの1枚目作成ページを新規タブで開きます">🖼 1枚目作成</button>
+      <button type="button" class="modal-btn make1-btn" onclick="openMake1('${_escape(code)}')" title="ランキング伝令ちゃんでこの商品を開き、1枚目を製作できるか確認します(新規タブ)">🔍 製作可能か<wbr>確認</button>
     </td>
     <td class="col-make2">
       <button type="button" class="modal-btn make2-btn" onclick="openMake2('${_escape(code)}')" title="2枚目画像の作成画面を開きます。開くだけでは何も変わりません(作成画面の「PNGを保存 / スタッツ変更」を押すと「🛠 変更中」になります)">🖼 2枚目作成</button>
@@ -6445,7 +6452,7 @@ function _make1Url(code) {
 }
 function openMake1(code) {
   const url = _make1Url(code);
-  if (!url) { _showToast('🖼 1枚目作成の飛び先が未設定です(MAKE1_URL を確認してください)', 'info'); return; }
+  if (!url) { _showToast('🔍 製作可能か確認の飛び先が未設定です(MAKE1_URL を確認してください)', 'info'); return; }
   window.open(url, '_blank', 'noopener');
 }
 // 用途「1枚目作成」のプリセットでバナー画面を開く従来の動き(必要になったら呼べるよう残す)
@@ -7480,7 +7487,7 @@ const DENREI_STATES = {
   none:       { label: '伝令ちゃん未登録',        cls: 'dnr-none',       order: 4 },
   unknown:    { label: '未取得',                  cls: 'dnr-unknown',    order: 5 },
 };
-let denreiMap = {};          // 商品管理番号 → { state, targets, achieved }
+let denreiMap = {};          // 商品管理番号 → { state, targets, achieved, rt }
 let denreiLoadState = 'idle';   // 'idle' | 'loading' | 'ok' | 'error'
 let denreiLoadedAt = '';
 let denreiError = '';
@@ -7492,9 +7499,56 @@ function _denreiStateOf(code) {
 function _denreiStateFromItem(it) {
   const list = Array.isArray(it && it.ranking_status) ? it.ranking_status : [];
   const achieved = list.filter(x => x && x.status === 'achieved').length;
-  if (it && (it.ranking_registered === true || it.ranking_registered === 1)) return { state: 'registered', achieved, targets: list.length };
-  if (achieved > 0) return { state: 'ready', achieved, targets: list.length };
-  return { state: 'before', achieved, targets: list.length };
+  const rt = _denreiRealtimeOf(list);   // v8.33
+  if (it && (it.ranking_registered === true || it.ranking_registered === 1)) return { state: 'registered', achieved, targets: list.length, rt };
+  if (achieved > 0) return { state: 'ready', achieved, targets: list.length, rt };
+  return { state: 'before', achieved, targets: list.length, rt };
+}
+/* v8.33: リアルタイムの順位。
+ *   伝令ちゃんの ranking_status のうち period === 'realtime' の対象(停止中は除く)を見る。
+ *   ・今の順位: latest_rank(直近のチェックでの順位。圏外なら null)。
+ *       2026-11-26 時点の伝令ちゃん(v0.32.5)はまだ返していない → 項目が無ければ「今の順位は不明」扱い。
+ *       項目名が違っても拾えるよう current_rank / last_rank も見る。
+ *   ・最高順位: best_rank(これまでで一番よかった順位)。今の順位が取れないときの代わりに「最高」と書き分けて出す。
+ *   リアルタイムの対象が複数あるとき(カテゴリ違い)は、いちばん上の順位を出し、全部は title に並べる。
+ */
+const _RT_NOW_KEYS = ['latest_rank', 'current_rank', 'last_rank'];
+function _rankNum(v) { const n = Number(v); return (v !== null && v !== '' && isFinite(n) && n > 0) ? Math.round(n) : null; }
+function _denreiRealtimeOf(list) {
+  const rts = list.filter(x => x && x.period === 'realtime' && x.target_enabled !== 0 && x.target_enabled !== false);
+  if (!rts.length) return null;
+  let hasNowField = false, now = null, nowOut = false, best = null, bestAt = '';
+  const lines = [];
+  for (const x of rts) {
+    const key = _RT_NOW_KEYS.find(k => Object.prototype.hasOwnProperty.call(x, k));
+    let nowTxt = '';
+    if (key) {
+      hasNowField = true;
+      const n = _rankNum(x[key]);
+      if (n != null) { if (now == null || n < now) now = n; nowTxt = `今 ${n}位`; }
+      else if (x.latest_check_status === 'success') { nowOut = true; nowTxt = '今 圏外'; }
+      else nowTxt = '今 不明';
+    }
+    const b = _rankNum(x.best_rank);
+    if (b != null && (best == null || b < best)) { best = b; bestAt = x.best_rank_at_jst || ''; }
+    const cat = String(x.category_label || '').split('>').map(t => t.trim()).filter(Boolean).pop() || '(カテゴリ不明)';
+    lines.push(`${cat}: ${[nowTxt, b != null ? `最高 ${b}位` : '最高 なし'].filter(Boolean).join(' / ')}`);
+  }
+  let kind;
+  if (now != null) kind = 'now';
+  else if (hasNowField && nowOut) kind = 'out';
+  else if (best != null) kind = 'best';
+  else kind = 'none';
+  return { kind, now, best, bestAt, lines };
+}
+function _renderDenreiRtLine(rt, achieved, targets) {
+  const tail = `\n獲得 ${achieved}/${targets}`;
+  if (!rt) return `<span class="dnr-rt is-none" title="${_escape('リアルタイムの監視対象がありません' + tail)}">リアルタイム 対象なし</span>`;
+  const tip = _escape(rt.lines.join('\n') + (rt.bestAt ? `\n最高順位の日時: ${rt.bestAt.slice(0, 16).replace('T', ' ')}` : '') + tail);
+  if (rt.kind === 'now')  return `<span class="dnr-rt" title="${tip}">リアルタイム ${rt.now}位</span>`;
+  if (rt.kind === 'out')  return `<span class="dnr-rt is-out" title="${tip}">リアルタイム 圏外</span>`;
+  if (rt.kind === 'best') return `<span class="dnr-rt is-best" title="${_escape('伝令ちゃんがまだ今の順位を返していないので、これまでの最高順位を出しています\n') + tip}">リアルタイム 最高${rt.best}位</span>`;
+  return `<span class="dnr-rt is-none" title="${tip}">リアルタイム 順位なし</span>`;
 }
 async function fetchDenreiStatus(manual) {
   if (denreiLoadState === 'loading') return;
@@ -7533,7 +7587,8 @@ function _renderDenreiStatusCell(code) {
   const d = denreiMap[String(code)];
   let sub = '';
   if (key === 'registered' || key === 'ready' || key === 'before') {
-    sub = `<span class="dnr-sub">獲得 ${d.achieved}/${d.targets}</span>`;
+    // v8.33: 「獲得 x/y」の場所に伝令ちゃんのリアルタイム順位を出す(獲得数はマウスを乗せると出る)
+    sub = _renderDenreiRtLine(d.rt, d.achieved, d.targets);
   } else if (key === 'unknown') {
     sub = `<span class="dnr-sub">${denreiLoadState === 'loading' ? '読込中' : '取得できていません'}</span>`;
   }
@@ -12268,7 +12323,7 @@ const COLUMN_DEFS = [
   { id: 'yearMonth',   label: '年月日',       defaultW:  95, min: 60,  align: 'center' },
   { id: 'sales',       label: '売上',         defaultW: 120, min: 60,  align: 'left' },
   { id: 'review',      label: 'レビュー',     defaultW: 120, min: 80,  align: 'left' },
-  { id: 'make1',       label: '1枚目作成',    defaultW: 112, min: 80,  align: 'center' },
+  { id: 'make1',       label: '製作可能か確認', defaultW: 112, min: 80,  align: 'center' },
   { id: 'image',       label: '画像(各)',     defaultW: 100, min: 60,  align: 'center' },
   { id: 'selimg',      label: '選択した画像',       defaultW: 104, min: 60,  align: 'center' },
   { id: 'crop',        label: '選択画像の右下(拡大)', defaultW: 292, min: 120, align: 'center' },
@@ -13269,7 +13324,7 @@ async function init() {
     _shopUrlWarn = '';
     setTimeout(function () { _showToast(_w, 'error'); }, 300);
   }
-  console.log('[reviewcheck] v8.32 initialized / shop=' + _getCurrentShopId());
+  console.log('[reviewcheck] v8.33 initialized / shop=' + _getCurrentShopId());
 }
 
 // v7.87: rankingDateTime(ランキング欄の「日時」)を廃止。
